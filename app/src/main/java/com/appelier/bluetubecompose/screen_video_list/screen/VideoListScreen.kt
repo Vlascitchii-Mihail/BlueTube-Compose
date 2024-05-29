@@ -20,9 +20,9 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.appelier.bluetubecompose.R
-import com.appelier.bluetubecompose.ui.theme.BlueTubeComposeTheme
-import com.appelier.bluetubecompose.ui.views.BodyText
-import com.appelier.bluetubecompose.ui.views.TubeButton
+import com.appelier.bluetubecompose.core.core_ui.theme.BlueTubeComposeTheme
+import com.appelier.bluetubecompose.core.core_ui.views.BodyText
+import com.appelier.bluetubecompose.core.core_ui.views.TubeButton
 import com.appelier.bluetubecompose.utils.Tags
 
 @Composable

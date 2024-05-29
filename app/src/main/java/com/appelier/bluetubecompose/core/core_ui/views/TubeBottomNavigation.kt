@@ -1,4 +1,4 @@
-package com.appelier.bluetubecompose.ui.views
+package com.appelier.bluetubecompose.core.core_ui.views
 
 import androidx.compose.foundation.background
 import androidx.compose.material.BottomNavigation
@@ -22,7 +22,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.appelier.bluetubecompose.R
 import com.appelier.bluetubecompose.navigation.Screen
-import com.appelier.bluetubecompose.ui.theme.BlueTubeComposeTheme
+import com.appelier.bluetubecompose.core.core_ui.theme.BlueTubeComposeTheme
 import com.appelier.bluetubecompose.utils.Tags
 
 private const val FIRST_ICON_INDEX = 0

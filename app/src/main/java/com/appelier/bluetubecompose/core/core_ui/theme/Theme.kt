@@ -1,4 +1,4 @@
-package com.appelier.bluetubecompose.ui.theme
+package com.appelier.bluetubecompose.core.core_ui.theme
 
 import android.app.Activity
 import android.os.Build
