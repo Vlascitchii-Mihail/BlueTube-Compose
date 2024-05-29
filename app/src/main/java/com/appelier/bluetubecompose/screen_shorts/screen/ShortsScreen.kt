@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import com.appelier.bluetubecompose.R
-import com.appelier.bluetubecompose.ui.views.BodyText
+import com.appelier.bluetubecompose.core.core_ui.views.BodyText
 import com.appelier.bluetubecompose.utils.Tags
 
 @Composable

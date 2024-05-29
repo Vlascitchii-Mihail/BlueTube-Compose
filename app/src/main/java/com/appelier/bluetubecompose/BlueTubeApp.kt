@@ -9,8 +9,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import com.appelier.bluetubecompose.navigation.BlueTubeNavigation
-import com.appelier.bluetubecompose.ui.theme.BlueTubeComposeTheme
-import com.appelier.bluetubecompose.ui.views.TubeBottomNavigation
+import com.appelier.bluetubecompose.core.core_ui.theme.BlueTubeComposeTheme
+import com.appelier.bluetubecompose.core.core_ui.views.TubeBottomNavigation
 
 @Composable
 fun BlueTubeApp(navController: NavHostController) {
