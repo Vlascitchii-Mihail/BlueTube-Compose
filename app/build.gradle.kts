@@ -1,7 +1,12 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin)
     alias(libs.plugins.kotlinx.serialization)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt.plugin)
+    alias(libs.plugins.parcelize)
 }
 
 android {
@@ -19,6 +24,10 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        val properties: Properties = Properties()
+        properties.load(project.rootProject.file("local.properties").inputStream())
+        buildConfigField("String", "API_KEY", properties.getProperty("API_KEY"))
     }
 
     buildTypes {
@@ -39,9 +48,10 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.14"
     }
     packaging {
         resources {
@@ -64,10 +74,44 @@ dependencies {
     implementation(libs.material3)
     implementation(libs.androidx.material)
 
+    //ViewModel
+    implementation(libs.lifecycle.viewmodel.ktx)
+
+    //LiveData
+    implementation(libs.livedata)
+
+    //coroutines
+    implementation(libs.coroutines.core)
+    implementation(libs.coroutines.android)
+    implementation(libs.lifecycle.runtime)
+
+    //dagger hilt
+    implementation(libs.hilt.android)
+    ksp(libs.ksp.hilt.compiler)
+    implementation(libs.hilt.livecycle.viewmodel)
+    implementation(libs.hilt.navigation)
 
     //navigation
     implementation(libs.navigation)
     implementation(libs.kotlinx.serialization.json)
+
+    //retrofit
+    implementation(libs.retrofit)
+    implementation(libs.okhttp3)
+    implementation(libs.okhttp.urlconnection)
+    implementation(libs.moshi)
+    implementation(libs.moshi.converter)
+    ksp(libs.moshi.compiler)
+    implementation(libs.interceptor)
+
+    //Paging
+    implementation(libs.paging)
+
+    //Glide
+    implementation(libs.glide)
+
+    //Youtube player
+    implementation(libs.youtube.player)
 
     //test
     testImplementation(libs.junit)
