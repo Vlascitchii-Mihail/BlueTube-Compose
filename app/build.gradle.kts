@@ -20,7 +20,7 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.appelier.bluetubecompose.BlueTubeTestRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -73,22 +73,23 @@ dependencies {
     implementation(libs.ui.tooling.preview)
     implementation(libs.material3)
     implementation(libs.androidx.material)
+    implementation(libs.constraint.layout)
 
     //ViewModel
     implementation(libs.lifecycle.viewmodel.ktx)
+    implementation(libs.viewmodel.compose)
 
     //LiveData
     implementation(libs.livedata)
+    implementation(libs.livedata.runtime)
 
     //coroutines
     implementation(libs.coroutines.core)
     implementation(libs.coroutines.android)
-    implementation(libs.lifecycle.runtime)
 
     //dagger hilt
     implementation(libs.hilt.android)
     ksp(libs.ksp.hilt.compiler)
-    implementation(libs.hilt.livecycle.viewmodel)
     implementation(libs.hilt.navigation)
 
     //navigation
@@ -106,6 +107,7 @@ dependencies {
 
     //Paging
     implementation(libs.paging)
+    implementation(libs.paging.compose)
 
     //Glide
     implementation(libs.glide)
@@ -115,10 +117,20 @@ dependencies {
 
     //test
     testImplementation(libs.junit)
+    testImplementation(libs.mockito)
+    testImplementation(libs.mockito.inline)
+    testImplementation(libs.mockwebserver)
+    androidTestImplementation(libs.mockwebserver)
+    testImplementation(libs.test.coroutines)
+    androidTestImplementation(libs.test.arch.core)
+    androidTestImplementation(libs.mockito.android)
+    androidTestImplementation(libs.mockito.kotlin.android)
     androidTestImplementation(libs.androidx.test.ext)
     androidTestImplementation(libs.androidx.test.espresso)
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.08.00"))
     androidTestImplementation(libs.androidx.compose.ui.test)
+    androidTestImplementation(libs.android.hilt.test)
+    kspAndroidTest(libs.ksp.android.test)
     debugImplementation(libs.compose.ui.tooling)
     debugImplementation(libs.compose.test.manifest)
 }

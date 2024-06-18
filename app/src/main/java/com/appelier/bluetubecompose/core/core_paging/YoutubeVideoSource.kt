@@ -42,7 +42,7 @@ class YoutubeVideoSource(
         }
     }
 
-    private suspend fun getLoadData(nextPageToken: String, videoType: VideoType): YoutubeVideoResponse {
+    suspend fun getLoadData(nextPageToken: String, videoType: VideoType): YoutubeVideoResponse {
         return when(videoType) {
             is VideoType.Videos -> fetchVideos(nextPageToken)
             is VideoType.SearchedVideo -> fetchSearchedVideos(videoType.query, nextPageToken)
@@ -106,7 +106,7 @@ class YoutubeVideoSource(
         return videoList.awaitAll()
     }
 
-    private suspend fun  List<YoutubeVideo>?.addChannelImgUrl() {
+    suspend fun  List<YoutubeVideo>?.addChannelImgUrl() {
         this?.let {
             it.addUrl(getChannelImgUrl(it))
         }
@@ -129,9 +129,10 @@ class YoutubeVideoSource(
         val channelUrlList: MutableList<Deferred<String>> = mutableListOf()
         coroutineScope {
             videos.map { video: YoutubeVideo ->
-                val channelResponse = apiService.fetchChannels(video.snippet.channelId).body()!!
-                val channelImgUrl =
-                    async { channelResponse.items.first().snippet.thumbnails.medium.url }
+                val channelImgUrl = async {
+                    val channelResponse = apiService.fetchChannels(video.snippet.channelId).body()!!
+                    channelResponse.items.first().snippet.thumbnails.medium.url
+                }
                 channelUrlList.add(channelImgUrl)
             }
         }

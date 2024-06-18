@@ -3,14 +3,18 @@ package com.appelier.bluetubecompose.core.core_ui.views
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.appelier.bluetubecompose.core.core_ui.theme.BlueTubeComposeTheme
 
 @Composable
-fun BodyText(text: String, color: Color = Color.White) {
+fun TextBodyLargeCentered(text: String, modifier: Modifier, color: Color = MaterialTheme.colorScheme.onBackground) {
     Text(
         text = text,
+        textAlign = TextAlign.Center,
+        modifier = modifier,
         color = color,
         style = MaterialTheme.typography.bodyLarge
     )
@@ -20,6 +24,6 @@ fun BodyText(text: String, color: Color = Color.White) {
 @Composable
 private fun BodyTextPreview() {
     BlueTubeComposeTheme {
-        BodyText(text = "Hello world", color = MaterialTheme.colorScheme.onPrimary)
+        TextBodyLargeCentered(text = "Hello world", Modifier, color = MaterialTheme.colorScheme.onPrimary)
     }
 }

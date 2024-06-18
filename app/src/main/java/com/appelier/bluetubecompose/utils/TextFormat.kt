@@ -2,6 +2,8 @@ package com.appelier.bluetubecompose.utils
 
 //import androidx.appcompat.widget.SearchView
 //import com.usm.bluetube.R
+import java.io.File
+import java.io.InputStreamReader
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -15,12 +17,11 @@ const val SECONDS_PER_MINUTE = 60
 const val SECONDS_PER_HOUR = 3600
 const val HOURS_PER_DAY = 24
 const val DAYS_PER_MONTH = 31
-const val DAYS_PER_YEAR = 365
-const val MONTHS_PER_YEAR = 12
+const val DAYS_PER_YEAR = 36
 
-const val VIDEO_LENGTH_SECONDS = 2
+const val MINUTES_PER_HOUR = 60
 
-fun formatCount(views: Long): String {
+fun formatViews(views: Long): String {
     return when(true) {
         (views < THOUSAND) -> views.toString()
         (views < MILLION) -> "${(views / THOUSAND).toInt()}K"
@@ -53,12 +54,28 @@ fun formatDate(date: String?): String {
     }
 }
 
-fun formatVideoDuration(duration: String?): String {
-    return duration?.replace("PT", "")?.replace("S", "")?.let { string ->
-        if (string.length == VIDEO_LENGTH_SECONDS) "0:$string"
-        else string
-    }?.replace("[A-Z]".toRegex(), ":")
-        ?: "null"
+//PT2M2S
+fun formatVideoDuration(duration: String): String {
+    val videoDuration = Duration.parse(duration)
+
+    val seconds = (videoDuration.seconds % SECONDS_PER_MINUTE).toString()
+    val strSeconds = if (seconds.length == 1) "0$seconds" else seconds
+
+    val minutes = (videoDuration.toMinutes() % MINUTES_PER_HOUR)
+    val strMinutes = when(true) {
+        (minutes in 1 .. 9) -> "0$minutes"
+        (minutes > 9) -> minutes.toString()
+        else -> "00"
+    }
+
+    val hours = videoDuration.toHours()
+    val strHours = when(true) {
+        (hours in 1..9) -> "0$hours"
+        (hours > 9) -> hours.toString()
+        else -> ""
+    }
+
+    return if (strHours == "") "$strMinutes:$strSeconds" else "$strHours:$strMinutes:$strSeconds"
 }
 
 //fun SearchView.setupTextAppearance(context: Context, fontId: Int) {
@@ -70,3 +87,12 @@ fun formatVideoDuration(duration: String?): String {
 //fun SearchView.setupBackground(context: Context, drawableId: Int) {
 //    this.background = ContextCompat.getDrawable(context, drawableId)
 //}
+
+fun readJsonFileFromUnitTest(filePath: String): String {
+    val jsonFile = File(filePath)
+    return jsonFile.readText()
+}
+
+fun readJsonFileFromAndroidTest(classLoader: ClassLoader?, path: String): String {
+    return InputStreamReader(classLoader?.getResourceAsStream(path)).use { it.readText() }
+}

@@ -22,8 +22,9 @@ private val DarkColorScheme = darkColorScheme(
     //screen background
     background = Black,
     onBackground = White,
-    secondary = Red,
-    tertiary = Red,
+    secondary = Black_60,
+    onSecondary = UltramarineBlue,
+    tertiary = White,
 
 )
 
@@ -36,9 +37,9 @@ private val LightColorScheme = lightColorScheme(
     //screen background
     background = White,
     onBackground = Black,
-    secondary = Red,
-    onSecondary = Red,
-    tertiary = Red,
+    secondary = Black_60,
+    onSecondary = PastelBlue,
+    tertiary = White,
     onTertiary = Red,
     surface = Red,
     onSurface = Red,

@@ -1,0 +1,55 @@
+{
+  "kind": "youtube#channelListResponse",
+  "etag": "WU778vADeWNxZS006aDWpm94zTU",
+  "pageInfo": {
+    "totalResults": 1,
+    "resultsPerPage": 1
+  },
+  "items": [
+    {
+      "kind": "youtube#channel",
+      "etag": "1nbO0K3SJb8NlSM_LVw7XHhyWU8",
+      "id": "UCLDAM_6WwevNIPHz7IalMLw",
+      "snippet": {
+        "title": "Noriel",
+        "description": "Danger",
+        "customUrl": "@norielofficial",
+        "publishedAt": "2011-12-20T21:43:22Z",
+        "thumbnails": {
+          "default": {
+            "url": "https://yt3.ggpht.com/MamDoeUwqyGIowFfBJ4teXOuHSuwpUdSwv_EcanSB99-VIKxExaoEpm80qwEo5uiaGJCYXuGiw=s88-c-k-c0x00ffffff-no-nd-rj",
+            "width": 88,
+            "height": 88
+          },
+          "medium": {
+            "url": "https://yt3.ggpht.com/MamDoeUwqyGIowFfBJ4teXOuHSuwpUdSwv_EcanSB99-VIKxExaoEpm80qwEo5uiaGJCYXuGiw=s240-c-k-c0x00ffffff-no-nd-rj",
+            "width": 240,
+            "height": 240
+          },
+          "high": {
+            "url": "https://yt3.ggpht.com/MamDoeUwqyGIowFfBJ4teXOuHSuwpUdSwv_EcanSB99-VIKxExaoEpm80qwEo5uiaGJCYXuGiw=s800-c-k-c0x00ffffff-no-nd-rj",
+            "width": 800,
+            "height": 800
+          }
+        },
+        "localized": {
+          "title": "Noriel",
+          "description": "Danger"
+        },
+        "country": "US"
+      },
+      "contentDetails": {
+        "relatedPlaylists": {
+          "likes": "",
+          "uploads": "UULDAM_6WwevNIPHz7IalMLw"
+        }
+      },
+      "statistics": {
+        "viewCount": "2093128375",
+        "subscriberCount": "5380000",
+        "hiddenSubscriberCount": false,
+        "videoCount": "121"
+      }
+    }
+  ]
+}
