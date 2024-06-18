@@ -10,18 +10,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import com.appelier.bluetubecompose.R
-import com.appelier.bluetubecompose.core.core_ui.views.BodyText
+import com.appelier.bluetubecompose.core.core_ui.views.TextBodyLargeCentered
 
 @Composable
 fun PlayerScreen(navController: NavController, videoId: String = "") {
     Scaffold(
         content = { paddingValue ->
             Column(modifier = Modifier.fillMaxSize().padding(paddingValue)) {
-                BodyText(
-                    text = stringResource(id = R.string.player_screen_descr),
+                TextBodyLargeCentered(
+                    text = stringResource(id = R.string.player_screen),
+                    modifier = Modifier,
                     color = MaterialTheme.colorScheme.primary
                 )
             }
-        },
+        }
     )
 }

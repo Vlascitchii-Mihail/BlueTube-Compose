@@ -1,0 +1,55 @@
+{
+  "kind": "youtube#channelListResponse",
+  "etag": "BQR3YBtXZ5CloQC02xX6rSWswNI",
+  "pageInfo": {
+    "totalResults": 1,
+    "resultsPerPage": 1
+  },
+  "items": [
+    {
+      "kind": "youtube#channel",
+      "etag": "qKEI4LuFoPTfFCD5nTIFz0AL2Qo",
+      "id": "UCS5Oz6CHmeoF7vSad0qqXfw",
+      "snippet": {
+        "title": "DanTDM",
+        "description": "non-daily videos..\n\nBUSINESS ONLY :: management@dantdmteam.com",
+        "customUrl": "@dantdm",
+        "publishedAt": "2012-07-14T21:58:18Z",
+        "thumbnails": {
+          "default": {
+            "url": "https://yt3.ggpht.com/_SQKtbdn1Xv6vkV_OX5D1jTNQY2SAQ5Gq-WSPlTbc8h5qMHQ3dnwpSXlpq8ADikltH3zC9KC5A=s88-c-k-c0x00ffffff-no-rj",
+            "width": 88,
+            "height": 88
+          },
+          "medium": {
+            "url": "https://yt3.ggpht.com/_SQKtbdn1Xv6vkV_OX5D1jTNQY2SAQ5Gq-WSPlTbc8h5qMHQ3dnwpSXlpq8ADikltH3zC9KC5A=s240-c-k-c0x00ffffff-no-rj",
+            "width": 240,
+            "height": 240
+          },
+          "high": {
+            "url": "https://yt3.ggpht.com/_SQKtbdn1Xv6vkV_OX5D1jTNQY2SAQ5Gq-WSPlTbc8h5qMHQ3dnwpSXlpq8ADikltH3zC9KC5A=s800-c-k-c0x00ffffff-no-rj",
+            "width": 800,
+            "height": 800
+          }
+        },
+        "localized": {
+          "title": "DanTDM",
+          "description": "non-daily videos..\n\nBUSINESS ONLY :: management@dantdmteam.com"
+        },
+        "country": "GB"
+      },
+      "contentDetails": {
+        "relatedPlaylists": {
+          "likes": "",
+          "uploads": "UUS5Oz6CHmeoF7vSad0qqXfw"
+        }
+      },
+      "statistics": {
+        "viewCount": "19837541254",
+        "subscriberCount": "28700000",
+        "hiddenSubscriberCount": false,
+        "videoCount": "3709"
+      }
+    }
+  ]
+}

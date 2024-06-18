@@ -10,18 +10,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import com.appelier.bluetubecompose.R
-import com.appelier.bluetubecompose.core.core_ui.views.BodyText
-import com.appelier.bluetubecompose.utils.Tags
+import com.appelier.bluetubecompose.core.core_ui.views.TextBodyLargeCentered
+import com.appelier.bluetubecompose.utils.NavigationTags
 
 @Composable
 fun SettingsScreen() {
 
     Scaffold(
-        modifier = Modifier.testTag(Tags.SETTINGS_SCREEN),
+        modifier = Modifier.testTag(NavigationTags.SETTINGS_SCREEN),
         content = { paddingValue ->
             Column(modifier = Modifier.fillMaxSize().padding(paddingValue)) {
-                BodyText(
-                    text = stringResource(id = R.string.settings_screen_descr),
+                TextBodyLargeCentered(
+                    text = stringResource(id = R.string.settings_screen),
+                    modifier = Modifier,
                     color = MaterialTheme.colorScheme.primary
                 )
             }

@@ -27,9 +27,7 @@ class VideoListRepositoryImpl @Inject constructor(
         return Pager(
             config = PagingConfig(
                 pageSize = 5,
-                maxSize = 25,
-                prefetchDistance = 10,
-                enablePlaceholders = true
+                prefetchDistance = 15,
             ),
             pagingSourceFactory = {
                 YoutubeVideoSource(apiVideoListService, viewModelScope, videoType)

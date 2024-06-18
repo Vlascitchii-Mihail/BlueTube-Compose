@@ -25,3 +25,4 @@ val Brown = Color(0xFF91754D)
 
 val White = Color(0xFFFFFFFF)
 val Black = Color(0xFF000000)
+val Black_60 = Color(0x99000000)
