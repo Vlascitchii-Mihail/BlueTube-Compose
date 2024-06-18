@@ -21,9 +21,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.appelier.bluetubecompose.R
-import com.appelier.bluetubecompose.navigation.Screen
+import com.appelier.bluetubecompose.navigation.ScreenType
 import com.appelier.bluetubecompose.core.core_ui.theme.BlueTubeComposeTheme
-import com.appelier.bluetubecompose.utils.Tags
+import com.appelier.bluetubecompose.utils.NavigationTags
 
 private const val FIRST_ICON_INDEX = 0
 private const val SECOND_ICON_INDEX = 1
@@ -33,13 +33,13 @@ private data class NavigationItem(
     val index: Int,
     val vectorResourceId: Int,
     val screenDescriptionId: Int,
-    val screen: Screen
+    val screen: ScreenType
 )
 
 private val navItemsList = listOf(
-    NavigationItem(FIRST_ICON_INDEX, R.drawable.ic_house_24, R.string.video_list_screen_descr, Screen.VideoList),
-    NavigationItem(SECOND_ICON_INDEX, R.drawable.ic_youtube_shorts_logo_24, R.string.shorts_screen_descr, Screen.ShortsScreen),
-    NavigationItem(THIRD_ICON_INDEX, R.drawable.ic_settings_24, R.string.settings_screen_descr, Screen.SettingsScreen)
+    NavigationItem(FIRST_ICON_INDEX, R.drawable.ic_house_24, R.string.video_list_screen, ScreenType.VideoList),
+    NavigationItem(SECOND_ICON_INDEX, R.drawable.ic_youtube_shorts_logo_24, R.string.shorts_screen, ScreenType.ShortsScreen),
+    NavigationItem(THIRD_ICON_INDEX, R.drawable.ic_settings_24, R.string.settings_screen, ScreenType.SettingsScreen)
 )
 
 @Composable
@@ -50,11 +50,11 @@ private fun NavigationItem.getScreenSelectedState(currentDestination: NavDestina
 }
 
 @Composable
-fun TubeBottomNavigation(navController: NavHostController) {
+fun BlueTubeBottomNavigation(navController: NavHostController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
-    BottomNavigation(modifier = Modifier.testTag(Tags.BOTTOM_NAV)) {
+    BottomNavigation(modifier = Modifier.testTag(NavigationTags.BOTTOM_NAV)) {
         navItemsList.forEach { navItem ->
             val isSelected = navItem.getScreenSelectedState(currentDestination = currentDestination)
 
@@ -89,6 +89,6 @@ fun TubeBottomNavigation(navController: NavHostController) {
 @Preview
 private fun BlueTubeBottomNavigationPreview() {
     BlueTubeComposeTheme {
-        TubeBottomNavigation(rememberNavController())
+        BlueTubeBottomNavigation(rememberNavController())
     }
 }

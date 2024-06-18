@@ -1,0 +1,55 @@
+{
+  "kind": "youtube#channelListResponse",
+  "etag": "NJzg9O-pT4iVNW1jKb6BrNEIQZk",
+  "pageInfo": {
+    "totalResults": 1,
+    "resultsPerPage": 1
+  },
+  "items": [
+    {
+      "kind": "youtube#channel",
+      "etag": "k2BQ7uCThlpIPYBiQt5Wd-440Nk",
+      "id": "UC33-OkQ6VCYk8xtml8Pk4-g",
+      "snippet": {
+        "title": "NRL - National Rugby League",
+        "description": "The Official YouTube Channel of the National Rugby League.  \n\nEvery week will feature exclusive interviews, highlights, and the greatest moments that the NRL has ever produced!\n\nSubscribe and hit that notification bell to know when new videos are available here.\n\nFollow us on social @nrl and visit NRL.com for all the latest news and updates!",
+        "customUrl": "@nrl",
+        "publishedAt": "2006-05-08T04:46:04Z",
+        "thumbnails": {
+          "default": {
+            "url": "https://yt3.ggpht.com/Pui0xFjDp_F-x0UK5Rkfh1tGkwZLy7fkU4Pr44Zht3DJcMwWXLnxoVIGSRS5Pr7SVxgES0-ouA=s88-c-k-c0x00ffffff-no-rj",
+            "width": 88,
+            "height": 88
+          },
+          "medium": {
+            "url": "https://yt3.ggpht.com/Pui0xFjDp_F-x0UK5Rkfh1tGkwZLy7fkU4Pr44Zht3DJcMwWXLnxoVIGSRS5Pr7SVxgES0-ouA=s240-c-k-c0x00ffffff-no-rj",
+            "width": 240,
+            "height": 240
+          },
+          "high": {
+            "url": "https://yt3.ggpht.com/Pui0xFjDp_F-x0UK5Rkfh1tGkwZLy7fkU4Pr44Zht3DJcMwWXLnxoVIGSRS5Pr7SVxgES0-ouA=s800-c-k-c0x00ffffff-no-rj",
+            "width": 800,
+            "height": 800
+          }
+        },
+        "localized": {
+          "title": "NRL - National Rugby League",
+          "description": "The Official YouTube Channel of the National Rugby League.  \n\nEvery week will feature exclusive interviews, highlights, and the greatest moments that the NRL has ever produced!\n\nSubscribe and hit that notification bell to know when new videos are available here.\n\nFollow us on social @nrl and visit NRL.com for all the latest news and updates!"
+        },
+        "country": "AU"
+      },
+      "contentDetails": {
+        "relatedPlaylists": {
+          "likes": "",
+          "uploads": "UU33-OkQ6VCYk8xtml8Pk4-g"
+        }
+      },
+      "statistics": {
+        "viewCount": "306591066",
+        "subscriberCount": "397000",
+        "hiddenSubscriberCount": false,
+        "videoCount": "8330"
+      }
+    }
+  ]
+}

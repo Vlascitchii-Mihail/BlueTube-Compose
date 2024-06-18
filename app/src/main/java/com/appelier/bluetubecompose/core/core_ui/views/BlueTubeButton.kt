@@ -8,12 +8,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.appelier.bluetubecompose.core.core_ui.theme.BlueTubeComposeTheme
 
 @Composable
-fun TubeButton(onClickAction: () -> Unit) {
+fun BlueTubeButton(text: String = "Test button", onClickAction: () -> Unit) {
     Button(
         shape = MaterialTheme.shapes.small,
-        onClick = { onClickAction }
+        onClick = onClickAction
     ) {
-        Text(text = "Test button")
+        Text(text = text)
     }
 }
 
@@ -21,6 +21,6 @@ fun TubeButton(onClickAction: () -> Unit) {
 @Composable
 private fun BlueTubeButtonPreview() {
     BlueTubeComposeTheme {
-        TubeButton {}
+        BlueTubeButton {}
     }
 }

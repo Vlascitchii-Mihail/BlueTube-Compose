@@ -34,7 +34,7 @@ interface VideoApiService {
     suspend fun fetchChannels(
         @Query("id") id: String,
         @Query("part") part: String = "$SNIPPET, $CONTENT_DETAILS, $STATISTICS",
-        @Query("maxResults") maxResults: Int = SINGLE_CHANNEL,
+        @Query("maxResults") maxResults: Int = SINGLE_CHANNEL
     ): Response<YoutubeChannelResponse>
 
     @GET(SEARCH)

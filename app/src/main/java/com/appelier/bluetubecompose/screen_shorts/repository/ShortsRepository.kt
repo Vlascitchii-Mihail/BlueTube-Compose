@@ -5,8 +5,8 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.appelier.bluetubecompose.core.core_api.VideoApiService
 import com.appelier.bluetubecompose.core.core_paging.YoutubeVideoSource
-import com.appelier.bluetubecompose.utils.VideoType
 import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideo
+import com.appelier.bluetubecompose.utils.VideoType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject

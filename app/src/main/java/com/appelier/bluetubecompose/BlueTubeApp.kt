@@ -8,16 +8,17 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
-import com.appelier.bluetubecompose.navigation.BlueTubeNavigation
+import androidx.navigation.compose.rememberNavController
 import com.appelier.bluetubecompose.core.core_ui.theme.BlueTubeComposeTheme
-import com.appelier.bluetubecompose.core.core_ui.views.TubeBottomNavigation
+import com.appelier.bluetubecompose.core.core_ui.views.BlueTubeBottomNavigation
+import com.appelier.bluetubecompose.navigation.Navigation
 
 @Composable
-fun BlueTubeApp(navController: NavHostController) {
+fun BlueTubeApp(navController: NavHostController = rememberNavController()) {
     BlueTubeComposeTheme {
         // A surface container using the 'background' color from the theme
         Scaffold(
-            bottomBar = { TubeBottomNavigation(navController) }
+            bottomBar = { BlueTubeBottomNavigation(navController) }
         ) { paddingValue ->
             Surface(
                 modifier = Modifier
@@ -25,7 +26,7 @@ fun BlueTubeApp(navController: NavHostController) {
                     .padding(paddingValue),
                 color = MaterialTheme.colorScheme.background
             ) {
-                BlueTubeNavigation(navController)
+                Navigation(navController)
             }
         }
     }

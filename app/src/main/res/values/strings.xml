@@ -1,7 +1,21 @@
 <resources>
     <string name="app_name">BlueTubeCompose</string>
-    <string name="video_list_screen_descr">VideoList</string>
-    <string name="player_screen_descr">PlayerScreen</string>
-    <string name="shorts_screen_descr">ShortsScreen</string>
-    <string name="settings_screen_descr">SettingsScreen</string>
+
+    <string name="appbar_title">BlueTube</string>
+    <string name="appbar_logo_descr">Blue Tube Icon</string>
+    <string name="appbar_search_icon_descr">Search icon</string>
+
+
+    <string name="video_list_screen">Video List</string>
+
+
+    <string name="player_screen">Player Screen</string>
+
+
+    <string name="shorts_screen">Shorts Screen</string>
+
+
+    <string name="settings_screen">Settings Screen</string>
+
+
 </resources>
