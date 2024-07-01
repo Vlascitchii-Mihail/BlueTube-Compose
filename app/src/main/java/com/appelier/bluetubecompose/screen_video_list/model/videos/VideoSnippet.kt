@@ -1,18 +1,34 @@
 package com.appelier.bluetubecompose.screen_video_list.model.videos
 
-import android.os.Parcelable
-import com.squareup.moshi.JsonClass
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Ignore
+import androidx.room.PrimaryKey
 import com.appelier.bluetubecompose.screen_video_list.model.Thumbnails
-import kotlinx.parcelize.Parcelize
+import com.squareup.moshi.JsonClass
 
-@Parcelize
+@Entity(
+    tableName = "video_snippet",
+    foreignKeys = [
+        ForeignKey(
+            entity = YoutubeVideo::class,
+            parentColumns = ["id"],
+            childColumns = ["videoId"],
+            onDelete = ForeignKey.CASCADE,
+        )
+    ]
+)
 @JsonClass(generateAdapter = true)
 data class VideoSnippet(
-    val title: String,
-    val description: String,
-    val publishedAt: String,
-    val channelTitle: String,
+    var title: String = "",
+    var description: String = "",
+    var publishedAt: String = "",
+    var channelTitle: String = "",
     var channelImgUrl: String = "",
-    val channelId: String,
-    val thumbnails: Thumbnails
-): Parcelable
+    var channelId: String = "",
+    @Ignore
+    var thumbnails: Thumbnails = Thumbnails(),
+    @PrimaryKey(autoGenerate = false)
+    var snippetId: String = "",
+    var videoId: String = ""
+)

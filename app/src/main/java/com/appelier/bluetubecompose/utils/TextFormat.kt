@@ -2,6 +2,8 @@ package com.appelier.bluetubecompose.utils
 
 //import androidx.appcompat.widget.SearchView
 //import com.usm.bluetube.R
+import com.appelier.bluetubecompose.core.core_database.relations.PageWithVideos
+import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideoResponse
 import java.io.File
 import java.io.InputStreamReader
 import java.time.Duration
@@ -93,6 +95,17 @@ fun readJsonFileFromUnitTest(filePath: String): String {
     return jsonFile.readText()
 }
 
-fun readJsonFileFromAndroidTest(classLoader: ClassLoader?, path: String): String {
+fun readJsonFileAsString(classLoader: ClassLoader?, path: String): String {
     return InputStreamReader(classLoader?.getResourceAsStream(path)).use { it.readText() }
+}
+
+fun convertPageWithVideosToYoutubeVideoResponse(pageWithVideos: PageWithVideos): YoutubeVideoResponse {
+    val page = pageWithVideos.page
+    val videos = pageWithVideos.videos
+    return YoutubeVideoResponse(
+        nextPageToken = page.nextPageToken,
+        currentPageToken = page.currentPageToken,
+        prevPageToken = page.prevPageToken,
+        videos
+    )
 }
