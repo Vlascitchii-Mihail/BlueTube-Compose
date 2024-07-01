@@ -4,6 +4,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.appelier.bluetubecompose.core.core_api.VideoApiService
+import com.appelier.bluetubecompose.core.core_database.YouTubeDatabase
 import com.appelier.bluetubecompose.core.core_paging.YoutubeVideoSource
 import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideo
 import com.appelier.bluetubecompose.utils.VideoType
@@ -19,7 +20,8 @@ interface VideoListRepository {
 }
 
 class VideoListRepositoryImpl @Inject constructor(
-    private val apiVideoListService: VideoApiService
+    private val apiVideoListService: VideoApiService,
+    private val youTubeDatabase: YouTubeDatabase
 ): VideoListRepository {
 
     override fun fetchVideos(videoType: VideoType, viewModelScope: CoroutineScope)
@@ -30,7 +32,12 @@ class VideoListRepositoryImpl @Inject constructor(
                 prefetchDistance = 15,
             ),
             pagingSourceFactory = {
-                YoutubeVideoSource(apiVideoListService, viewModelScope, videoType)
+                YoutubeVideoSource(
+                    apiVideoListService,
+                    viewModelScope,
+                    videoType,
+                    youTubeDatabase.youTubeVideoDao
+                )
             }
         ).flow
     }

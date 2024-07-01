@@ -1,6 +1,10 @@
 package com.appelier.bluetubecompose.di_mock_api
 
+import androidx.room.Room
+import androidx.test.core.app.ApplicationProvider
 import com.appelier.bluetubecompose.core.core_api.VideoApiService
+import com.appelier.bluetubecompose.core.core_database.YouTubeDatabase
+import com.appelier.bluetubecompose.core.core_database.YouTubeVideoDao
 import com.appelier.bluetubecompose.core.core_di.NetworkApiModule
 import dagger.Module
 import dagger.Provides
@@ -20,7 +24,7 @@ private const val BASE_URL  = "/"
     components = [SingletonComponent::class],
     replaces = [NetworkApiModule::class]
 )
-object MockWebServerModule {
+object DiIntegrationModule {
 
     @Singleton
     @Provides
@@ -40,4 +44,39 @@ object MockWebServerModule {
 
         return retrofit.create(VideoApiService::class.java)
     }
+
+    @Singleton
+    @Provides
+    fun provideYouTubeVideoDao(): YouTubeVideoDao {
+        val youTubeDatabase = Room.inMemoryDatabaseBuilder(
+            ApplicationProvider.getApplicationContext(), YouTubeDatabase::class.java
+        ).build()
+
+        return youTubeDatabase.youTubeVideoDao
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

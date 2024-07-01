@@ -3,6 +3,8 @@ package com.appelier.bluetubecompose.core.core_di
 import com.appelier.bluetubecompose.core.core_api.Constants.Companion.BASE_URL
 import com.appelier.bluetubecompose.core.core_api.InterceptorApiRequest
 import com.appelier.bluetubecompose.core.core_api.VideoApiService
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -27,11 +29,17 @@ object NetworkApiModule {
         .addInterceptor(interceptor)
         .build()
 
+    @Provides
+    @Singleton
+    fun provideMoshi(): Moshi = Moshi.Builder()
+        .add(KotlinJsonAdapterFactory())
+        .build()
+
     @Singleton
     @Provides
-    fun provideRetrofit(): Retrofit = Retrofit.Builder()
+    fun provideRetrofit(moshi: Moshi): Retrofit = Retrofit.Builder()
         .baseUrl(BASE_URL)
-        .addConverterFactory(MoshiConverterFactory.create())
+        .addConverterFactory(MoshiConverterFactory.create(moshi))
         .client(client)
         .build()
 

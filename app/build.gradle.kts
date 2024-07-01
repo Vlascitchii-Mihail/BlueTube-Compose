@@ -6,7 +6,6 @@ plugins {
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt.plugin)
-    alias(libs.plugins.parcelize)
 }
 
 android {
@@ -58,6 +57,13 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    sourceSets {
+        getByName("main") {
+            assets {
+                srcDirs("src\\main\\assets", "src\\main\\assets")
+            }
+        }
+    }
 }
 
 dependencies {
@@ -89,6 +95,8 @@ dependencies {
 
     //dagger hilt
     implementation(libs.hilt.android)
+    testImplementation("junit:junit:4.12")
+    testImplementation("junit:junit:4.12")
     ksp(libs.ksp.hilt.compiler)
     implementation(libs.hilt.navigation)
 
@@ -101,9 +109,16 @@ dependencies {
     implementation(libs.okhttp3)
     implementation(libs.okhttp.urlconnection)
     implementation(libs.moshi)
+    implementation(libs.moshi.kotlin)
     implementation(libs.moshi.converter)
+    implementation(libs.moshi.adapter)
     ksp(libs.moshi.compiler)
     implementation(libs.interceptor)
+
+    //room
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
 
     //Paging
     implementation(libs.paging)

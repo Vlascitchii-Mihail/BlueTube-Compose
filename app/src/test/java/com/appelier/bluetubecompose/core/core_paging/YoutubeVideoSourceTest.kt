@@ -2,6 +2,7 @@ package com.appelier.bluetubecompose.core.core_paging
 
 import androidx.paging.PagingSource
 import com.appelier.bluetubecompose.core.core_api.VideoApiService
+import com.appelier.bluetubecompose.core.core_database.YouTubeVideoDao
 import com.appelier.bluetubecompose.screen_video_list.model.single_cnannel.YoutubeChannelResponse.Companion.DEFAULT_YOUTUBE_CHANNEL_RESPONSE_LIST
 import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideo
 import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideoResponse.Companion.DEFAULT_VIDEO_RESPONSE
@@ -17,6 +18,7 @@ import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mock
+import org.mockito.Mockito.mock
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
@@ -31,11 +33,17 @@ class YoutubeVideoSourceTest {
     private lateinit var apiService: VideoApiService
     private val testCoroutineDispatcher = StandardTestDispatcher()
     private val testCoroutineScope = TestScope(testCoroutineDispatcher)
+    private val youTubeVideoDao: YouTubeVideoDao = mock()
     private lateinit var youtubeVideoSource: YoutubeVideoSource
 
     @Test
     fun `fetchVideos() adds channel image URL to a video`() {
-        youtubeVideoSource = YoutubeVideoSource(apiService, testCoroutineScope, VideoType.Videos)
+        youtubeVideoSource = YoutubeVideoSource(
+            apiService,
+            testCoroutineScope,
+            VideoType.Videos,
+            youTubeVideoDao
+        )
 
         testCoroutineScope.runTest {
             whenever(
@@ -63,7 +71,12 @@ class YoutubeVideoSourceTest {
 
     @Test
     fun `PagingSource returns list of video review on refresh or append state`() {
-        youtubeVideoSource = YoutubeVideoSource(apiService, testCoroutineScope, VideoType.Videos)
+        youtubeVideoSource = YoutubeVideoSource(
+            apiService,
+            testCoroutineScope,
+            VideoType.Videos,
+            youTubeVideoDao
+        )
         val spyYoutubeVideoSource = spy(youtubeVideoSource)
 
         testCoroutineScope.runTest {
