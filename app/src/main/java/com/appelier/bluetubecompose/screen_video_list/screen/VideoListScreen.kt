@@ -67,7 +67,11 @@ fun VideoListScreen(
 }
 
 @Composable
-private fun VideoList(videos: LazyPagingItems<YoutubeVideo>, modifier: Modifier, innerPadding: PaddingValues) {
+private fun VideoList(
+    videos: LazyPagingItems<YoutubeVideo>,
+    modifier: Modifier,
+    innerPadding: PaddingValues,
+) {
     Box(modifier = modifier
         .fillMaxSize().padding(innerPadding), contentAlignment = Alignment.Center) {
         when(videos.loadState.refresh) {
@@ -121,7 +125,10 @@ private fun VideoListPreview() {
             color = MaterialTheme.colorScheme.secondary
         )) {
         items(YoutubeVideo.DEFAULT_VIDEO_LIST) { video ->
-            VideoPreviewItem(youtubeVideo = video, defaultModifier = Modifier)
+            VideoPreviewItem(
+                youtubeVideo = video,
+                defaultModifier = Modifier,
+            )
         }
     }
 }

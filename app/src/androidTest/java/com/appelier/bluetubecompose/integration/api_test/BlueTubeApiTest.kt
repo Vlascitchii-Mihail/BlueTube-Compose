@@ -11,7 +11,7 @@ import com.appelier.bluetubecompose.core.core_api.Constants.Companion.STATISTICS
 import com.appelier.bluetubecompose.core.core_api.VideoApiService
 import com.appelier.bluetubecompose.screen_video_list.model.single_cnannel.Channel.Companion.DEFAULT_CHANNEL_1
 import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideoResponse.Companion.DEFAULT_VIDEO_RESPONSE
-import com.appelier.bluetubecompose.utils.readJsonFileFromAndroidTest
+import com.appelier.bluetubecompose.utils.readJsonFileAsString
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import junit.framework.TestCase.assertEquals
@@ -58,7 +58,7 @@ class BlueTubeApiTest {
     fun fetchVideosReturnsVideoList() {
         testCoroutineScope.runTest {
             val videoResponse = MockResponse().setBody(
-                readJsonFileFromAndroidTest(this.javaClass.classLoader, "raw/video_list")
+                readJsonFileAsString(this.javaClass.classLoader, "raw/video_list")
             ).setResponseCode(200)
 
             mockWebServer.enqueue(videoResponse)
@@ -78,7 +78,7 @@ class BlueTubeApiTest {
     fun fetchChannelsReturnsChannelsListWithOneVideoById() {
         testCoroutineScope.runTest {
             val mockChannelResponse = MockResponse().setBody(
-                readJsonFileFromAndroidTest(this.javaClass.classLoader, "raw/channel_response1")
+                readJsonFileAsString(this.javaClass.classLoader, "raw/channel_response1")
             )
             mockWebServer.enqueue(mockChannelResponse)
 

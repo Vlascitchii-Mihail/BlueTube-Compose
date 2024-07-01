@@ -4,6 +4,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.appelier.bluetubecompose.core.core_api.VideoApiService
+import com.appelier.bluetubecompose.core.core_database.YouTubeDatabase
 import com.appelier.bluetubecompose.core.core_paging.YoutubeVideoSource
 import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideo
 import com.appelier.bluetubecompose.utils.VideoType
@@ -16,7 +17,8 @@ interface ShortsRepository {
     : Flow<PagingData<YoutubeVideo>>
 }
 class ShortsRepositoryImpl @Inject constructor(
-    private val apiVideoListService: VideoApiService
+    private val apiVideoListService: VideoApiService,
+    private val youTubeDatabase: YouTubeDatabase
 ): ShortsRepository {
 
     override fun fetchShorts(videoType: VideoType, viewModelScope: CoroutineScope)
@@ -29,7 +31,12 @@ class ShortsRepositoryImpl @Inject constructor(
                 enablePlaceholders = false
             ),
             pagingSourceFactory = {
-                YoutubeVideoSource(apiVideoListService, viewModelScope, videoType)
+                YoutubeVideoSource(
+                    apiVideoListService,
+                    viewModelScope,
+                    videoType,
+                    youTubeDatabase.youTubeVideoDao
+                )
             }
         ).flow
     }
