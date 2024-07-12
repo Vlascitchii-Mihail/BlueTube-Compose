@@ -15,6 +15,8 @@ object VideoListScreenTags {
     const val VIDEO_TITLE = "video title"
     const val VIDEO_DURATION = "video duration"
     const val VIDEO_STATISTICS = "video statistics"
-
-    const val VIDEO_LIST = "VIDEO LIST"
+    const val LOAD_STATE = "video load state"
+    const val VIDEO_LIST = "video list"
+    const val ICON_CLOSE_SEARCH = "icon close search"
+    const val ICON_OPEN_SEARCH = "icon open search"
 }

@@ -11,6 +11,7 @@ import com.appelier.bluetubecompose.utils.VideoType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
+import javax.inject.Named
 
 
 interface VideoListRepository {
@@ -21,6 +22,7 @@ interface VideoListRepository {
 
 class VideoListRepositoryImpl @Inject constructor(
     private val apiVideoListService: VideoApiService,
+    @Named("OriginalDatabase")
     private val youTubeDatabase: YouTubeDatabase
 ): VideoListRepository {
 

@@ -27,7 +27,7 @@ class DatabaseContentController(private val youTubeVideoDao: YouTubeVideoDao) {
         deleteExtraVideos()
     }
 
-    fun YoutubeVideoResponse.setPageTokenToVideos(currentPageToken: String): YoutubeVideoResponse {
+    fun YoutubeVideoResponse.setCurrentPageTokenToVideos(currentPageToken: String): YoutubeVideoResponse {
         this.currentPageToken = currentPageToken
         this.items.forEach { videoItem ->
             videoItem.pageToken = currentPageToken
@@ -77,4 +77,19 @@ class DatabaseContentController(private val youTubeVideoDao: YouTubeVideoDao) {
             youTubeVideoDao.deleteExtraFiveVideos()
         }
     }
+
+//    suspend fun getVideosFromDatabase(pageToken: String): YoutubeVideoResponse {
+//        return if (pageToken == "") getFirstPageFromDatabase()
+//        else getParticularPageFromDatabase(pageToken)
+//    }
+
+//    private suspend fun getParticularPageFromDatabase(nextPageToken: String): YoutubeVideoResponse {
+//        val pageWithVideos = youTubeVideoDao.getPageWithVideos(nextPageToken)
+//        return convertPageWithVideosToYoutubeVideoResponse(pageWithVideos)
+//    }
+//
+//    private suspend fun getFirstPageFromDatabase(): YoutubeVideoResponse {
+//        val firstPageWithVideos = youTubeVideoDao.getFirstPageFromDb()
+//        return convertPageWithVideosToYoutubeVideoResponse(firstPageWithVideos)
+//    }
 }

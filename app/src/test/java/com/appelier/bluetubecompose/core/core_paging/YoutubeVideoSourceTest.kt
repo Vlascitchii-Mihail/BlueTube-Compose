@@ -4,15 +4,19 @@ import androidx.paging.PagingSource
 import com.appelier.bluetubecompose.core.core_api.VideoApiService
 import com.appelier.bluetubecompose.core.core_database.YouTubeVideoDao
 import com.appelier.bluetubecompose.screen_video_list.model.single_cnannel.YoutubeChannelResponse.Companion.DEFAULT_YOUTUBE_CHANNEL_RESPONSE_LIST
+import com.appelier.bluetubecompose.screen_video_list.model.videos.ParticularVideo
 import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideo
 import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideoResponse.Companion.DEFAULT_VIDEO_RESPONSE
 import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideoResponse.Companion.DEFAULT_VIDEO_RESPONSE_WITH_CHANNEL_IMG
+import com.appelier.bluetubecompose.search_video.model.DEFAULT_SEARCH_VIDEO_RESPONSE
+import com.appelier.bluetubecompose.search_video.model.SearchVideoItem
 import com.appelier.bluetubecompose.utils.VideoType
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyInt
@@ -31,20 +35,23 @@ class YoutubeVideoSourceTest {
 
     @Mock
     private lateinit var apiService: VideoApiService
-    private val testCoroutineDispatcher = StandardTestDispatcher()
-    private val testCoroutineScope = TestScope(testCoroutineDispatcher)
+    private val standardTestDispatcher = StandardTestDispatcher()
+    private val testCoroutineScope = TestScope(standardTestDispatcher)
     private val youTubeVideoDao: YouTubeVideoDao = mock()
     private lateinit var youtubeVideoSource: YoutubeVideoSource
 
-    @Test
-    fun `fetchVideos() adds channel image URL to a video`() {
+    @Before
+    fun initSource() {
         youtubeVideoSource = YoutubeVideoSource(
             apiService,
             testCoroutineScope,
             VideoType.Videos,
             youTubeVideoDao
         )
+    }
 
+    @Test
+    fun `fetchVideos() adds channel image URL to a video`() {
         testCoroutineScope.runTest {
             whenever(
                 apiService.fetchVideos(anyString(), anyString(), anyString(), anyString())
@@ -71,12 +78,6 @@ class YoutubeVideoSourceTest {
 
     @Test
     fun `PagingSource returns list of video review on refresh or append state`() {
-        youtubeVideoSource = YoutubeVideoSource(
-            apiService,
-            testCoroutineScope,
-            VideoType.Videos,
-            youTubeVideoDao
-        )
         val spyYoutubeVideoSource = spy(youtubeVideoSource)
 
         testCoroutineScope.runTest {
@@ -120,5 +121,33 @@ class YoutubeVideoSourceTest {
         )
         assertEquals(expectedLoadResult.nextKey, actualLoadRefreshResult.nextKey)
         assertEquals(expectedLoadResult.data, actualLoadRefreshResult.data)
+    }
+
+    @Test
+    fun `Paging source converts SearchVideoItem to YoutubeVideo`() {
+        testCoroutineScope.runTest {
+            var convertedVideoList: List<YoutubeVideo>
+            whenever(
+                apiService.searchVideo(anyString(), anyString(), anyString(), anyString())
+            ).thenReturn(Response.success(DEFAULT_SEARCH_VIDEO_RESPONSE))
+
+            val searchedVideos = apiService.searchVideo(anyString(), anyString(), anyString(), anyString()).body()!!
+            searchedVideos.items.prepareConvertAnswers()
+
+            with(youtubeVideoSource) {
+                convertedVideoList = searchedVideos.items.convertToVideosList()
+
+            }
+
+            assertEquals(DEFAULT_VIDEO_RESPONSE.items, convertedVideoList)
+        }
+    }
+
+    private suspend fun List<SearchVideoItem>.prepareConvertAnswers() {
+        for (index in this.indices) {
+            whenever(
+                apiService.fetchParticularVideo(this@prepareConvertAnswers[index].id.videoId)
+            ).thenReturn(Response.success(ParticularVideo(listOf(DEFAULT_VIDEO_RESPONSE.items[index]))))
+        }
     }
 }

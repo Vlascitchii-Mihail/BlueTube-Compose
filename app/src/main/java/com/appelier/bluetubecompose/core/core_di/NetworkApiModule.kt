@@ -45,7 +45,6 @@ object NetworkApiModule {
 
     @Singleton
     @Provides
-
     fun provideVideoListApi(retrofit: Retrofit): VideoApiService =
         retrofit.create(VideoApiService::class.java)
 }

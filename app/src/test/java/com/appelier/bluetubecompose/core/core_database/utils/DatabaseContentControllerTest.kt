@@ -31,14 +31,22 @@ class DatabaseContentControllerTest {
         var videoResponse: YoutubeVideoResponse
         with(databaseContentController) {
 
-            //creating a new object doesn't affect to the next tests
-            videoResponse = DEFAULT_VIDEO_RESPONSE_WITH_CHANNEL_IMG.copy()
-            videoResponse.setPageTokenToVideos(INITIAL_PAGE)
-        }
+            //creating a new object affects to the next tests
+            videoResponse =
+                DEFAULT_VIDEO_RESPONSE_WITH_CHANNEL_IMG.setCurrentPageTokenToVideos(INITIAL_PAGE)
 
-        assertEquals(TEST_DATABASE_VIDEO_RESPONSE.currentPageToken, videoResponse.currentPageToken)
-        for (index in RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.indices) {
-            assertEquals(TEST_DATABASE_VIDEO_LIST[index].pageToken, RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG[index].pageToken)
+            assertEquals(
+                TEST_DATABASE_VIDEO_RESPONSE.currentPageToken,
+                videoResponse.currentPageToken
+            )
+            for (index in RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.indices) {
+                assertEquals(
+                    TEST_DATABASE_VIDEO_LIST[index].pageToken,
+                    RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG[index].pageToken
+                )
+            }
+
+            videoResponse.setCurrentPageTokenToVideos("")
         }
     }
 }

@@ -12,7 +12,7 @@ import com.appelier.bluetubecompose.screen_settings.SettingsScreen
 import com.appelier.bluetubecompose.screen_shorts.screen.ShortsScreen
 import com.appelier.bluetubecompose.screen_video_list.screen.VideoListScreen
 import com.appelier.bluetubecompose.screen_video_list.screen.VideoListViewModel
-import com.appelier.bluetubecompose.utils.NavigationTags
+import com.appelier.bluetubecompose.utils.NavigationTags.NAVIGATION
 
 @Composable
 fun Navigation(navController: NavHostController) {
@@ -20,14 +20,18 @@ fun Navigation(navController: NavHostController) {
     NavHost(
         navController = navController,
         startDestination = ScreenType.VideoList,
-        modifier = Modifier.testTag(NavigationTags.NAVIGATION)
+        modifier = Modifier.testTag(NAVIGATION)
     ) {
         composable<ScreenType.VideoList> {
             val videoListViewModel: VideoListViewModel = hiltViewModel()
             VideoListScreen(
                 navController = navController,
-                videoListViewModel.videos,
-                videoListViewModel.searchedVideos
+                videoListViewModel.searchState.value,
+                videoListViewModel.searchTextState.value,
+                videoListViewModel.videos.value,
+                { searchText -> videoListViewModel.updateSearchTextState(searchText) },
+                { searchState -> videoListViewModel.updateSearchState(searchState) },
+                { searchText -> videoListViewModel.getSearchVideosFlow(searchText) }
             )
         }
         composable<ScreenType.PlayerScreen> {
