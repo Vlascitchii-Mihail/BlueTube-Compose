@@ -11,6 +11,7 @@ import com.appelier.bluetubecompose.utils.VideoType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
+import javax.inject.Named
 
 interface ShortsRepository {
     fun fetchShorts(videoType: VideoType, viewModelScope: CoroutineScope)
@@ -18,6 +19,7 @@ interface ShortsRepository {
 }
 class ShortsRepositoryImpl @Inject constructor(
     private val apiVideoListService: VideoApiService,
+    @Named("OriginalDatabase")
     private val youTubeDatabase: YouTubeDatabase
 ): ShortsRepository {
 

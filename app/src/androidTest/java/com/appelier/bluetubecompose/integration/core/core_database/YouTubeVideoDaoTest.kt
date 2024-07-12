@@ -35,8 +35,8 @@ class YouTubeVideoDaoTest {
 
     @Inject
     lateinit var youTubeVideoDao: YouTubeVideoDao
-    private val testCoroutineDispatcher = StandardTestDispatcher()
-    private val testCoroutineScope = TestScope(testCoroutineDispatcher)
+    private val standardTestDispatcher = StandardTestDispatcher()
+    private val testCoroutineScope = TestScope(standardTestDispatcher)
 
     @Before
     fun setup() {
@@ -71,7 +71,7 @@ class YouTubeVideoDaoTest {
         videoResponse: YoutubeVideoResponse = DEFAULT_VIDEO_RESPONSE_WITH_CHANNEL_IMG
     ) {
         with(databaseContentController) {
-            videoResponse.setPageTokenToVideos(initialPage)
+            videoResponse.setCurrentPageTokenToVideos(initialPage)
             videoResponse.insertVideosToDb(testDateTime)
         }
     }

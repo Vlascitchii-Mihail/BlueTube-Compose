@@ -1,6 +1,5 @@
 package com.appelier.bluetubecompose.core.core_ui.views
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -23,7 +22,11 @@ import androidx.constraintlayout.compose.Dimension
 import com.appelier.bluetubecompose.R
 import com.appelier.bluetubecompose.core.core_ui.theme.BlueTubeComposeTheme
 import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideo
-import com.appelier.bluetubecompose.utils.VideoListScreenTags
+import com.appelier.bluetubecompose.utils.VideoListScreenTags.CHANNEL_PREVIEW_IMG
+import com.appelier.bluetubecompose.utils.VideoListScreenTags.VIDEO_DURATION
+import com.appelier.bluetubecompose.utils.VideoListScreenTags.VIDEO_PREVIEW_IMG
+import com.appelier.bluetubecompose.utils.VideoListScreenTags.VIDEO_STATISTICS
+import com.appelier.bluetubecompose.utils.VideoListScreenTags.VIDEO_TITLE
 import com.appelier.bluetubecompose.utils.formatDate
 import com.appelier.bluetubecompose.utils.formatVideoDuration
 import com.appelier.bluetubecompose.utils.formatViews
@@ -40,8 +43,7 @@ fun VideoPreviewItem(
     ConstraintLayout(modifier = defaultModifier
         .fillMaxWidth()
         .wrapContentHeight()) {
-        Log.d("VideoPreviewItem", "VideoPreviewItem() called")
-        val (videoPreview, videoTitle, channelImg, channelName, viewsCount, postedAgo, videoDuration, statisticsFlow) = createRefs()
+        val (videoPreview, videoTitle, channelImg, videoDuration, statisticsFlow) = createRefs()
 
         GlideImage(
             model = youtubeVideo?.snippet?.thumbnails?.medium?.url ?: R.drawable.sceleton,
@@ -51,7 +53,7 @@ fun VideoPreviewItem(
             modifier = defaultModifier
                 .fillMaxWidth()
                 .wrapContentSize()
-                .testTag(VideoListScreenTags.VIDEO_PREVIEW_IMG)
+                .testTag(VIDEO_PREVIEW_IMG)
                 .constrainAs(videoPreview) {
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
@@ -64,7 +66,7 @@ fun VideoPreviewItem(
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.tertiary,
             modifier = defaultModifier
-                .testTag(VideoListScreenTags.VIDEO_DURATION)
+                .testTag(VIDEO_DURATION)
                 .padding(8.dp)
                 .clip(MaterialTheme.shapes.small)
                 .background(MaterialTheme.colorScheme.secondary)
@@ -81,7 +83,7 @@ fun VideoPreviewItem(
             contentDescription = "Channel name : ${youtubeVideo?.snippet?.channelTitle}",
             contentScale = ContentScale.Crop,
             modifier = defaultModifier
-                .testTag(VideoListScreenTags.CHANNEL_PREVIEW_IMG)
+                .testTag(CHANNEL_PREVIEW_IMG)
                 .padding(8.dp)
                 .width(50.dp)
                 .clip(CircleShape)
@@ -98,12 +100,13 @@ fun VideoPreviewItem(
             maxLines = 2,
             textAlign = TextAlign.Start,
             modifier = defaultModifier
-                .testTag(VideoListScreenTags.VIDEO_TITLE)
+                .testTag(VIDEO_TITLE)
                 .padding(top = 8.dp, end = 8.dp)
                 .constrainAs(videoTitle) {
                     start.linkTo(channelImg.end)
                     top.linkTo(videoPreview.bottom)
                     end.linkTo(parent.end)
+                    bottom.linkTo(statisticsFlow.top)
                     width = Dimension.fillToConstraints
                 }
         )
@@ -120,12 +123,13 @@ fun VideoPreviewItem(
             maxLines = 2,
             textAlign = TextAlign.Start,
             modifier = defaultModifier
-                .testTag(VideoListScreenTags.VIDEO_STATISTICS)
+                .testTag(VIDEO_STATISTICS)
                 .padding(end = 8.dp, top = 8.dp, bottom = 8.dp)
                 .constrainAs(statisticsFlow) {
                     start.linkTo(channelImg.end)
                     end.linkTo(parent.end)
                     top.linkTo(videoTitle.bottom)
+                    bottom.linkTo(parent.bottom)
                     width = Dimension.fillToConstraints
                     horizontalBias = 0f
                 }

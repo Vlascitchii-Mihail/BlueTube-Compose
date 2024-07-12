@@ -1,9 +1,11 @@
 <resources>
     <string name="app_name">BlueTubeCompose</string>
 
+<!--    VideoListScreen-->
     <string name="appbar_title">BlueTube</string>
     <string name="appbar_logo_descr">Blue Tube Icon</string>
     <string name="appbar_search_icon_descr">Search icon</string>
+    <string name="search_placeholder">Enter search text</string>
 
 
     <string name="video_list_screen">Video List</string>

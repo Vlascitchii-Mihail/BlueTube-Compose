@@ -7,6 +7,7 @@ import com.appelier.bluetubecompose.core.core_database.YouTubeVideoDao
 import com.appelier.bluetubecompose.core.core_database.utils.DatabaseContentController
 import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideo
 import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideoResponse
+import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideoResponse.Companion.INITIAL_PAGE
 import com.appelier.bluetubecompose.search_video.model.SearchVideoItem
 import com.appelier.bluetubecompose.search_video.model.SearchVideoResponse
 import com.appelier.bluetubecompose.utils.VideoType
@@ -26,7 +27,7 @@ class YoutubeVideoSource(
     private val youTubeVideoDao: YouTubeVideoDao
 ): PagingSource<String, YoutubeVideo>() {
 
-    private var sourceCurrentPageToken = "First page"
+    private var sourceCurrentPageToken = INITIAL_PAGE
     private val databaseContentController = DatabaseContentController(youTubeVideoDao)
 
     override suspend fun load(params: LoadParams<String>): LoadResult<String, YoutubeVideo> {
@@ -54,7 +55,7 @@ class YoutubeVideoSource(
     suspend fun getLoadData(nextPageToken: String, videoType: VideoType): YoutubeVideoResponse {
         return when(videoType) {
             is VideoType.Videos -> fetchVideos(nextPageToken)
-//            is VideoType.SearchedVideo -> fetchSearchedVideos(videoType.query, nextPageToken)
+            is VideoType.SearchedVideo -> fetchSearchedVideos(videoType.query, nextPageToken)
 //            is VideoType.Shorts -> fetchShorts(nextPageToken)
 //            is VideoType.SearchedRelatedVideo -> fetchSearchedRelatedVideos(videoType.query, nextPageToken)
             else -> fetchVideos(nextPageToken)
@@ -63,26 +64,48 @@ class YoutubeVideoSource(
 
     private suspend fun fetchVideos(nextPageToken: String): YoutubeVideoResponse {
         val videos = apiService.fetchVideos(nextPageToken = nextPageToken).body()!!
-        videos.items.addChannelImgUrl()
-        with(databaseContentController) {
-            videos.setPageTokenToVideos(sourceCurrentPageToken)
-            videos.insertVideosToDb()
-        }
-        videos.nextPageToken?.let { updateCurrentPageToken(it) }
-        return videos
+
+        return showVideosFromNetwork(videos)
+
+//       return if (videos != null) {
+//           showVideosFromNetwork(videos)
+//        }
+//        else {
+//            showVideosFromDb(nextPageToken)
+//        }
     }
 
-//    private suspend fun fetchSearchedVideos(query: String, nextPageToken: String)
-//    : YoutubeVideoResponse {
-//        val searchedVideos = apiService.searchVideo(query, nextPageToken = nextPageToken).body()!!
-//        val videos: List<YoutubeVideo> = searchedVideos.items.convertToVideosList()
-//        videos.addChannelImgUrl()
-//        return YoutubeVideoResponse(
-//            searchedVideos.nextPageToken,
-//            searchedVideos.prevPageToken,
-//            items = videos
-//        )
+    private suspend fun showVideosFromNetwork(videoResponse:YoutubeVideoResponse): YoutubeVideoResponse {
+        videoResponse.items.addChannelImgUrl()
+
+        with(databaseContentController) {
+            videoResponse.setCurrentPageTokenToVideos(sourceCurrentPageToken)
+            videoResponse.insertVideosToDb()
+        }
+
+        videoResponse.nextPageToken?.let { updateCurrentPageToken(it) }
+        return videoResponse
+    }
+
+//    private suspend fun showVideosFromDb(pageToken: String): YoutubeVideoResponse {
+//        val dbVideos = databaseContentController.getVideosFromDatabase(pageToken)
+//        dbVideos.nextPageToken?.let { updateCurrentPageToken(it) }
+//        return dbVideos
 //    }
+
+    private suspend fun fetchSearchedVideos(query: String, nextPageToken: String)
+    : YoutubeVideoResponse {
+        val searchedVideos = apiService.searchVideo(query, nextPageToken = nextPageToken).body()!!
+        val videos: List<YoutubeVideo> = searchedVideos.items.convertToVideosList()
+
+        val response = YoutubeVideoResponse(
+            nextPageToken = searchedVideos.nextPageToken,
+            prevPageToken = searchedVideos.prevPageToken,
+            items = videos
+        )
+
+        return showVideosFromNetwork(response)
+    }
 
 //    private suspend fun fetchSearchedRelatedVideos(query: String, nextPageToken: String)
 //            : YoutubeVideoResponse {
@@ -110,7 +133,7 @@ class YoutubeVideoSource(
         return this.copy(items = mutableVideoList)
     }
 
-    private suspend fun  List<SearchVideoItem>.convertToVideosList(): List<YoutubeVideo> {
+    suspend fun  List<SearchVideoItem>.convertToVideosList(): List<YoutubeVideo> {
         val videoList: MutableList<Deferred<YoutubeVideo>> = mutableListOf()
         coroutineScope {
             this@convertToVideosList.forEach { searchedVideo ->
@@ -135,10 +158,11 @@ class YoutubeVideoSource(
         }
     }
 
-    private suspend fun SearchVideoItem.convertToVideo(): YoutubeVideo {
-        val video = apiService.fetchParticularVideo(this.id.videoId).body()!!
-        return video.items.first()
-    }
+ private suspend fun SearchVideoItem.convertToVideo(): YoutubeVideo {
+    val video = apiService.fetchParticularVideo(this.id.videoId).body()!!
+
+    return video.items.first()
+}
 
     private suspend fun getChannelImgUrl(videos: List<YoutubeVideo>): List<String> {
         val channelUrlList: MutableList<Deferred<String>> = mutableListOf()

@@ -64,6 +64,19 @@ interface YouTubeVideoDao {
     suspend fun getPageWithEmptyVideos(currentPageToken: String): PageWithVideos
 
     @Transaction
+    @Query("")
+    suspend fun getFirstPageFromDb(): PageWithVideos {
+        val firstPage = getFirstPage()
+        firstPage.videos.initializeVideos()
+        return firstPage
+    }
+
+    @Transaction
+    @Query("SELECT * FROM pages WHERE currentPageToken IN(SELECT pageToken FROM youtube_video ORDER BY loadedDate LIMIT 5)")
+    suspend fun getFirstPage(): PageWithVideos
+
+
+    @Transaction
     suspend fun List<YoutubeVideo>.initializeVideos() {
         this.forEach { video ->
             val videoId = video.id

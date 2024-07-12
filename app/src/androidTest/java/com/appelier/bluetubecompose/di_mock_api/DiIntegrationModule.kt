@@ -47,12 +47,16 @@ object DiIntegrationModule {
 
     @Singleton
     @Provides
-    fun provideYouTubeVideoDao(): YouTubeVideoDao {
-        val youTubeDatabase = Room.inMemoryDatabaseBuilder(
+    fun provideYouTubeVideoDatabase(): YouTubeDatabase {
+        return Room.inMemoryDatabaseBuilder(
             ApplicationProvider.getApplicationContext(), YouTubeDatabase::class.java
         ).build()
+    }
 
-        return youTubeDatabase.youTubeVideoDao
+    @Singleton
+    @Provides
+    fun provideYouTubeVideoDao(database: YouTubeDatabase): YouTubeVideoDao {
+        return database.youTubeVideoDao
     }
 }
 

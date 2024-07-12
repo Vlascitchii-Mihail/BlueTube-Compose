@@ -5,12 +5,14 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.appelier.bluetubecompose.core.core_api.Constants.Companion.CONTENT_DETAILS
 import com.appelier.bluetubecompose.core.core_api.Constants.Companion.MOST_POPULAR
 import com.appelier.bluetubecompose.core.core_api.Constants.Companion.REGION_CODE
+import com.appelier.bluetubecompose.core.core_api.Constants.Companion.RELEVANCE
 import com.appelier.bluetubecompose.core.core_api.Constants.Companion.SINGLE_CHANNEL
 import com.appelier.bluetubecompose.core.core_api.Constants.Companion.SNIPPET
 import com.appelier.bluetubecompose.core.core_api.Constants.Companion.STATISTICS
 import com.appelier.bluetubecompose.core.core_api.VideoApiService
 import com.appelier.bluetubecompose.screen_video_list.model.single_cnannel.Channel.Companion.DEFAULT_CHANNEL_1
 import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideoResponse.Companion.DEFAULT_VIDEO_RESPONSE
+import com.appelier.bluetubecompose.search_video.model.DEFAULT_SEARCH_VIDEO_RESPONSE
 import com.appelier.bluetubecompose.utils.readJsonFileAsString
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -25,11 +27,12 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
 import javax.inject.Inject
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
-class BlueTubeApiTest {
+class VideoSourceApiTest {
 
     @get:Rule(order = 0)
     var hiltRule = HiltAndroidRule(this)
@@ -41,8 +44,8 @@ class BlueTubeApiTest {
     lateinit var apiService: VideoApiService
     @Inject
     lateinit var mockWebServer: MockWebServer
-    private val testCoroutineDispatcher = StandardTestDispatcher()
-    private val testCoroutineScope = TestScope(testCoroutineDispatcher)
+    private val standardTestDispatcher = StandardTestDispatcher()
+    private val testCoroutineScope = TestScope(standardTestDispatcher)
 
     @Before
     fun setup() {
@@ -58,7 +61,7 @@ class BlueTubeApiTest {
     fun fetchVideosReturnsVideoList() {
         testCoroutineScope.runTest {
             val videoResponse = MockResponse().setBody(
-                readJsonFileAsString(this.javaClass.classLoader, "raw/video_list")
+                readJsonFileAsString(this.javaClass.classLoader, "raw/video_list.json")
             ).setResponseCode(200)
 
             mockWebServer.enqueue(videoResponse)
@@ -78,7 +81,7 @@ class BlueTubeApiTest {
     fun fetchChannelsReturnsChannelsListWithOneVideoById() {
         testCoroutineScope.runTest {
             val mockChannelResponse = MockResponse().setBody(
-                readJsonFileAsString(this.javaClass.classLoader, "raw/channel_response1")
+                readJsonFileAsString(this.javaClass.classLoader, "raw/channel_response_1.json")
             )
             mockWebServer.enqueue(mockChannelResponse)
 
@@ -89,6 +92,39 @@ class BlueTubeApiTest {
             )
 
             assertEquals(DEFAULT_CHANNEL_1, fetchedChannel.body()?.items?.first())
+        }
+    }
+
+    @Test
+    fun fetchSearchVideosReturnsSearchVideos() {
+        testCoroutineScope.runTest {
+            val mockSearchVideosResponse = MockResponse().setBody(
+                readJsonFileAsString(this.javaClass.classLoader, "raw/search_response.json")
+            )
+            mockWebServer.enqueue(mockSearchVideosResponse)
+
+            val searchedVideos = apiService.searchVideo(
+                query = "steam deck",
+                SNIPPET,
+                RELEVANCE,
+                ""
+            )
+
+            assertEquals(DEFAULT_SEARCH_VIDEO_RESPONSE, searchedVideos.body())
+        }
+    }
+
+    @Test
+    fun fetchParticularVideoReturnsParticularVideo() {
+        testCoroutineScope.runTest {
+            val mockParticularVideoResponse = MockResponse().setBody(
+                readJsonFileAsString(this.javaClass.classLoader, "raw/particular_video_response.json")
+            )
+            mockWebServer.enqueue(mockParticularVideoResponse)
+
+            val particularVideo = apiService.fetchParticularVideo(any()).body()!!
+
+            assertEquals(DEFAULT_VIDEO_RESPONSE.items.first(), particularVideo.items.first())
         }
     }
 }

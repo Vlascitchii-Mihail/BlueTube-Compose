@@ -15,5 +15,5 @@ interface ModuleVideoList {
     @Binds
     @Singleton
     abstract fun bindVideoRepository(videoRepository: VideoListRepositoryImpl)
-    : VideoListRepository
+            : VideoListRepository
 }
