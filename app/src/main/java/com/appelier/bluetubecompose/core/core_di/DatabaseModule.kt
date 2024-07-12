@@ -8,6 +8,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -15,6 +16,7 @@ import javax.inject.Singleton
 object DatabaseModule {
 
     @Provides
+    @Named("OriginalDatabase")
     @Singleton
     fun provideDatabase(@ApplicationContext appContext: Context): YouTubeDatabase {
         return Room.databaseBuilder(appContext, YouTubeDatabase::class.java, "YouTubeDatabase")

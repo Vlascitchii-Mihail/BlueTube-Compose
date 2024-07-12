@@ -21,9 +21,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.appelier.bluetubecompose.R
-import com.appelier.bluetubecompose.navigation.ScreenType
 import com.appelier.bluetubecompose.core.core_ui.theme.BlueTubeComposeTheme
-import com.appelier.bluetubecompose.utils.NavigationTags
+import com.appelier.bluetubecompose.navigation.ScreenType
+import com.appelier.bluetubecompose.utils.NavigationTags.BOTTOM_NAV
 
 private const val FIRST_ICON_INDEX = 0
 private const val SECOND_ICON_INDEX = 1
@@ -54,7 +54,7 @@ fun BlueTubeBottomNavigation(navController: NavHostController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
-    BottomNavigation(modifier = Modifier.testTag(NavigationTags.BOTTOM_NAV)) {
+    BottomNavigation(modifier = Modifier.testTag(BOTTOM_NAV)) {
         navItemsList.forEach { navItem ->
             val isSelected = navItem.getScreenSelectedState(currentDestination = currentDestination)
 
@@ -76,7 +76,7 @@ fun BlueTubeBottomNavigation(navController: NavHostController) {
                     )
                 },
                 label = {
-                    Text(text = navItem.screen.name)
+                    Text(text = navItem.screen.name, style = MaterialTheme.typography.titleSmall)
                 },
                 unselectedContentColor = MaterialTheme.colorScheme.onPrimary,
                 selectedContentColor = MaterialTheme.colorScheme.onBackground

@@ -95,8 +95,6 @@ dependencies {
 
     //dagger hilt
     implementation(libs.hilt.android)
-    testImplementation("junit:junit:4.12")
-    testImplementation("junit:junit:4.12")
     ksp(libs.ksp.hilt.compiler)
     implementation(libs.hilt.navigation)
 
