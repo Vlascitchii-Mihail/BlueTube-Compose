@@ -8,6 +8,9 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.testTag
@@ -32,7 +35,7 @@ fun VideoListScreen(
     navigateToPlayerScreen: (video: YoutubeVideo) -> Unit,
     searchViewState: SearchState,
     searchTextState: String,
-    videos: StateFlow<PagingData<YoutubeVideo>>,
+    videos: State<StateFlow<PagingData<YoutubeVideo>>>,
     updateSearchTextState: (String) -> Unit,
     updateSearchState: (SearchState) -> Unit,
     getSearchVideosFlow: (String) -> Unit,
@@ -56,7 +59,7 @@ fun VideoListScreen(
         }
     )
     { innerPadding ->
-        YouTubeVideoList(videos.collectAsLazyPagingItems(), Modifier, innerPadding, navigateToPlayerScreen)
+        YouTubeVideoList(videos.value.collectAsLazyPagingItems(), Modifier, innerPadding, navigateToPlayerScreen)
     }
 }
 
@@ -94,13 +97,13 @@ private fun ListScreenAppBar(
 @Preview
 @Composable
 fun VideoListScreenPreview() {
+    val videos = remember {mutableStateOf(MutableStateFlow(PagingData.from(DEFAULT_VIDEO_LIST))) }
     VideoListScreen(
         navigateToPlayerScreen = {},
         searchViewState = SearchState.CLOSED,
         searchTextState = "Preview text",
-        videos = MutableStateFlow(PagingData.from(DEFAULT_VIDEO_LIST)),
+        videos = videos,
         updateSearchTextState = {},
-        updateSearchState = {},
-        getSearchVideosFlow = {}
-    )
+        updateSearchState = {}
+    ) {}
 }

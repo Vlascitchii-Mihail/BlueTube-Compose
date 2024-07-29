@@ -18,8 +18,11 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusRequester
@@ -31,9 +34,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.appelier.bluetubecompose.R
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 private val DEFAULT_APP_BAR_HEIGHT = 56.dp
 private const val SEARCH_INPUT_DELAY = 1500L
@@ -48,10 +51,21 @@ fun SearchAppBarBlueTube(
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusRequester = remember { FocusRequester() }
     val inputScope = rememberCoroutineScope()
-    var inputSearchJob = remember { inputScope.launch {  } }
+    var inputSearchJob by remember { mutableStateOf<Job?>(null) }
 
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
+    }
+
+    fun performSearch(input: String) {
+        if (input != "" && input != searchText) {
+            inputSearchJob?.cancel()
+            inputSearchJob = inputScope.async {
+                delay(SEARCH_INPUT_DELAY)
+                onSearchClicked.invoke(input)
+            }
+        }
+
     }
 
     Surface(
@@ -67,13 +81,7 @@ fun SearchAppBarBlueTube(
             value = searchText,
             onValueChange = { input ->
                 onTextChange.invoke(input)
-                if (input != "") {
-                    inputSearchJob.cancel()
-                    inputSearchJob = inputScope.async {
-                        delay(SEARCH_INPUT_DELAY)
-                        onSearchClicked.invoke(input)
-                    }
-                }
+                performSearch(input)
             },
             placeholder = {
                 Text(
@@ -115,7 +123,7 @@ fun SearchAppBarBlueTube(
             ),
             keyboardActions = KeyboardActions(
                 onSearch = {
-                    onSearchClicked.invoke(searchText)
+                    performSearch(searchText)
                     keyboardController?.hide()
                 }
             ),
@@ -128,6 +136,8 @@ fun SearchAppBarBlueTube(
             )
         )
     }
+
+
 }
 
 @Preview
