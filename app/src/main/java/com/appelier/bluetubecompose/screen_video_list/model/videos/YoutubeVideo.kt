@@ -1,15 +1,20 @@
 package com.appelier.bluetubecompose.screen_video_list.model.videos
 
+import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
+import com.appelier.bluetubecompose.core.core_database.OffsetDateTimeSerializer
 import com.appelier.bluetubecompose.screen_video_list.model.Page
 import com.appelier.bluetubecompose.screen_video_list.model.ThumbnailAttributes
 import com.appelier.bluetubecompose.screen_video_list.model.Thumbnails
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
+import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.Serializable
 import java.time.OffsetDateTime
 
 @Entity(
@@ -24,6 +29,8 @@ import java.time.OffsetDateTime
     ]
 )
 @JsonClass(generateAdapter = true)
+@Serializable
+@Parcelize
 data class YoutubeVideo(
     @PrimaryKey(autoGenerate = false)
     val id: String,
@@ -34,10 +41,14 @@ data class YoutubeVideo(
     @Ignore
     var statistics: VideoStatistics = VideoStatistics(),
     @Ignore
+    @Contextual
     var contentDetails: ContentDetails = ContentDetails(),
     @field:Json(ignore = true)
+    @Serializable(with = OffsetDateTimeSerializer::class)
     var loadedDate: OffsetDateTime? = null
-) {
+)
+    : Parcelable
+{
     //Need a secondary constructor to be able to use @Ignore parameters in your primary constructor.
     // This is so Room still has a constructor that it can use when instantiating your object.
     constructor(id: String, pageToken: String)

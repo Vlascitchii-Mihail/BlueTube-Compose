@@ -4,6 +4,7 @@ import com.appelier.bluetubecompose.core.core_database.YouTubeVideoDao
 import com.appelier.bluetubecompose.screen_video_list.model.Page
 import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideo
 import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideoResponse
+import com.appelier.bluetubecompose.utils.convertPageWithVideosToYoutubeVideoResponse
 import java.time.OffsetDateTime
 
 class DatabaseContentController(private val youTubeVideoDao: YouTubeVideoDao) {
@@ -78,18 +79,18 @@ class DatabaseContentController(private val youTubeVideoDao: YouTubeVideoDao) {
         }
     }
 
-//    suspend fun getVideosFromDatabase(pageToken: String): YoutubeVideoResponse {
-//        return if (pageToken == "") getFirstPageFromDatabase()
-//        else getParticularPageFromDatabase(pageToken)
-//    }
+    suspend fun getVideosFromDatabase(pageToken: String): YoutubeVideoResponse {
+        return if (pageToken == "") getFirstPageFromDatabase()
+        else getParticularPageFromDatabase(pageToken)
+    }
 
-//    private suspend fun getParticularPageFromDatabase(nextPageToken: String): YoutubeVideoResponse {
-//        val pageWithVideos = youTubeVideoDao.getPageWithVideos(nextPageToken)
-//        return convertPageWithVideosToYoutubeVideoResponse(pageWithVideos)
-//    }
-//
-//    private suspend fun getFirstPageFromDatabase(): YoutubeVideoResponse {
-//        val firstPageWithVideos = youTubeVideoDao.getFirstPageFromDb()
-//        return convertPageWithVideosToYoutubeVideoResponse(firstPageWithVideos)
-//    }
+    private suspend fun getParticularPageFromDatabase(nextPageToken: String): YoutubeVideoResponse {
+        val pageWithVideos = youTubeVideoDao.getPageWithVideos(nextPageToken)
+        return convertPageWithVideosToYoutubeVideoResponse(pageWithVideos)
+    }
+
+    private suspend fun getFirstPageFromDatabase(): YoutubeVideoResponse {
+        val firstPageWithVideos = youTubeVideoDao.getFirstPageFromDb()
+        return convertPageWithVideosToYoutubeVideoResponse(firstPageWithVideos)
+    }
 }

@@ -1,9 +1,12 @@
 package com.appelier.bluetubecompose.screen_video_list.model.videos
 
+import android.os.Parcelable
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import com.squareup.moshi.JsonClass
+import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 
 @Entity(
     tableName = "content_details",
@@ -17,9 +20,12 @@ import com.squareup.moshi.JsonClass
     ]
 )
 @JsonClass(generateAdapter = true)
+@Parcelize
+@Serializable
 data class ContentDetails(
     val duration: String = "",
     @PrimaryKey(autoGenerate = false)
     var contentDetailsId: String = "",
     var videoId: String = ""
 )
+    : Parcelable
