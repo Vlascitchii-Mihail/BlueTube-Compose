@@ -72,7 +72,7 @@ class VideoListScreenKtTest {
     fun init_video_list_screen() {
         hiltRule.inject()
 
-        val videoPage = MutableStateFlow(PagingData.from(DEFAULT_VIDEO_LIST))
+        val videoPage = mutableStateOf(MutableStateFlow(PagingData.from(DEFAULT_VIDEO_LIST)))
 
         composeAndroidTestRule.activity.setContent {
             navController = TestNavHostController(LocalContext.current)
@@ -87,11 +87,10 @@ class VideoListScreenKtTest {
                         searchTextState = testSearchTextState.value,
                         videos = videoPage,
                         updateSearchTextState = { searchText -> testSearchTextState.value = searchText },
-                        updateSearchState = { searchState -> testSearchState.value = searchState },
-                        getSearchVideosFlow = { searchText ->
-                            videoPage
-                        }
-                    )
+                        updateSearchState = { searchState -> testSearchState.value = searchState }
+                    ) { searchText ->
+                        videoPage
+                    }
                 }
                 composable<ScreenType.PlayerScreen>(
                     typeMap = mapOf(

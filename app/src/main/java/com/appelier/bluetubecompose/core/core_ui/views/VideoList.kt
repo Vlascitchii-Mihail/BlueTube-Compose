@@ -37,6 +37,7 @@ fun YouTubeVideoList(
     innerPadding: PaddingValues,
     navigateToPlayerScreen: (YoutubeVideo) -> Unit,
 ) {
+
     val keyboardController = LocalSoftwareKeyboardController.current
     val nestedScrollConnection = remember {
         object: NestedScrollConnection {
