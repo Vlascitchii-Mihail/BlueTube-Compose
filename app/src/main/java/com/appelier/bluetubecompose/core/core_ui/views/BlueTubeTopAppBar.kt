@@ -15,14 +15,12 @@ import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.appelier.bluetubecompose.R
 import com.appelier.bluetubecompose.core.core_ui.theme.BlueberryBlue
-import com.appelier.bluetubecompose.utils.VideoListScreenTags.ICON_OPEN_SEARCH
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,7 +49,6 @@ fun BlueTubeTopAppBar(
         actions = {
             IconButton(
                 onClick = { searchAction.invoke() },
-                modifier = Modifier.testTag(ICON_OPEN_SEARCH),
             ) {
                 Icon(
                     imageVector = icon,

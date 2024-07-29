@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt.plugin)
+    alias(libs.plugins.parcelize)
 }
 
 android {
@@ -48,6 +49,7 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
+        viewBinding = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.14"
@@ -136,13 +138,15 @@ dependencies {
     androidTestImplementation(libs.mockwebserver)
     testImplementation(libs.test.coroutines)
     androidTestImplementation(libs.test.arch.core)
-    androidTestImplementation(libs.mockito.android)
+    androidTestImplementation(libs.dexmaker)
     androidTestImplementation(libs.mockito.kotlin.android)
     androidTestImplementation(libs.androidx.test.ext)
     androidTestImplementation(libs.androidx.test.espresso)
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.08.00"))
     androidTestImplementation(libs.androidx.compose.ui.test)
     androidTestImplementation(libs.android.hilt.test)
+    androidTestImplementation(libs.navigation.compose.testing)
+
     kspAndroidTest(libs.ksp.android.test)
     debugImplementation(libs.compose.ui.tooling)
     debugImplementation(libs.compose.test.manifest)

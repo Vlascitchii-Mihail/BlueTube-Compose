@@ -1,11 +1,14 @@
 package com.appelier.bluetubecompose.screen_video_list.model
 
+import android.os.Parcelable
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import com.appelier.bluetubecompose.screen_video_list.model.videos.VideoSnippet
 import com.squareup.moshi.JsonClass
+import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 
 @Entity(
     tableName = "thumbnails",
@@ -19,6 +22,8 @@ import com.squareup.moshi.JsonClass
     ]
 )
 @JsonClass(generateAdapter = true)
+@Parcelize
+@Serializable
 data class Thumbnails(
     @Ignore
     var medium: ThumbnailAttributes = ThumbnailAttributes(),
@@ -26,3 +31,4 @@ data class Thumbnails(
     var thumbnailsId: String = "",
     var snippetId: String = ""
     )
+    : Parcelable

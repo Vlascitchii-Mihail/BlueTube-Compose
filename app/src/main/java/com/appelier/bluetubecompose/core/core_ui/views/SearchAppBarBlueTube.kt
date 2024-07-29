@@ -26,13 +26,11 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.appelier.bluetubecompose.R
-import com.appelier.bluetubecompose.utils.VideoListScreenTags.ICON_CLOSE_SEARCH
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -93,14 +91,13 @@ fun SearchAppBarBlueTube(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Search,
-                        contentDescription = "Search Icon",
+                        contentDescription = stringResource(id = R.string.appbar_search_icon_descr),
                         tint = MaterialTheme.colorScheme.onBackground
                     )
                 }
             },
             trailingIcon = {
                 IconButton(
-                    modifier = Modifier.testTag(ICON_CLOSE_SEARCH),
                     onClick = {
                         if(searchText.isNotEmpty()) onTextChange("")
                         else onCloseClicked.invoke()
@@ -108,7 +105,7 @@ fun SearchAppBarBlueTube(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Close,
-                        contentDescription = "Search Icon",
+                        contentDescription = stringResource(id = R.string.appbar_close_icon_descr),
                         tint = MaterialTheme.colorScheme.onBackground
                     )
                 }
