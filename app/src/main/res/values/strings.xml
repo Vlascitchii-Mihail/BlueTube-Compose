@@ -5,13 +5,15 @@
     <string name="appbar_title">BlueTube</string>
     <string name="appbar_logo_descr">Blue Tube Icon</string>
     <string name="appbar_search_icon_descr">Search icon</string>
+    <string name="appbar_close_icon_descr">Close icon</string>
     <string name="search_placeholder">Enter search text</string>
-
-
+    <string name="video_preview">Video preview</string>
+    <string name="channel_name">Channel name is </string>
     <string name="video_list_screen">Video List</string>
 
-
+<!--Player Screen-->
     <string name="player_screen">Player Screen</string>
+    <string name="views">\u0020views</string>
 
 
     <string name="shorts_screen">Shorts Screen</string>

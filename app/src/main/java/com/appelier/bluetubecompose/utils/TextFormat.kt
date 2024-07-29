@@ -1,10 +1,7 @@
 package com.appelier.bluetubecompose.utils
 
-//import androidx.appcompat.widget.SearchView
-//import com.usm.bluetube.R
 import com.appelier.bluetubecompose.core.core_database.relations.PageWithVideos
 import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideoResponse
-import java.io.File
 import java.io.InputStreamReader
 import java.time.Duration
 import java.time.LocalDateTime
@@ -78,21 +75,6 @@ fun formatVideoDuration(duration: String): String {
     }
 
     return if (strHours == "") "$strMinutes:$strSeconds" else "$strHours:$strMinutes:$strSeconds"
-}
-
-//fun SearchView.setupTextAppearance(context: Context, fontId: Int) {
-//    val searchText = this.findViewById<View>(androidx.appcompat.R.id.search_src_text) as TextView
-//    searchText.typeface = resources.getFont(fontId)
-//    searchText.setTextColor(ContextCompat.getColor(context, R.color.black))
-//}
-//
-//fun SearchView.setupBackground(context: Context, drawableId: Int) {
-//    this.background = ContextCompat.getDrawable(context, drawableId)
-//}
-
-fun readJsonFileFromUnitTest(filePath: String): String {
-    val jsonFile = File(filePath)
-    return jsonFile.readText()
 }
 
 fun readJsonFileAsString(classLoader: ClassLoader?, path: String): String {

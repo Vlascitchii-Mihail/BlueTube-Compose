@@ -4,6 +4,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
@@ -22,31 +23,27 @@ class VideoListViewModel @Inject constructor(
     private val videoRepository: VideoListRepository,
 ): ViewModel() {
 
-    private var _videos: MutableState<StateFlow<PagingData<YoutubeVideo>>> = mutableStateOf(getVideosFlow())
-    val videos: State<StateFlow<PagingData<YoutubeVideo>>> = _videos
-
     private val _searchState: MutableState<SearchState> = mutableStateOf(SearchState.CLOSED)
     val searchState: State<SearchState> = _searchState
 
     private val _searchTextState: MutableState<String> = mutableStateOf("")
     val searchTextState: State<String> = _searchTextState
 
-    private var performedQuery = ""
+    var performedQuery = ""
 
-    private fun getVideosFlow(): StateFlow<PagingData<YoutubeVideo>> {
+    fun getVideosFlow(): StateFlow<PagingData<YoutubeVideo>> {
         return videoRepository
             .fetchVideos(VideoType.Videos, viewModelScope).cachedIn(viewModelScope)
             .stateIn(viewModelScope, SharingStarted.Lazily, PagingData.empty())
     }
 
-    fun getSearchVideosFlow(query: String = "") {
-        if (query != "" && query != performedQuery) {
-            _videos.value = videoRepository
+    fun getSearchVideosFlow(query: String = ""): StateFlow<PagingData<YoutubeVideo>> {
+        performedQuery = query
+
+        return videoRepository
                 .fetchVideos(VideoType.SearchedVideo(query), viewModelScope)
                 .cachedIn(viewModelScope)
                 .stateIn(viewModelScope, SharingStarted.Lazily, PagingData.empty())
-            performedQuery = query
-        }
     }
 
     fun updateSearchState(newSearchState: SearchState) {
@@ -55,5 +52,19 @@ class VideoListViewModel @Inject constructor(
 
     fun updateSearchTextState(newSearchTextState: String) {
         _searchTextState.value = newSearchTextState
+    }
+}
+
+
+class VideoListViewModelFactory(
+    private val videoRepository: VideoListRepository,
+) : ViewModelProvider.Factory {
+
+    @Suppress("UNCHECKED_CAST")
+    override fun <T: ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(VideoListViewModel::class.java)) {
+            return VideoListViewModel(videoRepository) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

@@ -51,7 +51,7 @@ class YoutubeVideoSourceTest {
     }
 
     @Test
-    fun `fetchVideos() adds channel image URL to a video`() {
+    fun `fetchVideos() adds channel image URL and subscription count to a video`() {
         testCoroutineScope.runTest {
             whenever(
                 apiService.fetchVideos(anyString(), anyString(), anyString(), anyString())

@@ -1,4 +1,4 @@
-package com.appelier.bluetubecompose.ui
+package com.appelier.bluetubecompose.ui.navigation
 
 import androidx.activity.compose.setContent
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
@@ -33,6 +33,7 @@ class BlueTubeNavigationTest {
 
     @Before
     fun init_app() {
+        hiltRule.inject()
         composeAndroidTestRule.activity.setContent {
             BlueTubeApp()
         }
@@ -40,12 +41,12 @@ class BlueTubeNavigationTest {
 
     @Test
     fun app_shows_navigation_and_bottom_nav() {
-            composeAndroidTestRule.onNodeWithTag(NavigationTags.NAVIGATION).assertIsDisplayed()
-            composeAndroidTestRule.onNodeWithTag(NavigationTags.BOTTOM_NAV).assertIsDisplayed()
+        composeAndroidTestRule.onNodeWithTag(NavigationTags.NAVIGATION).assertIsDisplayed()
+        composeAndroidTestRule.onNodeWithTag(NavigationTags.BOTTOM_NAV).assertIsDisplayed()
     }
 
     @Test
-    fun app_shows_button_nav_navigates_to_screens() {
+    fun button_nav_navigates_to_screens() {
         composeAndroidTestRule.onNodeWithTag(NavigationTags.VIDEO_LIST_SCREEN).assertIsDisplayed()
         composeAndroidTestRule.onNodeWithText("Shorts").performClick()
         composeAndroidTestRule.onNodeWithTag(NavigationTags.SHORTS_SCREEN).assertIsDisplayed()
