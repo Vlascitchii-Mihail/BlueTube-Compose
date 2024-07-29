@@ -40,13 +40,14 @@ fun Navigation(
         ) {
             composable<ScreenType.VideoList> {
                 val videoListViewModel: VideoListViewModel = hiltViewModel()
+                videoListViewModel.getVideosFlow()
                 VideoListScreen(
                     navigateToPlayerScreen = { video: YoutubeVideo ->
                         navController.navigate(ScreenType.PlayerScreen(video))
                     },
-                    videoListViewModel.searchState.value,
-                    videoListViewModel.searchTextState.value,
-                    videoListViewModel.getVideosFlow(),
+                    searchViewState = videoListViewModel.searchState.value,
+                    searchTextState = videoListViewModel.searchTextState.value,
+                    videos = videoListViewModel.videoStateFlow,
                     updateSearchTextState = { searchText ->
                         videoListViewModel.updateSearchTextState(
                             searchText
@@ -58,10 +59,8 @@ fun Navigation(
                         )
                     },
                     getSearchVideosFlow = { searchText ->
-                        if (searchText != "" && searchText != videoListViewModel.performedQuery) {
-                            videoListViewModel.getSearchVideosFlow(searchText)
-                        }
-                    },
+                        videoListViewModel.getSearchVideosFlow(searchText)
+                    }
                 )
             }
             composable<ScreenType.PlayerScreen>(

@@ -13,6 +13,7 @@ import com.appelier.bluetubecompose.screen_video_list.repository.VideoListReposi
 import com.appelier.bluetubecompose.search_video.SearchState
 import com.appelier.bluetubecompose.utils.VideoType
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
@@ -23,24 +24,26 @@ class VideoListViewModel @Inject constructor(
     private val videoRepository: VideoListRepository,
 ): ViewModel() {
 
+    private val emptyPagingData = PagingData.empty<YoutubeVideo>()
+    private val _videoStateFlow: MutableState<StateFlow<PagingData<YoutubeVideo>>> = mutableStateOf(MutableStateFlow(emptyPagingData))
+    val videoStateFlow: State<StateFlow<PagingData<YoutubeVideo>>> get() = _videoStateFlow
+
     private val _searchState: MutableState<SearchState> = mutableStateOf(SearchState.CLOSED)
     val searchState: State<SearchState> = _searchState
 
     private val _searchTextState: MutableState<String> = mutableStateOf("")
     val searchTextState: State<String> = _searchTextState
 
-    var performedQuery = ""
-
-    fun getVideosFlow(): StateFlow<PagingData<YoutubeVideo>> {
-        return videoRepository
-            .fetchVideos(VideoType.Videos, viewModelScope).cachedIn(viewModelScope)
-            .stateIn(viewModelScope, SharingStarted.Lazily, PagingData.empty())
+    fun getVideosFlow() {
+        if (_videoStateFlow.value.value == emptyPagingData) {
+            _videoStateFlow.value = videoRepository
+                .fetchVideos(VideoType.Videos, viewModelScope).cachedIn(viewModelScope)
+                .stateIn(viewModelScope, SharingStarted.Lazily, PagingData.empty())
+        }
     }
 
-    fun getSearchVideosFlow(query: String = ""): StateFlow<PagingData<YoutubeVideo>> {
-        performedQuery = query
-
-        return videoRepository
+    fun getSearchVideosFlow(query: String = "") {
+            _videoStateFlow.value = videoRepository
                 .fetchVideos(VideoType.SearchedVideo(query), viewModelScope)
                 .cachedIn(viewModelScope)
                 .stateIn(viewModelScope, SharingStarted.Lazily, PagingData.empty())
