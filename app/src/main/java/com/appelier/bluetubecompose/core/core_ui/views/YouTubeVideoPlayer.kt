@@ -43,11 +43,9 @@ fun YoutubeVideoPlayer(
             videoId
         )
     }
-    var orientationCode = OrientationState.PORTRAIT.ordinal
-
 
     fun setupOrientationChange(orientation: Int) {
-        if (playerOrientationState.value == OrientationState.PORTRAIT && orientation == orientationCode) {
+        if (playerOrientationState.value == OrientationState.PORTRAIT && OrientationState.PORTRAIT.ordinal != orientation) {
             youTubePlayerHandler.youTubePlayer?.toggleFullscreen()
         }
     }
@@ -55,7 +53,6 @@ fun YoutubeVideoPlayer(
     DisposableEffect(Unit) {
         val orientationEventListener = object : OrientationEventListener(localContext) {
             override fun onOrientationChanged(orientation: Int) {
-                orientationCode = orientation
                 setupOrientationChange(orientation)
             }
         }
