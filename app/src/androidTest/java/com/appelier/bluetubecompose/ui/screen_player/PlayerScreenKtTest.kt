@@ -86,7 +86,8 @@ class PlayerScreenKtTest {
                                 launchSingleTop = true
                             }
                         },
-                        popBackStack = {}
+                        popBackStack = {},
+                        getUpdatedPlaybackPosition = { videoPlayback: Float -> videoPlayback }
                     )
                 }
             }

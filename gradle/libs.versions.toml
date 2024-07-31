@@ -7,7 +7,9 @@ lifecycle-runtime-ktx = "2.8.0"
 #ui
 material = "1.6.7"
 navigation = "2.8.0-beta05"
-constraint-layout = "1.1.0-alpha13"
+constraint-layout-compose = "1.1.0-alpha13"
+constraint-layout-xml = "2.1.4"
+
 
 #dagger hilt
 hilt = "2.49"
@@ -66,7 +68,9 @@ compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
 material3 = { module = "androidx.compose.material3:material3" }
 androidx-material = { module = "androidx.compose.material:material", version.ref = "material" }
-constraint_layout = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraint-layout"}
+constraint-layout-compose = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraint-layout-compose"}
+constraint-layout-xml = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraint-layout-xml" }
+
 
 livedata = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "lifecycle"}
 livedata-runtime = { module = "androidx.compose.runtime:runtime-livedata", version.ref = "livedata-runtime" }

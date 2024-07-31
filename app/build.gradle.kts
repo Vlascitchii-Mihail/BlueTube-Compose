@@ -81,7 +81,8 @@ dependencies {
     implementation(libs.ui.tooling.preview)
     implementation(libs.material3)
     implementation(libs.androidx.material)
-    implementation(libs.constraint.layout)
+    implementation(libs.constraint.layout.compose)
+    implementation(libs.constraint.layout.xml)
 
     //ViewModel
     implementation(libs.lifecycle.viewmodel.ktx)

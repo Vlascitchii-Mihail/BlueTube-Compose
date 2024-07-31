@@ -5,6 +5,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.LifecycleOwner
@@ -22,9 +25,10 @@ import kotlinx.coroutines.flow.StateFlow
 fun PlayerScreen(
     video: YoutubeVideo,
     lifecycleOwner: LifecycleOwner,
-    relatedVideos: StateFlow<PagingData<YoutubeVideo>>,
+    relatedVideos: State<StateFlow<PagingData<YoutubeVideo>>>,
     navigateToPlayerScreen: (YoutubeVideo) -> Unit,
-    popBackStack: () -> Unit
+    popBackStack: () -> Unit,
+    getUpdatedPlaybackPosition: (Float) -> Float
 ) {
     Scaffold(
         content = { paddingValue ->
@@ -35,17 +39,18 @@ fun PlayerScreen(
                     videoId = video.id,
                     lifecycleOwner = lifecycleOwner,
                     Modifier,
-                    popBackStack
+                    popBackStack,
+                    getUpdatedPlaybackPosition
                 )
 
                 VideoDescription(video = video)
 
-                YouTubeVideoList(
-                    videos = relatedVideos.collectAsLazyPagingItems(),
-                    modifier = Modifier,
-                    innerPadding = paddingValue,
-                    navigateToPlayerScreen = navigateToPlayerScreen
-                )
+//                YouTubeVideoList(
+//                    videos = relatedVideos.value.collectAsLazyPagingItems(),
+//                    modifier = Modifier,
+//                    innerPadding = paddingValue,
+//                    navigateToPlayerScreen = navigateToPlayerScreen
+//                )
             }
         }
     )
@@ -54,11 +59,13 @@ fun PlayerScreen(
 @Preview
 @Composable
 fun PlayerScreenPreview() {
+    val relatedVideos = remember { mutableStateOf(MutableStateFlow(PagingData.from(DEFAULT_VIDEO_LIST))) }
     PlayerScreen(
         video = YoutubeVideo.DEFAULT_VIDEO,
         lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current,
-        relatedVideos = MutableStateFlow(PagingData.from(DEFAULT_VIDEO_LIST)),
+        relatedVideos = relatedVideos,
         navigateToPlayerScreen = {},
-        popBackStack = {}
+        popBackStack = {},
+        getUpdatedPlaybackPosition = { videoPlayback: Float -> videoPlayback }
     )
 }
