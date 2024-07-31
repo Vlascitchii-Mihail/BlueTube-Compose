@@ -1,6 +1,7 @@
 package com.appelier.bluetubecompose.ui.screen_player
 
 import androidx.activity.compose.setContent
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -60,7 +61,7 @@ class PlayerScreenKtTest {
     fun init_player_screen() {
         hiltRule.inject()
 
-        val videoPage = MutableStateFlow(PagingData.from(DEFAULT_VIDEO_LIST))
+        val videoPage = mutableStateOf(MutableStateFlow(PagingData.from(DEFAULT_VIDEO_LIST)))
 
         composeAndroidTestRule.activity.setContent {
             navController = TestNavHostController(LocalContext.current)
