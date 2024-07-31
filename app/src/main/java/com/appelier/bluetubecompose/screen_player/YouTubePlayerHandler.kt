@@ -22,10 +22,8 @@ class YouTubePlayerHandler(
 ) {
 
     var youTubePlayer: YouTubePlayer? = null
-    private val landscapeOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
     private val landscapeSensorOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
-    private val portraitUserOrientation = ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT
-    private val sensorOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
+    private val portraitSensorOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
     lateinit var playerFullScreenView: View
     var playerHeight: Int = 0
 
@@ -61,12 +59,12 @@ class YouTubePlayerHandler(
                 override fun onEnterFullscreen(fullscreenView: View, exitFullscreen: () -> Unit) {
                     playerFullScreenView = fullscreenView
                     setFullScreenVisibility(fullscreenView)
-                    changeToLandscapeOrientation(activity)
+                    changeToLandscapeOrientation()
                 }
 
                 override fun onExitFullscreen() {
                     setPortraitVisibility()
-                    changeToPortraitOrientation(activity)
+                    changeToPortraitOrientation()
                 }
             })
         }
@@ -101,15 +99,15 @@ class YouTubePlayerHandler(
         activity.window?.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
     }
 
-     fun changeToLandscapeOrientation(activity: Activity?) {
-        if (activity?.requestedOrientation != landscapeOrientation) {
-            activity?.requestedOrientation = landscapeSensorOrientation
-        }
+     fun changeToLandscapeOrientation() {
+         if (activity.requestedOrientation != landscapeSensorOrientation) {
+             activity.requestedOrientation = landscapeSensorOrientation
+         }
      }
 
-    fun changeToPortraitOrientation(activity: Activity?) {
-        if (activity?.requestedOrientation != portraitUserOrientation) {
-            activity?.requestedOrientation = portraitUserOrientation
+    fun changeToPortraitOrientation() {
+        if (activity.requestedOrientation != portraitSensorOrientation) {
+            activity.requestedOrientation = portraitSensorOrientation
         }
     }
 }

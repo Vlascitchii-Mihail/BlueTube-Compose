@@ -73,10 +73,11 @@ fun Navigation(
             ) { navBackStackEntry ->
                 val arg = navBackStackEntry.toRoute<ScreenType.PlayerScreen>().video
                 val playerScreenViewModel: VideoPlayerViewModel = hiltViewModel()
+                playerScreenViewModel.getSearchedRelatedVideos(arg.snippet.title)
                 PlayerScreen(
                     video = arg,
                     lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current,
-                    relatedVideos = playerScreenViewModel.getSearchedRelatedVideos(arg.snippet.title),
+                    relatedVideos = playerScreenViewModel.relatedVideoStateFlow,
                     navigateToPlayerScreen = { video: YoutubeVideo ->
                         navController.navigate(ScreenType.PlayerScreen(video)) {
                             launchSingleTop = true
