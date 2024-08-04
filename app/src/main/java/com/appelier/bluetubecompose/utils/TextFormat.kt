@@ -81,9 +81,9 @@ fun readJsonFileAsString(classLoader: ClassLoader?, path: String): String {
     return InputStreamReader(classLoader?.getResourceAsStream(path)).use { it.readText() }
 }
 
-fun convertPageWithVideosToYoutubeVideoResponse(pageWithVideos: PageWithVideos): YoutubeVideoResponse {
-    val page = pageWithVideos.page
-    val videos = pageWithVideos.videos
+fun  PageWithVideos.convertToYoutubeVideoResponse(): YoutubeVideoResponse {
+    val page = this.page
+    val videos = this.videos
     return YoutubeVideoResponse(
         nextPageToken = page.nextPageToken,
         currentPageToken = page.currentPageToken,

@@ -102,7 +102,6 @@ class VideoListScreenKtTest {
                 ) {
                     PlayerScreen(
                         video = video,
-                        lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current,
                         relatedVideos = mutableStateOf(MutableStateFlow(PagingData.from(DEFAULT_VIDEO_LIST))),
                         navigateToPlayerScreen = {},
                         popBackStack = {}

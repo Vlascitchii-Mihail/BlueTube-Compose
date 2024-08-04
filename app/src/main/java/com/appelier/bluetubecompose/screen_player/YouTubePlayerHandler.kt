@@ -3,6 +3,7 @@ package com.appelier.bluetubecompose.screen_player
 import android.app.Activity
 import android.content.pm.ActivityInfo
 import android.view.View
+import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.compose.runtime.MutableState
 import androidx.lifecycle.Lifecycle
@@ -21,11 +22,11 @@ class YouTubePlayerHandler(
     private val videoId: String
 ) {
 
-    var youTubePlayer: YouTubePlayer? = null
+    private lateinit var youTubePlayer: YouTubePlayer
     private val landscapeSensorOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
     private val portraitSensorOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
-    lateinit var playerFullScreenView: View
-    var playerHeight: Int = 0
+    private lateinit var playerFullScreenView: View
+    private var playerHeight: Int = 0
 
     init {
         setupFullScreenListener()
@@ -37,7 +38,8 @@ class YouTubePlayerHandler(
             currentComposeLifecycle.addObserver(this)
             enableAutomaticInitialization = false
             val fullScreenControl = IFramePlayerOptions.Builder().controls(1).fullscreen(1).build()
-            initialize(getYouTubePlayerListener(videoId, currentComposeLifecycle), fullScreenControl)
+            val youTubePlayerListener = getYouTubePlayerListener(videoId, currentComposeLifecycle)
+            initialize(youTubePlayerListener, fullScreenControl)
         }
     }
 
@@ -70,7 +72,7 @@ class YouTubePlayerHandler(
         }
     }
 
-    fun setFullScreenVisibility(fullscreenView: View) {
+    private fun setFullScreenVisibility(fullscreenView: View) {
         with(binding) {
             playerHeight = ytPlayer.height
 
@@ -81,12 +83,10 @@ class YouTubePlayerHandler(
         }
 
         playerOrientationState.value = OrientationState.FULL_SCREEN
-
-        //FLAG_FULLSCREEN - hide status bar
-        activity.window?.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        setScreenVisibilityFlag()
     }
 
-    fun setPortraitVisibility() {
+    private fun setPortraitVisibility() {
         with(binding) {
             llPlayerContainer.apply {
 
@@ -96,18 +96,38 @@ class YouTubePlayerHandler(
         }
 
         playerOrientationState.value = OrientationState.PORTRAIT
-        activity.window?.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        setScreenVisibilityFlag()
     }
 
-     fun changeToLandscapeOrientation() {
+    private fun setScreenVisibilityFlag() {
+        when(playerOrientationState.value) {
+            OrientationState.PORTRAIT -> activity.window?.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+            OrientationState.FULL_SCREEN -> activity.window?.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        }
+    }
+
+     private fun changeToLandscapeOrientation() {
          if (activity.requestedOrientation != landscapeSensorOrientation) {
              activity.requestedOrientation = landscapeSensorOrientation
          }
      }
 
-    fun changeToPortraitOrientation() {
+    private fun changeToPortraitOrientation() {
         if (activity.requestedOrientation != portraitSensorOrientation) {
             activity.requestedOrientation = portraitSensorOrientation
         }
+    }
+
+    fun togglePlayerOrientation() {
+        youTubePlayer.toggleFullscreen()
+    }
+
+    fun getPlayerContainerHeight(): Int {
+        return if (playerHeight > 0) playerHeight
+        else ViewGroup.LayoutParams.WRAP_CONTENT
+    }
+
+    fun setFullScreenVideoFitScreenHeight() {
+        playerFullScreenView.layoutParams.height = binding.ytPlayer.width
     }
 }
