@@ -3,7 +3,6 @@ package com.appelier.bluetubecompose.core.core_ui.views
 import android.app.Activity
 import android.view.LayoutInflater
 import android.view.OrientationEventListener
-import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,7 +16,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.zIndex
-import androidx.lifecycle.LifecycleOwner
 import com.appelier.bluetubecompose.databinding.FragmentPlayVideoBinding
 import com.appelier.bluetubecompose.screen_player.OrientationState
 import com.appelier.bluetubecompose.screen_player.YouTubePlayerHandler
@@ -27,26 +25,26 @@ import com.appelier.bluetubecompose.utils.getActivity
 @Composable
 fun YoutubeVideoPlayer(
     videoId: String,
-    lifecycleOwner: LifecycleOwner,
     modifier: Modifier = Modifier,
     popBackStack: () -> Unit
 ) {
     val playerOrientationState = remember { mutableStateOf(OrientationState.PORTRAIT) }
     val localContext = LocalContext.current
     val binding = remember { FragmentPlayVideoBinding.inflate(LayoutInflater.from(localContext)) }
+    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current.lifecycle
     val youTubePlayerHandler = remember {
         YouTubePlayerHandler(
             binding,
             playerOrientationState,
             localContext.getActivity() ?: localContext as Activity,
-            lifecycleOwner.lifecycle,
+            lifecycleOwner,
             videoId
         )
     }
 
     fun setupOrientationChange(orientation: Int) {
         if (playerOrientationState.value == OrientationState.PORTRAIT && OrientationState.PORTRAIT.ordinal != orientation) {
-            youTubePlayerHandler.youTubePlayer?.toggleFullscreen()
+            youTubePlayerHandler.togglePlayerOrientation()
         }
     }
 
@@ -63,7 +61,7 @@ fun YoutubeVideoPlayer(
 
     BackHandler {
         if (playerOrientationState.value == OrientationState.FULL_SCREEN)
-            youTubePlayerHandler.youTubePlayer?.toggleFullscreen()
+            youTubePlayerHandler.togglePlayerOrientation()
 
         else popBackStack.invoke()
     }
@@ -84,16 +82,14 @@ fun YoutubeVideoPlayer(
             binding.llPlayerContainer
         },
         update = { llPlayerContainer ->
-            when(playerOrientationState.value) {
+            when (playerOrientationState.value) {
                 OrientationState.PORTRAIT -> {
-                    val playerHeight = youTubePlayerHandler.playerHeight
                     llPlayerContainer.layoutParams.height =
-                        if (playerHeight > 0) playerHeight
-                        else WRAP_CONTENT
+                        youTubePlayerHandler.getPlayerContainerHeight()
                 }
-                OrientationState.FULL_SCREEN ->{
-                    youTubePlayerHandler.playerFullScreenView.layoutParams.height =
-                        binding.ytPlayer.width
+
+                OrientationState.FULL_SCREEN -> {
+                    youTubePlayerHandler.setFullScreenVideoFitScreenHeight()
                 }
             }
         }

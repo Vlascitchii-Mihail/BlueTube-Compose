@@ -22,8 +22,8 @@ interface YouTubeVideoDao {
 
     @Transaction
     @Query("")
-    suspend fun insertData(video: YoutubeVideo) {
-        insertVideo(video)
+    suspend fun insertVideo(video: YoutubeVideo) {
+        insertParticularVideo(video)
         insertVideoStatistics(video.statistics)
         insertContentDetails(video.contentDetails)
         insertVideoSnippet(video.snippet)
@@ -47,13 +47,13 @@ interface YouTubeVideoDao {
     suspend fun insertContentDetails(contentDetails: ContentDetails)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertVideo(video: YoutubeVideo)
+    suspend fun insertParticularVideo(video: YoutubeVideo)
 
 
 
     @Transaction
     @Query("")
-    suspend fun getPageWithVideos(currentPageToken: String): PageWithVideos {
+    suspend fun getVideosFromPage(currentPageToken: String): PageWithVideos {
         val pageWithVideos = getPageWithEmptyVideos(currentPageToken)
         pageWithVideos.videos.initializeVideos()
         return pageWithVideos

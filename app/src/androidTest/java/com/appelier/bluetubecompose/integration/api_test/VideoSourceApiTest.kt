@@ -2,13 +2,6 @@ package com.appelier.bluetubecompose.integration.api_test
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.appelier.bluetubecompose.core.core_api.Constants.Companion.CONTENT_DETAILS
-import com.appelier.bluetubecompose.core.core_api.Constants.Companion.MOST_POPULAR
-import com.appelier.bluetubecompose.core.core_api.Constants.Companion.REGION_CODE
-import com.appelier.bluetubecompose.core.core_api.Constants.Companion.RELEVANCE
-import com.appelier.bluetubecompose.core.core_api.Constants.Companion.SINGLE_CHANNEL
-import com.appelier.bluetubecompose.core.core_api.Constants.Companion.SNIPPET
-import com.appelier.bluetubecompose.core.core_api.Constants.Companion.STATISTICS
 import com.appelier.bluetubecompose.core.core_api.VideoApiService
 import com.appelier.bluetubecompose.screen_video_list.model.single_cnannel.Channel.Companion.DEFAULT_CHANNEL_1
 import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideoResponse.Companion.DEFAULT_VIDEO_RESPONSE
@@ -29,6 +22,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import javax.inject.Inject
+
+const val SUCCESS_CODE = 200
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
@@ -60,18 +55,9 @@ class VideoSourceApiTest {
     @Test
     fun fetchVideosReturnsVideoList() {
         testCoroutineScope.runTest {
-            val videoResponse = MockResponse().setBody(
-                readJsonFileAsString(this.javaClass.classLoader, "raw/video_list.json")
-            ).setResponseCode(200)
+            generateMockResponseFrom("raw/video_list.json")
 
-            mockWebServer.enqueue(videoResponse)
-
-            val fetchedVideoList = apiService.fetchVideos(
-                "$SNIPPET, $CONTENT_DETAILS, $STATISTICS",
-                MOST_POPULAR,
-                REGION_CODE,
-                ""
-            )
+            val fetchedVideoList = apiService.fetchVideos()
 
             assertEquals(DEFAULT_VIDEO_RESPONSE, fetchedVideoList.body())
         }
@@ -80,16 +66,9 @@ class VideoSourceApiTest {
     @Test
     fun fetchChannelsReturnsChannelsListWithOneVideoById() {
         testCoroutineScope.runTest {
-            val mockChannelResponse = MockResponse().setBody(
-                readJsonFileAsString(this.javaClass.classLoader, "raw/channel_response_1.json")
-            )
-            mockWebServer.enqueue(mockChannelResponse)
+            generateMockResponseFrom("raw/channel_response_1.json")
 
-            val fetchedChannel = apiService.fetchChannels(
-                DEFAULT_CHANNEL_1.id,
-                "$SNIPPET, $CONTENT_DETAILS, $STATISTICS",
-                SINGLE_CHANNEL
-            )
+            val fetchedChannel = apiService.fetchChannels(DEFAULT_CHANNEL_1.id)
 
             assertEquals(DEFAULT_CHANNEL_1, fetchedChannel.body()?.items?.first())
         }
@@ -98,17 +77,9 @@ class VideoSourceApiTest {
     @Test
     fun fetchSearchVideosReturnsSearchVideos() {
         testCoroutineScope.runTest {
-            val mockSearchVideosResponse = MockResponse().setBody(
-                readJsonFileAsString(this.javaClass.classLoader, "raw/search_response.json")
-            )
-            mockWebServer.enqueue(mockSearchVideosResponse)
+            generateMockResponseFrom("raw/search_response.json")
 
-            val searchedVideos = apiService.searchVideo(
-                query = "steam deck",
-                SNIPPET,
-                RELEVANCE,
-                ""
-            )
+            val searchedVideos = apiService.searchVideo(query = "steam deck")
 
             assertEquals(DEFAULT_SEARCH_VIDEO_RESPONSE, searchedVideos.body())
         }
@@ -117,14 +88,19 @@ class VideoSourceApiTest {
     @Test
     fun fetchParticularVideoReturnsParticularVideo() {
         testCoroutineScope.runTest {
-            val mockParticularVideoResponse = MockResponse().setBody(
-                readJsonFileAsString(this.javaClass.classLoader, "raw/particular_video_response.json")
-            )
-            mockWebServer.enqueue(mockParticularVideoResponse)
+            generateMockResponseFrom("raw/particular_video_response.json")
 
             val particularVideo = apiService.fetchParticularVideo(any()).body()!!
 
             assertEquals(DEFAULT_VIDEO_RESPONSE.items.first(), particularVideo.items.first())
         }
+    }
+
+    private fun generateMockResponseFrom(jsonFilePath: String) {
+        val videoResponse = MockResponse().setBody(
+            readJsonFileAsString(this.javaClass.classLoader, jsonFilePath)
+        ).setResponseCode(SUCCESS_CODE)
+
+        mockWebServer.enqueue(videoResponse)
     }
 }

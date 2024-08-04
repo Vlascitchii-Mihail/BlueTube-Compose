@@ -80,7 +80,6 @@ class PlayerScreenKtTest {
 
                     PlayerScreen(
                         video = video,
-                        lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current,
                         relatedVideos = videoPage,
                         navigateToPlayerScreen = {
                             navController.navigate(ScreenType.PlayerScreen(secondVideo)) {
