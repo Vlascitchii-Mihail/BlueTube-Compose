@@ -10,7 +10,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.LifecycleOwner
 import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.appelier.bluetubecompose.core.core_ui.views.VideoDescription
@@ -24,7 +23,6 @@ import kotlinx.coroutines.flow.StateFlow
 @Composable
 fun PlayerScreen(
     video: YoutubeVideo,
-    lifecycleOwner: LifecycleOwner,
     relatedVideos: State<StateFlow<PagingData<YoutubeVideo>>>,
     navigateToPlayerScreen: (YoutubeVideo) -> Unit,
     popBackStack: () -> Unit
@@ -36,7 +34,6 @@ fun PlayerScreen(
                 .padding(paddingValue)) {
                 YoutubeVideoPlayer(
                     videoId = video.id,
-                    lifecycleOwner = lifecycleOwner,
                     Modifier,
                     popBackStack
                 )
@@ -60,7 +57,6 @@ fun PlayerScreenPreview() {
     val relatedVideos = remember { mutableStateOf(MutableStateFlow(PagingData.from(DEFAULT_VIDEO_LIST))) }
     PlayerScreen(
         video = YoutubeVideo.DEFAULT_VIDEO,
-        lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current,
         relatedVideos = relatedVideos,
         navigateToPlayerScreen = {},
         popBackStack = {}

@@ -51,7 +51,7 @@ class YoutubeVideoSourceTest {
     }
 
     @Test
-    fun `fetchVideos() adds channel image URL and subscription count to a video`() {
+    fun `fetchVideos() adds channel image URL to a video`() {
         testCoroutineScope.runTest {
             whenever(
                 apiService.fetchVideos(anyString(), anyString(), anyString(), anyString())
@@ -59,10 +59,8 @@ class YoutubeVideoSourceTest {
 
             stubFetchChannels(DEFAULT_VIDEO_RESPONSE.items)
 
-            val videos = apiService.fetchVideos("","","","").body()
-            with(youtubeVideoSource) {
-                videos?.items.addChannelImgUrl()
-            }
+            val videos = apiService.fetchVideos().body()
+            videos?.items?.let { youtubeVideoSource.addChannelImgUrl(it) }
 
             assertEquals(DEFAULT_VIDEO_RESPONSE_WITH_CHANNEL_IMG, videos)
         }
@@ -70,7 +68,13 @@ class YoutubeVideoSourceTest {
 
     private suspend fun stubFetchChannels(videos: List<YoutubeVideo>) {
         for (index in videos.indices) {
-            whenever(apiService.fetchChannels(eq(videos[index].snippet.channelId), anyString(), anyInt()))
+            whenever(
+                apiService.fetchChannels(
+                    eq(videos[index].snippet.channelId),
+                    anyString(),
+                    anyInt()
+                )
+            )
                 .thenReturn(Response.success(DEFAULT_YOUTUBE_CHANNEL_RESPONSE_LIST[index]))
         }
     }
@@ -126,27 +130,24 @@ class YoutubeVideoSourceTest {
     @Test
     fun `Paging source converts SearchVideoItem to YoutubeVideo`() {
         testCoroutineScope.runTest {
-            var convertedVideoList: List<YoutubeVideo>
             whenever(
-                apiService.searchVideo(anyString(), anyString(), anyString(), anyString())
+                apiService.searchVideo()
             ).thenReturn(Response.success(DEFAULT_SEARCH_VIDEO_RESPONSE))
 
-            val searchedVideos = apiService.searchVideo(anyString(), anyString(), anyString(), anyString()).body()!!
-            searchedVideos.items.prepareConvertAnswers()
+            val searchedVideos = apiService.searchVideo().body() ?: DEFAULT_SEARCH_VIDEO_RESPONSE
+            searchedVideos.items.mockConvertToVideoList()
 
-            with(youtubeVideoSource) {
-                convertedVideoList = searchedVideos.items.convertToVideosList()
-
-            }
+            val convertedVideoList =
+                youtubeVideoSource.convertSearchVideoToVideosList(searchedVideos.items)
 
             assertEquals(DEFAULT_VIDEO_RESPONSE.items, convertedVideoList)
         }
     }
 
-    private suspend fun List<SearchVideoItem>.prepareConvertAnswers() {
+    private suspend fun List<SearchVideoItem>.mockConvertToVideoList() {
         for (index in this.indices) {
             whenever(
-                apiService.fetchParticularVideo(this@prepareConvertAnswers[index].id.videoId)
+                apiService.fetchParticularVideo(this@mockConvertToVideoList[index].id.videoId)
             ).thenReturn(Response.success(ParticularVideo(listOf(DEFAULT_VIDEO_RESPONSE.items[index]))))
         }
     }

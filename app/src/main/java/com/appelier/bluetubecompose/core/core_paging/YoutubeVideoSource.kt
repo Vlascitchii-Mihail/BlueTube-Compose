@@ -4,10 +4,10 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.appelier.bluetubecompose.core.core_api.VideoApiService
 import com.appelier.bluetubecompose.core.core_database.YouTubeVideoDao
-import com.appelier.bluetubecompose.core.core_database.utils.DatabaseContentController
+import com.appelier.bluetubecompose.core.core_database.utils.DatabaseContentManager
 import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideo
 import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideoResponse
-import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideoResponse.Companion.INITIAL_PAGE
+import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideoResponse.Companion.INITIAL_PAGE_TOKEN
 import com.appelier.bluetubecompose.search_video.model.SearchVideoItem
 import com.appelier.bluetubecompose.search_video.model.SearchVideoResponse
 import com.appelier.bluetubecompose.utils.VideoType
@@ -27,8 +27,8 @@ class YoutubeVideoSource(
     private val youTubeVideoDao: YouTubeVideoDao
 ): PagingSource<String, YoutubeVideo>() {
 
-    private var sourceCurrentPageToken = INITIAL_PAGE
-    private val databaseContentController = DatabaseContentController(youTubeVideoDao)
+    private var sourceCurrentPageToken = INITIAL_PAGE_TOKEN
+    private val databaseContentManager = DatabaseContentManager(youTubeVideoDao)
 
     override suspend fun load(params: LoadParams<String>): LoadResult<String, YoutubeVideo> {
         return try {
@@ -75,29 +75,35 @@ class YoutubeVideoSource(
     }
 
     private suspend fun showVideosFromNetwork(videoResponse:YoutubeVideoResponse): YoutubeVideoResponse {
-        videoResponse.items.addChannelImgUrl()
+        addChannelImgUrl(videoResponse.items)
 
-        with(databaseContentController) {
-            videoResponse.setCurrentPageTokenToVideos(sourceCurrentPageToken)
-            videoResponse.insertVideosToDb()
-        }
+        videoResponse.writeVideosToDatabase()
 
-        videoResponse.nextPageToken?.let { updateCurrentPageToken(it) }
         return videoResponse
     }
 
+    private suspend fun YoutubeVideoResponse.writeVideosToDatabase() {
+        databaseContentManager.setCurrentPageTokenToVideos(
+            sourceCurrentPageToken,
+            this@writeVideosToDatabase
+        )
+        databaseContentManager.insertVideosToDatabaseWithTimeStamp(youTubeVideoResponse = this@writeVideosToDatabase)
+
+        this.nextPageToken?.let { updateCurrentPageToken(it) }
+    }
+
     private suspend fun showVideosFromDb(pageToken: String = ""): YoutubeVideoResponse {
-        val dbVideos = databaseContentController.getVideosFromDatabase(pageToken)
+        val dbVideos = databaseContentManager.getVideosFromDatabase(pageToken)
         dbVideos.nextPageToken?.let { updateCurrentPageToken(it) }
         return dbVideos
     }
 
     private suspend fun fetchSearchedVideos(query: String, nextPageToken: String)
-    : YoutubeVideoResponse {
+            : YoutubeVideoResponse {
         val searchedVideos = apiService.searchVideo(query, nextPageToken = nextPageToken).body()
 
         return if (searchedVideos != null) {
-            val videos: List<YoutubeVideo> = searchedVideos.items.convertToVideosList()
+            val videos: List<YoutubeVideo> = convertSearchVideoToVideosList(searchedVideos.items)
             val response = YoutubeVideoResponse(
                 nextPageToken = searchedVideos.nextPageToken,
                 prevPageToken = searchedVideos.prevPageToken,
@@ -112,7 +118,7 @@ class YoutubeVideoSource(
 
         return if (searchedVideos != null) {
             val newSearchedVideos = searchedVideos.deleteFirstSameVideo()
-            val videos: List<YoutubeVideo> = newSearchedVideos.items.convertToVideosList()
+            val videos: List<YoutubeVideo> = convertSearchVideoToVideosList(newSearchedVideos.items)
 
             val response = YoutubeVideoResponse(
                 nextPageToken = searchedVideos.nextPageToken,
@@ -137,10 +143,10 @@ class YoutubeVideoSource(
         return this.copy(items = mutableVideoList)
     }
 
-    suspend fun  List<SearchVideoItem>.convertToVideosList(): List<YoutubeVideo> {
+    suspend fun convertSearchVideoToVideosList(searchList: List<SearchVideoItem>): List<YoutubeVideo> {
         val videoList: MutableList<Deferred<YoutubeVideo>> = mutableListOf()
         coroutineScope {
-            this@convertToVideosList.forEach { searchedVideo ->
+            searchList.forEach { searchedVideo ->
                 val video = async { searchedVideo.convertToVideo() }
                 videoList.add(video)
             }
@@ -148,33 +154,30 @@ class YoutubeVideoSource(
         return videoList.awaitAll()
     }
 
-    suspend fun  List<YoutubeVideo>?.addChannelImgUrl() {
-        this?.let {
-            it.addUrl(getChannelImgUrl(it))
-        }
+    private suspend fun SearchVideoItem.convertToVideo(): YoutubeVideo {
+        val video = apiService.fetchParticularVideo(this.id.videoId).body()
+
+        return video?.items?.first() ?: YoutubeVideo.DEFAULT_VIDEO
     }
 
-    private fun List<YoutubeVideo>.addUrl(
-        channelUrlList: List<String>
-    ) {
+    suspend fun addChannelImgUrl(videoList: List<YoutubeVideo>) {
+        val urlList = getChannelImgUrlList(videoList)
+        videoList.addChannelUrl(urlList)
+    }
+
+    private fun List<YoutubeVideo>.addChannelUrl(channelUrlList: List<String>) {
         for (i in this.indices) {
             this[i].snippet.channelImgUrl = channelUrlList[i]
         }
     }
 
- private suspend fun SearchVideoItem.convertToVideo(): YoutubeVideo {
-    val video = apiService.fetchParticularVideo(this.id.videoId).body()!!
-
-    return video.items.first()
-}
-
-    private suspend fun getChannelImgUrl(videos: List<YoutubeVideo>): List<String> {
+    private suspend fun getChannelImgUrlList(videos: List<YoutubeVideo>): List<String> {
         val channelUrlList: MutableList<Deferred<String>> = mutableListOf()
         coroutineScope {
             videos.map { video: YoutubeVideo ->
                 val channelImgUrl = async {
-                    val channelResponse = apiService.fetchChannels(video.snippet.channelId).body()!!
-                    channelResponse.items.first().snippet.thumbnails.medium.url
+                    val channelResponse = apiService.fetchChannels(video.snippet.channelId).body()
+                    channelResponse?.items?.first()?.snippet?.thumbnails?.medium?.url ?: ""
                 }
                 channelUrlList.add(channelImgUrl)
             }
