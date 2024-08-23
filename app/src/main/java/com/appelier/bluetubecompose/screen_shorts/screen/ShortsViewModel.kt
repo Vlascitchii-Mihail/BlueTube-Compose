@@ -1,5 +1,8 @@
 package com.appelier.bluetubecompose.screen_shorts.screen
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
@@ -18,9 +21,16 @@ class ShortsViewModel @Inject constructor(
     private val shortsRepository: ShortsRepository
 ): ViewModel() {
 
-    fun getShorts(): StateFlow<PagingData<YoutubeVideo>> {
-        return shortsRepository.fetchShorts(VideoType.Shorts, viewModelScope)
-            .cachedIn(viewModelScope)
-            .stateIn(viewModelScope, SharingStarted.Lazily, PagingData.empty())
+    private var _shortsVideoState: MutableState<StateFlow<PagingData<YoutubeVideo>>>? = null
+    val shortsVideoState: State<StateFlow<PagingData<YoutubeVideo>>>? get() = _shortsVideoState
+
+    fun getShorts() {
+        if (_shortsVideoState == null) {
+           val youTubeStateFlow  = shortsRepository.fetchShorts(VideoType.Shorts, viewModelScope)
+                .cachedIn(viewModelScope)
+                .stateIn(viewModelScope, SharingStarted.Lazily, PagingData.empty())
+
+            _shortsVideoState = mutableStateOf(youTubeStateFlow)
+        }
     }
 }

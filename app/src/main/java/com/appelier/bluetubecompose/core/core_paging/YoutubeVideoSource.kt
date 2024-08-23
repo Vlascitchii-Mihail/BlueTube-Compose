@@ -20,6 +20,8 @@ import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
 
+private const val DEFAULT_CHANNEL_IMG_LINK = "https://yt3.ggpht.com/ytc/AIdro_kQsQPf4J4FIufPC4XOJiWEdabmHjHFHvT_irLQXB0feS4=s88-c-k-c0x00ffffff-no-rj"
+
 class YoutubeVideoSource(
     private val apiService: VideoApiService,
     private val viewModelScope: CoroutineScope,
@@ -56,9 +58,8 @@ class YoutubeVideoSource(
         val response = when(videoType) {
             is VideoType.Videos -> fetchVideos(nextPageToken)
             is VideoType.SearchedVideo -> fetchSearchedVideos(videoType.query, nextPageToken)
-//            is VideoType.Shorts -> fetchShorts(nextPageToken)
+            is VideoType.Shorts -> fetchShorts(nextPageToken)
             is VideoType.SearchedRelatedVideo -> fetchSearchedRelatedVideos(videoType.query, nextPageToken)
-            else -> fetchVideos(nextPageToken)
         }
 
         return response
@@ -130,12 +131,21 @@ class YoutubeVideoSource(
         } else showVideosFromDb(nextPageToken)
     }
 
-//    private suspend fun fetchShorts(nextPageToken: String): YoutubeVideoResponse {
-//        val shorts = apiService.fetchShorts(nextPageToken = nextPageToken).body()!!
-//        val shortsVideos = shorts.items.convertToVideosList()
-//        shortsVideos.addChannelImgUrl()
-//        return YoutubeVideoResponse(shorts.nextPageToken, shorts.prevPageToken, items = shortsVideos)
-//    }
+    private suspend fun fetchShorts(nextPageToken: String): YoutubeVideoResponse {
+        val shorts = apiService.fetchShorts(nextPageToken = nextPageToken).body()
+
+        return if (shorts != null) {
+            val shortsVideos = convertSearchVideoToVideosList(shorts.items)
+            val response = YoutubeVideoResponse(
+                nextPageToken = shorts.nextPageToken,
+                prevPageToken = shorts.prevPageToken,
+                items = shortsVideos
+            )
+            showVideosFromNetwork(response)
+        } else {
+            showVideosFromDb(nextPageToken)
+        }
+    }
 
     private fun SearchVideoResponse.deleteFirstSameVideo(): SearchVideoResponse {
         val mutableVideoList = this.items.toMutableList()
@@ -176,8 +186,12 @@ class YoutubeVideoSource(
         coroutineScope {
             videos.map { video: YoutubeVideo ->
                 val channelImgUrl = async {
-                    val channelResponse = apiService.fetchChannels(video.snippet.channelId).body()
-                    channelResponse?.items?.first()?.snippet?.thumbnails?.medium?.url ?: ""
+                    try {
+                        val channelResponse = apiService.fetchChannels(video.snippet.channelId).body()
+                        channelResponse?.items?.first()?.snippet?.thumbnails?.medium?.url ?: ""
+                    } catch (ex: NoSuchElementException) {
+                        ex.printStackTrace()
+                        DEFAULT_CHANNEL_IMG_LINK                    }
                 }
                 channelUrlList.add(channelImgUrl)
             }

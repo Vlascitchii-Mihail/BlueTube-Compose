@@ -97,6 +97,7 @@ dependencies {
 
     //dagger hilt
     implementation(libs.hilt.android)
+    testImplementation("junit:junit:4.12")
     ksp(libs.ksp.hilt.compiler)
     implementation(libs.hilt.navigation)
 
@@ -130,21 +131,22 @@ dependencies {
     //Youtube player
     implementation(libs.youtube.player)
 
-    //test
+    //unit test
     testImplementation(libs.junit)
     testImplementation(libs.mockito)
     testImplementation(libs.mockito.inline)
-    testImplementation(libs.mockwebserver)
-    androidTestImplementation(libs.mockwebserver)
     testImplementation(libs.test.coroutines)
+
+//    android tests
+    androidTestImplementation(libs.mockwebserver)
     androidTestImplementation(libs.test.arch.core)
     androidTestImplementation(libs.dexmaker)
     androidTestImplementation(libs.mockito.kotlin.android)
     androidTestImplementation(libs.androidx.test.ext)
     androidTestImplementation(libs.androidx.test.espresso)
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.08.00"))
-    androidTestImplementation(libs.androidx.compose.ui.test)
     androidTestImplementation(libs.android.hilt.test)
+    androidTestImplementation(libs.androidx.compose.ui.test)
     androidTestImplementation(libs.navigation.compose.testing)
 
     kspAndroidTest(libs.ksp.android.test)

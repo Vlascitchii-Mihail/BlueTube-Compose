@@ -17,6 +17,7 @@ import com.appelier.bluetubecompose.screen_player.PlayerScreen
 import com.appelier.bluetubecompose.screen_player.VideoPlayerViewModel
 import com.appelier.bluetubecompose.screen_settings.SettingsScreen
 import com.appelier.bluetubecompose.screen_shorts.screen.ShortsScreen
+import com.appelier.bluetubecompose.screen_shorts.screen.ShortsViewModel
 import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideo
 import com.appelier.bluetubecompose.screen_video_list.screen.VideoListScreen
 import com.appelier.bluetubecompose.screen_video_list.screen.VideoListViewModel
@@ -86,7 +87,11 @@ fun Navigation(
                 )
             }
             composable<ScreenType.ShortsScreen> {
-                ShortsScreen()
+                val shortsViewModel: ShortsViewModel = hiltViewModel()
+                shortsViewModel.getShorts()
+                ShortsScreen(
+                    shortsViewModel.shortsVideoState
+                )
             }
             composable<ScreenType.SettingsScreen> {
                 SettingsScreen()

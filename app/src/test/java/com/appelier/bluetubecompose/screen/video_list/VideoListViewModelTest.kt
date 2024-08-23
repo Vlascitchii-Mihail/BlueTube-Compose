@@ -1,4 +1,4 @@
-package com.appelier.bluetubecompose.ui.screen.screen_video_list
+package com.appelier.bluetubecompose.screen.video_list
 
 
 import com.appelier.bluetubecompose.screen_video_list.repository.VideoListRepositoryImpl
