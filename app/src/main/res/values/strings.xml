@@ -1,6 +1,13 @@
 <resources>
     <string name="app_name">BlueTubeCompose</string>
 
+<!--    Core-->
+    <string name="channel_name">Channel name is </string>
+    <string name="paging_error_retry_btn">Try Again</string>
+    <string name="paging_error_msg_txt">Videos not found</string>
+    <string name="error_msg_empty_list">The video list is empty</string>
+
+
 <!--    VideoListScreen-->
     <string name="appbar_title">BlueTube</string>
     <string name="appbar_logo_descr">Blue Tube Icon</string>
@@ -8,17 +15,14 @@
     <string name="appbar_close_icon_descr">Close icon</string>
     <string name="search_placeholder">Enter search text</string>
     <string name="video_preview">Video preview</string>
-    <string name="channel_name">Channel name is </string>
     <string name="video_list_screen">Video List</string>
 
 <!--Player Screen-->
     <string name="views">\u0020views</string>
 
-
+<!--Shorts Screen-->
     <string name="shorts_screen">Shorts Screen</string>
 
-
-    <string name="settings_screen">Settings Screen</string>
-
+    <string name="settings_screen">Setting\'s screen</string>
 
 </resources>

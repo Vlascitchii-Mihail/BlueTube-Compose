@@ -1,31 +1,29 @@
 package com.appelier.bluetubecompose.screen_shorts.screen
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
+import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.stringResource
-import com.appelier.bluetubecompose.R
-import com.appelier.bluetubecompose.core.core_ui.views.TextBodyLargeCentered
-import com.appelier.bluetubecompose.utils.NavigationTags.SHORTS_SCREEN
+import androidx.paging.PagingData
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import com.appelier.bluetubecompose.core.core_ui.views.PagerContentSupplier
+import com.appelier.bluetubecompose.core.core_ui.views.ShortsList
+import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideo
+import com.appelier.bluetubecompose.utils.NavigationTags
+import kotlinx.coroutines.flow.StateFlow
 
 @Composable
-fun ShortsScreen() {
-
-    Scaffold(
-        modifier = Modifier.testTag(SHORTS_SCREEN),
-        content = { paddingValue ->
-            Column(modifier = Modifier.fillMaxSize().padding(paddingValue)) {
-                TextBodyLargeCentered(
-                    text = stringResource(id = R.string.shorts_screen),
-                    modifier = Modifier,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
-        },
-    )
+fun ShortsScreen(
+    shortsVideoState: State<StateFlow<PagingData<YoutubeVideo>>>?,
+) {
+    Surface(modifier = Modifier.testTag(NavigationTags.SHORTS_SCREEN)) {
+        shortsVideoState?.let {
+            PagerContentSupplier(
+                shortsVideoState.value.collectAsLazyPagingItems(),
+                { videoState: LazyPagingItems<YoutubeVideo> -> ShortsList(videos = videoState) }
+            )
+        }
+    }
 }

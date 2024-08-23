@@ -1,7 +1,11 @@
 package com.appelier.bluetubecompose.utils
 
-object NavigationTags {
+object Core {
+    const val CHANNEL_PREVIEW_IMG = "channel preview img"
+    const val PAGING_ERROR_MSG = "paging_error_message"
+}
 
+object NavigationTags {
     const val NAVIGATION = "navigation"
     const val BOTTOM_NAV = "bottom nav"
     const val VIDEO_LIST_SCREEN = "video list screen"
@@ -20,4 +24,10 @@ object VideoListScreenTags {
 
 object VideoPlayerScreenTags {
     const val VIDEO_PLAYER = "video player"
+}
+
+object VideoItemTag {
+    const val SHORTS_VIDEO_PLAYER = "shorts_video_player"
+    const val SHORTS_CHANNEL_TITLE = "shorts_channel_title"
+    const val SHORTS_VIDEO_TITLE = "shorts_video_title"
 }

@@ -113,3 +113,106 @@ val DEFAULT_SEARCH_VIDEO_RESPONSE = SearchVideoResponse(
     prevPageToken = "CAUQAQ",
     RESPONSE_SEARCH_VIDEO_LIST
 )
+
+
+private val RESPONSE_SHORTS_LIST = listOf(
+    SearchVideoItem(
+        SearchVideoItemId(videoId = "MnLjVkNrJSE"),
+        snippet = VideoSnippet(
+            "This trio is the best☀\uFE0F #kdramaedit#extraordinaryyou#snowdropkdrama#kdramalover#asiandrama#kdramalo",
+            "7055734468606283014.",
+            "2022-06-11T06:00:40Z",
+            "scene Kiss",
+            "",
+            channelId = "UCA_UEa12RqJ4E6aWodNtWGQ",
+            thumbnails = Thumbnails(
+                ThumbnailAttributes(
+                    "https://i.ytimg.com/vi/MnLjVkNrJSE/mqdefault.jpg",
+                    180,
+                    320
+                )
+            )
+        )
+    ),
+
+    SearchVideoItem(
+        SearchVideoItemId(videoId = "hLX-_cNq4m0"),
+        snippet = VideoSnippet(
+            "上期答案：因为土妹根本就不是妈妈亲生的！#轻漫计划",
+            "上期答案：因为土妹根本就不是妈妈亲生的！#轻漫计划.",
+            "2022-06-22T10:00:48Z",
+            "山菜同学",
+            "",
+            channelId = "UCuieJRU0ShA-GfquEyyN43w",
+            thumbnails = Thumbnails(
+                ThumbnailAttributes(
+                    "https://i.ytimg.com/vi/hLX-_cNq4m0/mqdefault.jpg",
+                    180,
+                    320
+                )
+            )
+        ),
+    ),
+    SearchVideoItem(
+        SearchVideoItemId(videoId = "7GJy9fFsMCo"),
+        snippet = VideoSnippet(
+            "上期答案：土妹体力太好了，把蜥蜴累垮了！#轻漫计划 #悬疑推理",
+            "上期答案：土妹体力太好了，把蜥蜴累垮了！#轻漫计划#悬疑推理.",
+            "2022-07-29T10:00:04Z",
+            "山菜同学",
+            "",
+            channelId = "UCuieJRU0ShA-GfquEyyN43w",
+            thumbnails = Thumbnails(
+                ThumbnailAttributes(
+                    "https://i.ytimg.com/vi/7GJy9fFsMCo/mqdefault.jpg",
+                    180,
+                    320
+                )
+            )
+        ),
+    ),
+
+    SearchVideoItem(
+        SearchVideoItemId(videoId = "QVjVB89hMOc"),
+        snippet = VideoSnippet(
+            "上期答案：因为土妹开始了上晚班，并且再也没做过任何不健康的事情！",
+            "上期答案：因为土妹开始了上晚班，并且再也没做过任何不健康的事情！",
+            "2022-05-25T09:00:59Z",
+            "山菜同学",
+            "",
+            channelId = "UCuieJRU0ShA-GfquEyyN43w",
+            thumbnails = Thumbnails(
+                ThumbnailAttributes(
+                    "https://i.ytimg.com/vi/QVjVB89hMOc/mqdefault.jpg",
+                    180,
+                    320
+                )
+            )
+        ),
+    ),
+
+    SearchVideoItem(
+        SearchVideoItemId(videoId = "VEOsr3FM7VM"),
+        snippet = VideoSnippet(
+            "上期答案：土妹的脚虽然结实，但是太臭了！#轻漫计划",
+            "上期答案：土妹的脚虽然结实，但是太臭了！#轻漫计划.",
+            "2022-07-12T09:00:37Z",
+            "山菜同学",
+            "",
+            channelId = "UCuieJRU0ShA-GfquEyyN43w",
+            thumbnails = Thumbnails(
+                ThumbnailAttributes(
+                    "https://i.ytimg.com/vi/VEOsr3FM7VM/mqdefault.jpg",
+                    180,
+                    320
+                )
+            )
+        ),
+    )
+)
+
+val DEFAULT_SHORTS_RESPONSE = SearchVideoResponse(
+    nextPageToken = "CAoQAA",
+    prevPageToken = "CAUQAQ",
+    RESPONSE_SHORTS_LIST
+)
