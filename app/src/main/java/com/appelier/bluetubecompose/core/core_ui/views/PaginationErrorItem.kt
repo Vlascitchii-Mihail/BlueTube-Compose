@@ -8,25 +8,32 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.appelier.bluetubecompose.R
+import com.appelier.bluetubecompose.utils.Core.PAGING_ERROR_MSG
 
 @Composable
 fun PaginationErrorItem(
-    errorText: String? = "Videos not found",
+    errorText: String?,
     modifier: Modifier = Modifier,
     onRetryClick: () -> Unit
 ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
-            text = errorText ?: "Videos not found",
+            text = errorText ?: stringResource(id = R.string.paging_error_msg_txt),
             textAlign = TextAlign.Center,
-            modifier = modifier.fillMaxWidth().padding(8.dp),
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+                .testTag(PAGING_ERROR_MSG),
             color = MaterialTheme.colorScheme.onBackground,
             style = MaterialTheme.typography.bodyLarge
         )
-        BlueTubeButton(text = "Try Again", onClickAction = onRetryClick)
+        BlueTubeButton(text = stringResource(id = R.string.paging_error_retry_btn), onClickAction = onRetryClick)
     }
 }
 

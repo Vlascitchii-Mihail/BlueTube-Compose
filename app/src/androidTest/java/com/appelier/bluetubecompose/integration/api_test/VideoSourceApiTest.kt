@@ -6,6 +6,7 @@ import com.appelier.bluetubecompose.core.core_api.VideoApiService
 import com.appelier.bluetubecompose.screen_video_list.model.single_cnannel.Channel.Companion.DEFAULT_CHANNEL_1
 import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideoResponse.Companion.DEFAULT_VIDEO_RESPONSE
 import com.appelier.bluetubecompose.search_video.model.DEFAULT_SEARCH_VIDEO_RESPONSE
+import com.appelier.bluetubecompose.search_video.model.DEFAULT_SHORTS_RESPONSE
 import com.appelier.bluetubecompose.utils.readJsonFileAsString
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -93,6 +94,17 @@ class VideoSourceApiTest {
             val particularVideo = apiService.fetchParticularVideo(any()).body()!!
 
             assertEquals(DEFAULT_VIDEO_RESPONSE.items.first(), particularVideo.items.first())
+        }
+    }
+
+    @Test
+    fun fetchShortsVideos() {
+        testCoroutineScope.runTest {
+            generateMockResponseFrom("raw/shorts_response.json")
+
+            val shorts = apiService.fetchShorts().body()!!
+
+            assertEquals(DEFAULT_SHORTS_RESPONSE.items[4], shorts.items[4])
         }
     }
 
