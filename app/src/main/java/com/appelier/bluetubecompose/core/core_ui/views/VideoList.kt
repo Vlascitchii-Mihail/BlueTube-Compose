@@ -34,7 +34,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 fun YouTubeVideoList(
     videos: LazyPagingItems<YoutubeVideo>,
     modifier: Modifier,
-    innerPadding: PaddingValues,
+    innerPadding: PaddingValues = PaddingValues(0.dp),
     navigateToPlayerScreen: (YoutubeVideo) -> Unit,
 ) {
 

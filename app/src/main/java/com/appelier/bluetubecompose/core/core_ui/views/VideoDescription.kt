@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.appelier.bluetubecompose.R
 import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideo
 import com.appelier.bluetubecompose.utils.VideoListScreenTags
+import com.appelier.bluetubecompose.utils.VideoPlayerScreenTags
 import com.appelier.bluetubecompose.utils.formatDate
 import com.appelier.bluetubecompose.utils.formatViews
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
@@ -33,6 +34,7 @@ fun VideoDescription(video: YoutubeVideo, modifier: Modifier = Modifier) {
         modifier = modifier
             .fillMaxWidth()
             .padding(8.dp)
+            .testTag(VideoPlayerScreenTags.VIDEO_DESCRIPTION)
     ) {
         Text(
             text = video.snippet.title,

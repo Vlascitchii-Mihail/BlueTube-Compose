@@ -78,12 +78,19 @@ fun Navigation(
                 PlayerScreen(
                     video = arg,
                     relatedVideos = playerScreenViewModel.relatedVideoStateFlow,
+                    playerScreenViewModel.youTubePlayerPlayState,
                     navigateToPlayerScreen = { video: YoutubeVideo ->
                         navController.navigate(ScreenType.PlayerScreen(video)) {
                             launchSingleTop = true
                         }
                     },
-                    popBackStack = { navController.popBackStack() }
+                    popBackStack = { navController.popBackStack() },
+                    updatePlaybackPosition = { playbackPosition: Float ->
+                        playerScreenViewModel.updatePlaybackPosition(
+                            playbackPosition
+                        )
+                    },
+                    getPlaybackPosition = { playerScreenViewModel.getCurrentPlaybackPosition() },
                 )
             }
             composable<ScreenType.ShortsScreen> {

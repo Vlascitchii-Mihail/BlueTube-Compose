@@ -28,4 +28,8 @@ import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideo
 abstract class YouTubeDatabase: RoomDatabase() {
 
     abstract val youTubeVideoDao: YouTubeVideoDao
+
+    companion object {
+        const val ROOM_DATABASE = "YouTubeDatabase"
+    }
 }
