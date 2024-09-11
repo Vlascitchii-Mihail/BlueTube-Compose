@@ -1,4 +1,4 @@
-package com.appelier.bluetubecompose.integration.api_test
+package com.appelier.bluetubecompose.instrumented.api_test
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4

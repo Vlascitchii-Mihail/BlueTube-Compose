@@ -24,6 +24,7 @@ object VideoListScreenTags {
 
 object VideoPlayerScreenTags {
     const val VIDEO_PLAYER = "video player"
+    const val VIDEO_DESCRIPTION = "video description"
 }
 
 object VideoItemTag {

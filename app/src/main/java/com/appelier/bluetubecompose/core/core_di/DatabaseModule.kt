@@ -19,7 +19,7 @@ object DatabaseModule {
     @Named("OriginalDatabase")
     @Singleton
     fun provideDatabase(@ApplicationContext appContext: Context): YouTubeDatabase {
-        return Room.databaseBuilder(appContext, YouTubeDatabase::class.java, "YouTubeDatabase")
+        return Room.databaseBuilder(appContext, YouTubeDatabase::class.java, YouTubeDatabase.ROOM_DATABASE)
             .build()
     }
 }

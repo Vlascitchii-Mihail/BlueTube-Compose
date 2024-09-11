@@ -1,35 +1,29 @@
 package com.appelier.bluetubecompose.screen_player
 
 import android.app.Activity
-import android.content.pm.ActivityInfo
-import android.view.View
-import android.view.ViewGroup
-import android.view.WindowManager
 import androidx.compose.runtime.MutableState
 import androidx.lifecycle.Lifecycle
 import com.appelier.bluetubecompose.databinding.FragmentPlayVideoBinding
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.PlayerConstants
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.FullscreenListener
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.options.IFramePlayerOptions
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.utils.loadOrCueVideo
 
 class YouTubePlayerHandler(
     private val binding: FragmentPlayVideoBinding,
-    private var playerOrientationState: MutableState<OrientationState>,
-    private val activity: Activity,
+    playerOrientationState: MutableState<OrientationState>,
+    activity: Activity,
     private val currentComposeLifecycle: Lifecycle,
-    private val videoId: String
+    private val videoId: String,
+    private var youTubePlayerPlayState:  MutableState<Boolean>,
+    private val updatePlaybackPosition:(Float) -> Unit,
+    private val getCurrentPlaybackPosition: () -> Float
 ) {
 
-    private lateinit var youTubePlayer: YouTubePlayer
-    private val landscapeSensorOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
-    private val portraitSensorOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
-    private lateinit var playerFullScreenView: View
-    private var playerHeight: Int = 0
+    var player: YouTubePlayer? = null
+    private val orientationHandler = OrientationHandler(binding, activity, playerOrientationState)
 
     init {
-        setupFullScreenListener()
         setupPlayerWidgets()
     }
 
@@ -38,96 +32,53 @@ class YouTubePlayerHandler(
             currentComposeLifecycle.addObserver(this)
             enableAutomaticInitialization = false
             val fullScreenControl = IFramePlayerOptions.Builder().controls(1).fullscreen(1).build()
-            val youTubePlayerListener = getYouTubePlayerListener(videoId, currentComposeLifecycle)
+            val youTubePlayerListener = getYouTubePlayerListener()
             initialize(youTubePlayerListener, fullScreenControl)
         }
     }
 
-    private fun getYouTubePlayerListener(
-        videoId: String,
-        currentComposeLifecycle: Lifecycle
-    ): AbstractYouTubePlayerListener {
+    private fun getYouTubePlayerListener(): AbstractYouTubePlayerListener {
         return object : AbstractYouTubePlayerListener() {
+
             override fun onReady(youTubePlayer: YouTubePlayer) {
-                this@YouTubePlayerHandler.youTubePlayer = youTubePlayer
-                youTubePlayer.loadOrCueVideo(currentComposeLifecycle, videoId, 0F)
-            }
-        }
-    }
+                player = youTubePlayer
 
-    private fun setupFullScreenListener() {
-        with(binding) {
-            ytPlayer.addFullscreenListener(object: FullscreenListener {
-                override fun onEnterFullscreen(fullscreenView: View, exitFullscreen: () -> Unit) {
-                    playerFullScreenView = fullscreenView
-                    setFullScreenVisibility(fullscreenView)
-                    changeToLandscapeOrientation()
+                orientationHandler.initFullScreenWidgetState(player)
+
+                when {
+                    youTubePlayerPlayState.value -> youTubePlayer.loadVideo(videoId, getCurrentPlaybackPosition.invoke())
+                    else -> youTubePlayer.cueVideo(videoId, getCurrentPlaybackPosition.invoke())
                 }
+            }
 
-                override fun onExitFullscreen() {
-                    setPortraitVisibility()
-                    changeToPortraitOrientation()
+            override fun onStateChange(
+                youTubePlayer: YouTubePlayer,
+                state: PlayerConstants.PlayerState
+            ) {
+                super.onStateChange(youTubePlayer, state)
+                when(state) {
+                    PlayerConstants.PlayerState.PAUSED -> {
+                        youTubePlayerPlayState.value = false
+                    }
+                    PlayerConstants.PlayerState.PLAYING -> {
+                        youTubePlayerPlayState.value = true
+                    }
+                    else -> {}
                 }
-            })
-        }
-    }
+            }
 
-    private fun setFullScreenVisibility(fullscreenView: View) {
-        with(binding) {
-            playerHeight = ytPlayer.height
-
-            llPlayerContainer.apply {
-                removeAllViews()
-                addView(fullscreenView)
+            override fun onCurrentSecond(youTubePlayer: YouTubePlayer, second: Float) {
+                super.onCurrentSecond(youTubePlayer, second)
+                updatePlaybackPosition.invoke(second)
             }
         }
-
-        playerOrientationState.value = OrientationState.FULL_SCREEN
-        setScreenVisibilityFlag()
     }
 
-    private fun setPortraitVisibility() {
-        with(binding) {
-            llPlayerContainer.apply {
-
-                removeAllViews()
-                addView(ytPlayer)
-            }
-        }
-
-        playerOrientationState.value = OrientationState.PORTRAIT
-        setScreenVisibilityFlag()
+    fun changeToPortraitOrientation() {
+        orientationHandler.changeToPortraitOrientation()
     }
 
-    private fun setScreenVisibilityFlag() {
-        when(playerOrientationState.value) {
-            OrientationState.PORTRAIT -> activity.window?.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-            OrientationState.FULL_SCREEN -> activity.window?.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-        }
-    }
-
-     private fun changeToLandscapeOrientation() {
-         if (activity.requestedOrientation != landscapeSensorOrientation) {
-             activity.requestedOrientation = landscapeSensorOrientation
-         }
-     }
-
-    private fun changeToPortraitOrientation() {
-        if (activity.requestedOrientation != portraitSensorOrientation) {
-            activity.requestedOrientation = portraitSensorOrientation
-        }
-    }
-
-    fun togglePlayerOrientation() {
-        youTubePlayer.toggleFullscreen()
-    }
-
-    fun getPlayerContainerHeight(): Int {
-        return if (playerHeight > 0) playerHeight
-        else ViewGroup.LayoutParams.WRAP_CONTENT
-    }
-
-    fun setFullScreenVideoFitScreenHeight() {
-        playerFullScreenView.layoutParams.height = binding.ytPlayer.width
+    fun setScreenAppearanceOrientationFlag(orientation: Int) {
+        orientationHandler.setScreenAppearanceOrientationFlag(orientation)
     }
 }

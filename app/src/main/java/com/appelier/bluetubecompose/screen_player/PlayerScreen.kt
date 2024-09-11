@@ -1,64 +1,60 @@
 package com.appelier.bluetubecompose.screen_player
 
+import android.content.pm.ActivityInfo
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.appelier.bluetubecompose.core.core_ui.views.VideoDescription
 import com.appelier.bluetubecompose.core.core_ui.views.YouTubeVideoList
 import com.appelier.bluetubecompose.core.core_ui.views.YoutubeVideoPlayer
 import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideo
-import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideo.Companion.DEFAULT_VIDEO_LIST
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 @Composable
 fun PlayerScreen(
     video: YoutubeVideo,
-    relatedVideos: State<StateFlow<PagingData<YoutubeVideo>>>,
+    relatedVideos: State<StateFlow<PagingData<YoutubeVideo>>>?,
+    youTubePlayerPlayState: MutableState<Boolean>,
     navigateToPlayerScreen: (YoutubeVideo) -> Unit,
-    popBackStack: () -> Unit
+    popBackStack: () -> Unit,
+    updatePlaybackPosition: (Float) -> Unit,
+    getPlaybackPosition: () -> Float,
 ) {
     Scaffold(
         content = { paddingValue ->
             Column(modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValue)) {
+                .padding(paddingValue)
+            ) {
                 YoutubeVideoPlayer(
                     videoId = video.id,
                     Modifier,
-                    popBackStack
+                    youTubePlayerPlayState,
+                    popBackStack,
+                    updatePlaybackPosition,
+                    getPlaybackPosition,
                 )
 
-                VideoDescription(video = video)
+                if (LocalConfiguration.current.orientation != ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE) {
+                    VideoDescription(video = video)
 
-                YouTubeVideoList(
-                    videos = relatedVideos.value.collectAsLazyPagingItems(),
-                    modifier = Modifier,
-                    innerPadding = paddingValue,
-                    navigateToPlayerScreen = navigateToPlayerScreen
-                )
+                    relatedVideos?.let { relatedVideos ->
+                        YouTubeVideoList(
+                            videos = relatedVideos.value.collectAsLazyPagingItems(),
+                            modifier = Modifier,
+                            navigateToPlayerScreen = navigateToPlayerScreen
+                        )
+                    }
+                }
             }
         }
-    )
-}
-
-@Preview
-@Composable
-fun PlayerScreenPreview() {
-    val relatedVideos = remember { mutableStateOf(MutableStateFlow(PagingData.from(DEFAULT_VIDEO_LIST))) }
-    PlayerScreen(
-        video = YoutubeVideo.DEFAULT_VIDEO,
-        relatedVideos = relatedVideos,
-        navigateToPlayerScreen = {},
-        popBackStack = {}
     )
 }

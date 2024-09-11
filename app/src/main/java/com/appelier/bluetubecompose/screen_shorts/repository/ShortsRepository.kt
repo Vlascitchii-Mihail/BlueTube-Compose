@@ -17,6 +17,7 @@ interface ShortsRepository {
     fun fetchShorts(videoType: VideoType, viewModelScope: CoroutineScope)
     : Flow<PagingData<YoutubeVideo>>
 }
+
 class ShortsRepositoryImpl @Inject constructor(
     private val apiVideoListService: VideoApiService,
     @Named("OriginalDatabase")

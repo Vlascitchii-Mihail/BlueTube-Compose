@@ -66,8 +66,6 @@ class VideoListScreenKtTest {
     private lateinit var navController: TestNavHostController
     private val video = YoutubeVideoResponse.DEFAULT_VIDEO_RESPONSE_WITH_CHANNEL_IMG.items.first()
 
-
-
     @Before
     fun init_video_list_screen() {
         hiltRule.inject()
@@ -100,11 +98,15 @@ class VideoListScreenKtTest {
                         )
                     )
                 ) {
+                    val initialPlaybackPosition = 0F
                     PlayerScreen(
                         video = video,
                         relatedVideos = mutableStateOf(MutableStateFlow(PagingData.from(DEFAULT_VIDEO_LIST))),
+                        mutableStateOf(true),
                         navigateToPlayerScreen = {},
-                        popBackStack = {}
+                        popBackStack = {},
+                        updatePlaybackPosition = {},
+                        getPlaybackPosition = { initialPlaybackPosition }
                     )
                 }
             }

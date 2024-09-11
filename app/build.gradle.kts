@@ -66,6 +66,11 @@ android {
             }
         }
     }
+    testOptions {
+        emulatorControl {
+            enable = true
+        }
+    }
 }
 
 dependencies {
@@ -81,7 +86,8 @@ dependencies {
     implementation(libs.ui.tooling.preview)
     implementation(libs.material3)
     implementation(libs.androidx.material)
-    implementation(libs.constraint.layout)
+    implementation(libs.constraint.layout.compose)
+    implementation(libs.constraint.layout.xml)
 
     //ViewModel
     implementation(libs.lifecycle.viewmodel.ktx)
@@ -97,6 +103,7 @@ dependencies {
 
     //dagger hilt
     implementation(libs.hilt.android)
+    testImplementation("junit:junit:4.12")
     testImplementation("junit:junit:4.12")
     ksp(libs.ksp.hilt.compiler)
     implementation(libs.hilt.navigation)
@@ -148,6 +155,7 @@ dependencies {
     androidTestImplementation(libs.android.hilt.test)
     androidTestImplementation(libs.androidx.compose.ui.test)
     androidTestImplementation(libs.navigation.compose.testing)
+    androidTestImplementation(libs.espresso.device)
 
     kspAndroidTest(libs.ksp.android.test)
     debugImplementation(libs.compose.ui.tooling)
