@@ -8,6 +8,7 @@ lifecycle-runtime-ktx = "2.8.0"
 material = "1.6.7"
 navigation = "2.8.0-beta05"
 constraint-layout = "1.1.0-alpha13"
+constraint-layout-xml = "2.1.4"
 
 #dagger hilt
 hilt = "2.49"
@@ -43,6 +44,7 @@ dexmaker = "2.28.1"
 mockwebserver = "4.9.2"
 coroutine-test = "1.8.1"
 test-arch-core = "2.2.0"
+espresso_device = "1.0.1"
 
 #plugins
 android-application = "8.2.2"
@@ -66,7 +68,8 @@ compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
 material3 = { module = "androidx.compose.material3:material3" }
 androidx-material = { module = "androidx.compose.material:material", version.ref = "material" }
-constraint_layout = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraint-layout"}
+constraint-layout-compose = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraint-layout"}
+constraint-layout-xml = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraint-layout-xml"}
 
 livedata = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "lifecycle"}
 livedata-runtime = { module = "androidx.compose.runtime:runtime-livedata", version.ref = "livedata-runtime" }
@@ -130,6 +133,8 @@ ksp-android-test = { module = "com.google.dagger:hilt-android-compiler", version
 androidx-compose-ui-test = { module = "androidx.compose.ui:ui-test-junit4" }
 navigation-compose-testing = { module = "androidx.navigation:navigation-testing", version.ref = "navigation-testing" }
 compose-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
+#orientation test
+espresso-device = { module = "androidx.test.espresso:espresso-device", version.ref = "espresso_device"}
 
 
 [plugins]

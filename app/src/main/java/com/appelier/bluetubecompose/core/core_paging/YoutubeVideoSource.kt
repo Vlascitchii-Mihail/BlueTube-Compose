@@ -165,9 +165,14 @@ class YoutubeVideoSource(
     }
 
     private suspend fun SearchVideoItem.convertToVideo(): YoutubeVideo {
-        val video = apiService.fetchParticularVideo(this.id.videoId).body()
-
-        return video?.items?.first() ?: YoutubeVideo.DEFAULT_VIDEO
+        var youtubeVideo: YoutubeVideo? = null
+        try {
+            val particularVideo = apiService.fetchParticularVideo(this.id.videoId).body()
+            youtubeVideo = particularVideo?.items?.first()
+        } catch (ex: NoSuchElementException) {
+            ex.printStackTrace()
+        }
+        return youtubeVideo ?: YoutubeVideo.DEFAULT_VIDEO
     }
 
     suspend fun addChannelImgUrl(videoList: List<YoutubeVideo>) {
