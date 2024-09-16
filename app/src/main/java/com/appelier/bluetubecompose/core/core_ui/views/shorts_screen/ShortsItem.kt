@@ -1,4 +1,4 @@
-package com.appelier.bluetubecompose.core.core_ui.views
+package com.appelier.bluetubecompose.core.core_ui.views.shorts_screen
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,30 +27,23 @@ import com.appelier.bluetubecompose.utils.VideoItemTag.SHORTS_VIDEO_TITLE
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.integration.compose.placeholder
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun ShortsItem(
     youTubeVideo: YoutubeVideo,
-    videoIndex: Int,
-    currentPageIndex: Int,
-    defaultModifier: Modifier = Modifier
+    videoQueue: MutableSharedFlow<YouTubePlayer?> = MutableSharedFlow(),
+    modifier: Modifier = Modifier
 ) {
     val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current.lifecycle
     val shortsPlayerHandler =
-        remember { ShortsPlayerHandler(lifecycleOwner, youTubeVideo.id) }
-
-    LaunchedEffect(currentPageIndex) {
-        if (currentPageIndex == videoIndex) {
-            delay(2000)
-            shortsPlayerHandler.playVideo()
-        }
-    }
+        remember { ShortsPlayerHandler(lifecycleOwner, youTubeVideo.id, videoQueue) }
 
     ConstraintLayout(
-        modifier = defaultModifier
+        modifier = modifier
             .fillMaxSize()
     ) {
         val (videoPlayer, channelImg, channelTitle, videoTitle) = createRefs()
@@ -62,7 +54,7 @@ fun ShortsItem(
                 shortsPlayerHandler.setupPlayer(youTubePlayerView)
                 youTubePlayerView
             },
-            modifier = defaultModifier
+            modifier = modifier
                 .fillMaxSize()
                 .testTag(SHORTS_VIDEO_PLAYER)
                 .constrainAs(videoPlayer) {
@@ -77,7 +69,7 @@ fun ShortsItem(
             model = youTubeVideo.snippet.channelImgUrl,
             contentDescription = stringResource(id = R.string.channel_name) + youTubeVideo.snippet.channelTitle,
             loading = placeholder(R.drawable.sceleton_android_ompose_thumbnail),
-            modifier = defaultModifier
+            modifier = modifier
                 .testTag(CHANNEL_PREVIEW_IMG)
                 .padding(8.dp)
                 .width(50.dp)
@@ -94,7 +86,7 @@ fun ShortsItem(
             color = MaterialTheme.colorScheme.tertiary,
             maxLines = 1,
             textAlign = TextAlign.Start,
-            modifier = defaultModifier
+            modifier = modifier
                 .testTag(SHORTS_VIDEO_TITLE)
                 .padding(start = 8.dp)
                 .constrainAs(channelTitle) {
@@ -109,7 +101,7 @@ fun ShortsItem(
             color = MaterialTheme.colorScheme.tertiary,
             maxLines = 2,
             textAlign = TextAlign.Start,
-            modifier = defaultModifier
+            modifier = modifier
                 .testTag(SHORTS_CHANNEL_TITLE)
                 .padding(start = 8.dp, bottom = 70.dp)
                 .constrainAs(videoTitle) {
@@ -123,5 +115,5 @@ fun ShortsItem(
 @Preview
 @Composable
 fun ShortsItemPreview() {
-    ShortsItem(YoutubeVideo.DEFAULT_VIDEO, 0, 0)
+    ShortsItem(YoutubeVideo.DEFAULT_VIDEO)
 }

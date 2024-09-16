@@ -97,8 +97,9 @@ fun Navigation(
                 val shortsViewModel: ShortsViewModel = hiltViewModel()
                 shortsViewModel.getShorts()
                 ShortsScreen(
-                    shortsViewModel.shortsVideoState
-                )
+                    shortsViewModel.shortsVideoState,
+                    shortsViewModel.videoQueue
+                ) { shortsViewModel.listenToVideoQueue() }
             }
             composable<ScreenType.SettingsScreen> {
                 SettingsScreen()
