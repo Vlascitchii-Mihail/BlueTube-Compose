@@ -24,8 +24,9 @@ import com.appelier.bluetubecompose.utils.Core
 import com.appelier.bluetubecompose.utils.VideoItemTag
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import org.junit.Assert.*
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -43,29 +44,40 @@ class ShortsScreenKtTest {
     private val videoPage = mutableStateOf(MutableStateFlow(PagingData.from(YoutubeVideo.DEFAULT_VIDEO_LIST)))
     private val emptyVideoPage = mutableStateOf(MutableStateFlow(PagingData.empty<YoutubeVideo>()))
 
-    private fun init_shorts_screen() {
+    @Before
+    fun injectBeforeTest() {
         hiltRule.inject()
+    }
 
+    private fun init_shorts_screen() {
         composeAndroidTestRule.activity.setContent {
             navController = TestNavHostController(LocalContext.current)
             navController.navigatorProvider.addNavigator(ComposeNavigator())
             NavHost(navController = navController, startDestination = ScreenType.ShortsScreen) {
                 composable<ScreenType.ShortsScreen> {
-                    ShortsScreen(videoPage)
+                    ShortsScreen(
+                        videoPage,
+                        MutableSharedFlow(3),
+                        {  }
+                    )
                 }
             }
+
+            navController.navigate(ScreenType.ShortsScreen)
         }
     }
 
     private fun init_empty_shorts_screen() {
-        hiltRule.inject()
-
         composeAndroidTestRule.activity.setContent {
             navController = TestNavHostController(LocalContext.current)
             navController.navigatorProvider.addNavigator(ComposeNavigator())
             NavHost(navController = navController, startDestination = ScreenType.ShortsScreen) {
                 composable<ScreenType.ShortsScreen> {
-                    ShortsScreen(emptyVideoPage)
+                    ShortsScreen(
+                        emptyVideoPage,
+                        MutableSharedFlow(3),
+                        {  }
+                    )
                 }
             }
         }
