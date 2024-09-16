@@ -16,7 +16,6 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import javax.inject.Singleton
 
-
 private const val BASE_URL  = "/"
 
 @Module
@@ -59,29 +58,3 @@ object DiIntegrationModule {
         return database.youTubeVideoDao
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
