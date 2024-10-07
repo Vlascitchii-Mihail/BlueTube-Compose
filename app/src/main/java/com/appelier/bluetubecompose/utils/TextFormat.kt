@@ -2,7 +2,6 @@ package com.appelier.bluetubecompose.utils
 
 import com.appelier.bluetubecompose.core.core_database.relations.PageWithVideos
 import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideoResponse
-import java.io.InputStreamReader
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -75,10 +74,6 @@ fun formatVideoDuration(duration: String): String {
     }
 
     return if (strHours == "") "$strMinutes:$strSeconds" else "$strHours:$strMinutes:$strSeconds"
-}
-
-fun readJsonFileAsString(classLoader: ClassLoader?, path: String): String {
-    return InputStreamReader(classLoader?.getResourceAsStream(path)).use { it.readText() }
 }
 
 fun  PageWithVideos.convertToYoutubeVideoResponse(): YoutubeVideoResponse {

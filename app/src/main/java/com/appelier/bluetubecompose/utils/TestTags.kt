@@ -15,11 +15,12 @@ object NavigationTags {
 
 object VideoListScreenTags {
     const val VIDEO_PREVIEW_IMG = "video preview img"
-    const val CHANNEL_PREVIEW_IMG = "channel preview img"
     const val VIDEO_TITLE = "video title"
     const val VIDEO_DURATION = "video duration"
     const val VIDEO_STATISTICS = "video statistics"
     const val VIDEO_LIST = "video list"
+    const val VIDEO_LIST_ERROR = "video list error"
+    const val VIDEO_LIST_RETRY_ITEM = "video list retry item"
 }
 
 object VideoPlayerScreenTags {

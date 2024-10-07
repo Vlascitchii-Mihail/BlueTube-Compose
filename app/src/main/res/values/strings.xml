@@ -4,6 +4,7 @@
 <!--    Core-->
     <string name="channel_name">Channel name is </string>
     <string name="paging_error_retry_btn">Try Again</string>
+    <string name="paging_error_retry_item">Try loading items again</string>
     <string name="paging_error_msg_txt">Videos not found</string>
     <string name="error_msg_empty_list">The video list is empty</string>
 
@@ -16,6 +17,7 @@
     <string name="search_placeholder">Enter search text</string>
     <string name="video_preview">Video preview</string>
     <string name="video_list_screen">Video List</string>
+    <string name="video_thumbnail_item">Video thumbnail item</string>
 
 <!--Player Screen-->
     <string name="views">\u0020views</string>

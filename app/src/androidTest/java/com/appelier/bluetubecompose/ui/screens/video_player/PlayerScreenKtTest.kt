@@ -1,4 +1,4 @@
-package com.appelier.bluetubecompose.ui.screen_player
+package com.appelier.bluetubecompose.ui.screens.video_player
 
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.mutableStateOf
@@ -27,9 +27,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.appelier.bluetubecompose.MainActivity
 import com.appelier.bluetubecompose.R
-import com.appelier.bluetubecompose.core.core_api.VideoApiService
 import com.appelier.bluetubecompose.core.core_database.CustomNavTypeSerializer
-import com.appelier.bluetubecompose.core.core_database.YouTubeDatabase
 import com.appelier.bluetubecompose.navigation.ScreenType
 import com.appelier.bluetubecompose.screen_player.PlayerScreen
 import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideo
@@ -44,7 +42,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import javax.inject.Inject
 import kotlin.reflect.typeOf
 
 @RunWith(AndroidJUnit4::class)
@@ -57,11 +54,6 @@ class PlayerScreenKtTest {
     val hiltRule = HiltAndroidRule(this)
     @get:Rule
     val screenOrientation = ScreenOrientationRule(ScreenOrientation.PORTRAIT)
-
-    @Inject
-    lateinit var fakeDatabase: YouTubeDatabase
-    @Inject
-    lateinit var fakeVideoApiService: VideoApiService
 
     private lateinit var navController: TestNavHostController
     private val videoPage = mutableStateOf(MutableStateFlow(PagingData.from(YoutubeVideo.DEFAULT_VIDEO_LIST)))
@@ -94,8 +86,8 @@ class PlayerScreenKtTest {
 
                     PlayerScreen(
                         video = video,
-                        relatedVideos = videoPage,
-                        mutableStateOf(true),
+                        relatedVideos = { videoPage },
+                        MutableStateFlow(true),
                         navigateToPlayerScreen = {
                             navController.navigate(ScreenType.PlayerScreen(secondVideo)) {
                                 launchSingleTop = true

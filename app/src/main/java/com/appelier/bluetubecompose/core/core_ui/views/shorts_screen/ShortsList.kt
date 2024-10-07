@@ -11,7 +11,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemKey
 import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideo
-import com.appelier.bluetubecompose.utils.getActivity
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import kotlinx.coroutines.flow.MutableSharedFlow
 
@@ -25,11 +24,11 @@ fun ShortsList(
     val pagerState = rememberPagerState(pageCount = { videos.itemCount })
 
     fun lockOrientation() {
-        (context.getActivity() ?: context as Activity).requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LOCKED
+        (context as Activity).requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LOCKED
     }
 
     fun unlockOrientation() {
-        (context.getActivity() ?: context as Activity).requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+        (context as Activity).requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     }
 
     DisposableEffect(Unit) {

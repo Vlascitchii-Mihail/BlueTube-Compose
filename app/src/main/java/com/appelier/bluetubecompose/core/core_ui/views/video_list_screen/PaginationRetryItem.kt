@@ -1,4 +1,4 @@
-package com.appelier.bluetubecompose.core.core_ui.views
+package com.appelier.bluetubecompose.core.core_ui.views.video_list_screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -16,8 +16,12 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.appelier.bluetubecompose.R
+import com.appelier.bluetubecompose.utils.VideoListScreenTags.VIDEO_LIST_RETRY_ITEM
 
 @Composable
 fun PaginationRetryItem(modifier: Modifier = Modifier, onRetryClick: () -> Unit = {}) {
@@ -28,7 +32,8 @@ fun PaginationRetryItem(modifier: Modifier = Modifier, onRetryClick: () -> Unit 
             .height(48.dp)
             .clickable(
                 onClick = onRetryClick
-            ),
+            )
+            .testTag(VIDEO_LIST_RETRY_ITEM),
         elevation = CardDefaults.cardElevation(defaultElevation = 12.dp),
         shape = RoundedCornerShape(8.dp)
     ) {

@@ -1,5 +1,6 @@
 package com.appelier.bluetubecompose.core.core_database.utils
 
+import android.util.Log
 import com.appelier.bluetubecompose.core.core_database.YouTubeVideoDao
 import com.appelier.bluetubecompose.screen_video_list.model.Page
 import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideo
@@ -88,11 +89,13 @@ class DatabaseContentManager(private val youTubeVideoDao: YouTubeVideoDao) {
     }
 
     private suspend fun getParticularPageFromDatabase(nextPageToken: String): YoutubeVideoResponse {
+        Log.d("Database", "getParticularPageFromDatabase() called with: nextPageToken = $nextPageToken")
         val pageWithVideos = youTubeVideoDao.getVideosFromPage(nextPageToken)
         return pageWithVideos.convertToYoutubeVideoResponse()
     }
 
     private suspend fun getFirstPageFromDatabase(): YoutubeVideoResponse {
+        Log.d("Database", "getFirstPageFromDatabase() called")
         val firstPageWithVideos = youTubeVideoDao.getFirstPageFromDb()
         return firstPageWithVideos.convertToYoutubeVideoResponse()
     }

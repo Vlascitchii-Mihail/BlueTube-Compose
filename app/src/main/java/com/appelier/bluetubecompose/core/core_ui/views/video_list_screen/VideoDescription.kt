@@ -1,4 +1,4 @@
-package com.appelier.bluetubecompose.core.core_ui.views
+package com.appelier.bluetubecompose.core.core_ui.views.video_list_screen
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,7 +19,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.appelier.bluetubecompose.R
 import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideo
-import com.appelier.bluetubecompose.utils.VideoListScreenTags
+import com.appelier.bluetubecompose.utils.Core.CHANNEL_PREVIEW_IMG
 import com.appelier.bluetubecompose.utils.VideoPlayerScreenTags
 import com.appelier.bluetubecompose.utils.formatDate
 import com.appelier.bluetubecompose.utils.formatViews
@@ -60,7 +60,7 @@ fun VideoDescription(video: YoutubeVideo, modifier: Modifier = Modifier) {
                 contentDescription = stringResource(R.string.channel_name) + video.snippet.channelTitle,
                 contentScale = ContentScale.Crop,
                 modifier = modifier
-                    .testTag(VideoListScreenTags.CHANNEL_PREVIEW_IMG)
+                    .testTag(CHANNEL_PREVIEW_IMG)
                     .padding(end = 8.dp)
                     .width(50.dp)
                     .height(50.dp)

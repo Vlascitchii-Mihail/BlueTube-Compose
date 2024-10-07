@@ -14,6 +14,7 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
@@ -36,17 +37,18 @@ class ShortsViewModel @Inject constructor(
         }
     }
 
-    private var _shortsVideoState: MutableState<StateFlow<PagingData<YoutubeVideo>>>? = null
-    val shortsVideoState: State<StateFlow<PagingData<YoutubeVideo>>>? get() = _shortsVideoState
+    private val emptyPagingData = PagingData.empty<YoutubeVideo>()
+    private var _shortsVideoState: MutableState<StateFlow<PagingData<YoutubeVideo>>> = mutableStateOf(
+        MutableStateFlow(emptyPagingData))
+    private val shortsVideoState: State<StateFlow<PagingData<YoutubeVideo>>> get() = _shortsVideoState
 
+    fun getShortsVideo() = shortsVideoState
 
     fun getShorts() {
-        if (_shortsVideoState == null) {
-           val youTubeStateFlow  = shortsRepository.fetchShorts(VideoType.Shorts, viewModelScope)
-                .cachedIn(viewModelScope)
-                .stateIn(viewModelScope, SharingStarted.Lazily, PagingData.empty())
+        val youTubeStateFlow = shortsRepository.fetchShorts(VideoType.Shorts, viewModelScope)
+            .cachedIn(viewModelScope)
+            .stateIn(viewModelScope, SharingStarted.Lazily, PagingData.empty())
 
-            _shortsVideoState = mutableStateOf(youTubeStateFlow)
-        }
+        _shortsVideoState = mutableStateOf(youTubeStateFlow)
     }
 }

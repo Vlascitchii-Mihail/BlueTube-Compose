@@ -1,7 +1,6 @@
-package com.appelier.bluetubecompose.ui.screen_video_list.screen
+package com.appelier.bluetubecompose.ui.screens.video_list
 
 import androidx.activity.compose.setContent
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.assertIsDisplayed
@@ -24,9 +23,7 @@ import androidx.paging.PagingData
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.appelier.bluetubecompose.MainActivity
 import com.appelier.bluetubecompose.R
-import com.appelier.bluetubecompose.core.core_api.VideoApiService
 import com.appelier.bluetubecompose.core.core_database.CustomNavTypeSerializer
-import com.appelier.bluetubecompose.core.core_database.YouTubeDatabase
 import com.appelier.bluetubecompose.navigation.ScreenType
 import com.appelier.bluetubecompose.screen_player.PlayerScreen
 import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideo
@@ -34,17 +31,17 @@ import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideo.
 import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideoResponse
 import com.appelier.bluetubecompose.screen_video_list.screen.VideoListScreen
 import com.appelier.bluetubecompose.search_video.SearchState
+import com.appelier.bluetubecompose.utils.Core.CHANNEL_PREVIEW_IMG
 import com.appelier.bluetubecompose.utils.VideoListScreenTags
+import com.appelier.bluetubecompose.utils.VideoListScreenTags.VIDEO_LIST_ERROR
 import com.appelier.bluetubecompose.utils.VideoPlayerScreenTags
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.flow.MutableStateFlow
-import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import javax.inject.Inject
 import kotlin.reflect.typeOf
 
 @RunWith(AndroidJUnit4::class)
@@ -56,22 +53,19 @@ class VideoListScreenKtTest {
     @get:Rule
     val hiltRule = HiltAndroidRule(this)
 
-    @Inject
-    lateinit var fakeDatabase: YouTubeDatabase
-    @Inject
-    lateinit var fakeVideoApiService: VideoApiService
-
-    private val testSearchState: MutableState<SearchState> = mutableStateOf(SearchState.CLOSED)
-    private val testSearchTextState: MutableState<String> = mutableStateOf("")
+    private val testSearchState: MutableStateFlow<SearchState> = MutableStateFlow(SearchState.CLOSED)
+    private val testSearchTextState: MutableStateFlow<String> = MutableStateFlow("")
     private lateinit var navController: TestNavHostController
     private val video = YoutubeVideoResponse.DEFAULT_VIDEO_RESPONSE_WITH_CHANNEL_IMG.items.first()
+    private val videoPage = MutableStateFlow(PagingData.from(DEFAULT_VIDEO_LIST))
+    private val emptyVideoPage = MutableStateFlow(PagingData.empty<YoutubeVideo>())
 
     @Before
     fun init_video_list_screen() {
         hiltRule.inject()
+    }
 
-        val videoPage = mutableStateOf(MutableStateFlow(PagingData.from(DEFAULT_VIDEO_LIST)))
-
+    private fun launchNavigation(videoList: MutableStateFlow<PagingData<YoutubeVideo>>) {
         composeAndroidTestRule.activity.setContent {
             navController = TestNavHostController(LocalContext.current)
             navController.navigatorProvider.addNavigator(ComposeNavigator())
@@ -81,14 +75,13 @@ class VideoListScreenKtTest {
                         navigateToPlayerScreen = {
                             navController.navigate(ScreenType.PlayerScreen(video))
                         },
-                        searchViewState = testSearchState.value,
-                        searchTextState = testSearchTextState.value,
-                        videos = videoPage,
+                        searchViewState = testSearchState,
+                        searchTextState = testSearchTextState,
+                        videos = { mutableStateOf(videoList) },
                         updateSearchTextState = { searchText -> testSearchTextState.value = searchText },
-                        updateSearchState = { searchState -> testSearchState.value = searchState }
-                    ) { searchText ->
-                        videoPage
-                    }
+                        updateSearchState = { searchState -> testSearchState.value = searchState },
+                        setSearchVideosFlow = { videoList }
+                    )
                 }
                 composable<ScreenType.PlayerScreen>(
                     typeMap = mapOf(
@@ -101,8 +94,8 @@ class VideoListScreenKtTest {
                     val initialPlaybackPosition = 0F
                     PlayerScreen(
                         video = video,
-                        relatedVideos = mutableStateOf(MutableStateFlow(PagingData.from(DEFAULT_VIDEO_LIST))),
-                        mutableStateOf(true),
+                        relatedVideos = { mutableStateOf(MutableStateFlow(PagingData.from(DEFAULT_VIDEO_LIST))) },
+                        MutableStateFlow(true),
                         navigateToPlayerScreen = {},
                         popBackStack = {},
                         updatePlaybackPosition = {},
@@ -115,6 +108,7 @@ class VideoListScreenKtTest {
 
     @Test
     fun app_shows_appbar_and_search_app_bar() {
+        launchNavigation(videoPage)
         with(composeAndroidTestRule) {
             val appName = activity.getString(R.string.appbar_title)
             val searchPlaceholder = activity.getString(R.string.search_placeholder)
@@ -137,11 +131,13 @@ class VideoListScreenKtTest {
 
     @Test
     fun app_shows_video_list() {
+        launchNavigation(videoPage)
+
         with(composeAndroidTestRule) {
             waitForIdle()
             onNodeWithTag(VideoListScreenTags.VIDEO_LIST).assertIsDisplayed()
             onAllNodesWithTag(VideoListScreenTags.VIDEO_PREVIEW_IMG).onFirst().assertIsDisplayed()
-            onAllNodesWithTag(VideoListScreenTags.CHANNEL_PREVIEW_IMG).onFirst().isDisplayed()
+            onAllNodesWithTag(CHANNEL_PREVIEW_IMG).onFirst().isDisplayed()
             onAllNodesWithTag(VideoListScreenTags.VIDEO_TITLE).onFirst().assertIsDisplayed()
             onAllNodes(hasContentDescription(VideoListScreenTags.VIDEO_DURATION)).onFirst().assertIsDisplayed()
             onAllNodesWithTag(VideoListScreenTags.VIDEO_STATISTICS).onFirst().assertIsDisplayed()
@@ -150,8 +146,17 @@ class VideoListScreenKtTest {
 
     @Test
     fun onClick_to_video_preview_navigates_to_PlayerScreen() {
-        composeAndroidTestRule.onAllNodesWithTag(VideoListScreenTags.VIDEO_PREVIEW_IMG).onFirst().performClick()
-        composeAndroidTestRule.onNodeWithTag(VideoPlayerScreenTags.VIDEO_PLAYER).assertIsDisplayed()
-        composeAndroidTestRule.onNodeWithTag(VideoListScreenTags.VIDEO_LIST).assertIsDisplayed()
+        launchNavigation(videoPage)
+        with(composeAndroidTestRule) {
+            onAllNodesWithTag(VideoListScreenTags.VIDEO_PREVIEW_IMG).onFirst().performClick()
+            onNodeWithTag(VideoPlayerScreenTags.VIDEO_PLAYER).assertIsDisplayed()
+            onNodeWithTag(VideoListScreenTags.VIDEO_LIST).assertIsDisplayed()
+        }
+    }
+
+    @Test
+    fun emptyVideoListShowsPaginationErrorItemComposable() {
+        launchNavigation(emptyVideoPage)
+        composeAndroidTestRule.onNodeWithTag(VIDEO_LIST_ERROR).assertIsDisplayed()
     }
 }
