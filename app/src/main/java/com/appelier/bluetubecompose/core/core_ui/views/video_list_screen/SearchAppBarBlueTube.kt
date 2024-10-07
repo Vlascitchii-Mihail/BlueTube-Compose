@@ -1,4 +1,4 @@
-package com.appelier.bluetubecompose.core.core_ui.views
+package com.appelier.bluetubecompose.core.core_ui.views.video_list_screen
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -33,39 +33,44 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.appelier.bluetubecompose.R
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
 private val DEFAULT_APP_BAR_HEIGHT = 56.dp
 private const val SEARCH_INPUT_DELAY = 1500L
 
 @Composable
 fun SearchAppBarBlueTube(
-    searchText: String,
+    searchText: StateFlow<String>,
     onTextChange: (String) -> Unit,
     onCloseClicked: () -> Unit,
-    onSearchClicked: (String) -> Unit
+    onSearchClicked: () -> Unit,
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusRequester = remember { FocusRequester() }
     val inputScope = rememberCoroutineScope()
     var inputSearchJob by remember { mutableStateOf<Job?>(null) }
+    val searchQuery by searchText.collectAsStateWithLifecycle()
+    var previousQuery: String = remember { "" }
 
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
     }
 
     fun performSearch(input: String) {
-        if (input != "" && input != searchText) {
+        if (input != "" && input != previousQuery) {
             inputSearchJob?.cancel()
-            inputSearchJob = inputScope.async {
+            inputSearchJob = inputScope.launch {
                 delay(SEARCH_INPUT_DELAY)
-                onSearchClicked.invoke(input)
+                onSearchClicked.invoke()
+                previousQuery = input
             }
         }
-
     }
 
     Surface(
@@ -78,7 +83,7 @@ fun SearchAppBarBlueTube(
             modifier = Modifier
                 .fillMaxWidth()
                 .focusRequester(focusRequester),
-            value = searchText,
+            value = searchQuery,
             onValueChange = { input ->
                 onTextChange.invoke(input)
                 performSearch(input)
@@ -107,7 +112,7 @@ fun SearchAppBarBlueTube(
             trailingIcon = {
                 IconButton(
                     onClick = {
-                        if(searchText.isNotEmpty()) onTextChange("")
+                        if(searchQuery.isNotEmpty()) onTextChange("")
                         else onCloseClicked.invoke()
                     }
                 ) {
@@ -123,7 +128,7 @@ fun SearchAppBarBlueTube(
             ),
             keyboardActions = KeyboardActions(
                 onSearch = {
-                    performSearch(searchText)
+                    performSearch(searchQuery)
                     keyboardController?.hide()
                 }
             ),
@@ -143,10 +148,11 @@ fun SearchAppBarBlueTube(
 @Preview
 @Composable
 fun PreviewSearchAppBarBlueTube() {
+    val searchText = remember { MutableStateFlow("Test text") }
     SearchAppBarBlueTube(
-        searchText = "Test text",
+        searchText = searchText,
         onTextChange = {},
         onCloseClicked = {},
-        onSearchClicked = {}
+        onSearchClicked = {},
     )
 }

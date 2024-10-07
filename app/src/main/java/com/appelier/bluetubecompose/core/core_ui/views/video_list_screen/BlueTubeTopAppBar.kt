@@ -1,4 +1,4 @@
-package com.appelier.bluetubecompose.core.core_ui.views
+package com.appelier.bluetubecompose.core.core_ui.views.video_list_screen
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons

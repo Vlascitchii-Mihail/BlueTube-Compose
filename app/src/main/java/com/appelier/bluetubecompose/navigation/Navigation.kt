@@ -46,9 +46,9 @@ fun Navigation(
                     navigateToPlayerScreen = { video: YoutubeVideo ->
                         navController.navigate(ScreenType.PlayerScreen(video))
                     },
-                    searchViewState = videoListViewModel.searchState.value,
-                    searchTextState = videoListViewModel.searchTextState.value,
-                    videos = videoListViewModel.videoStateFlow,
+                    searchViewState = videoListViewModel.searchState,
+                    searchTextState = videoListViewModel.searchTextState,
+                    videos = { videoListViewModel.getSearchVideosState() },
                     updateSearchTextState = { searchText ->
                         videoListViewModel.updateSearchTextState(
                             searchText
@@ -59,9 +59,7 @@ fun Navigation(
                             searchState
                         )
                     },
-                    getSearchVideosFlow = { searchText ->
-                        videoListViewModel.getSearchVideosFlow(searchText)
-                    }
+                    setSearchVideosFlow = { videoListViewModel.setSearchVideosFlow() }
                 )
             }
             composable<ScreenType.PlayerScreen>(
@@ -77,8 +75,8 @@ fun Navigation(
                 playerScreenViewModel.getSearchedRelatedVideos(arg.snippet.title)
                 PlayerScreen(
                     video = arg,
-                    relatedVideos = playerScreenViewModel.relatedVideoStateFlow,
-                    playerScreenViewModel.youTubePlayerPlayState,
+                    relatedVideos = { playerScreenViewModel.getRelatedVideosState() },
+                    isVideoPlaysFlow = playerScreenViewModel.isVideoPlaysFlow,
                     navigateToPlayerScreen = { video: YoutubeVideo ->
                         navController.navigate(ScreenType.PlayerScreen(video)) {
                             launchSingleTop = true
@@ -90,14 +88,14 @@ fun Navigation(
                             playbackPosition
                         )
                     },
-                    getPlaybackPosition = { playerScreenViewModel.getCurrentPlaybackPosition() },
+                    getPlaybackPosition = { playerScreenViewModel.getCurrentPlaybackPosition() }
                 )
             }
             composable<ScreenType.ShortsScreen> {
                 val shortsViewModel: ShortsViewModel = hiltViewModel()
                 shortsViewModel.getShorts()
                 ShortsScreen(
-                    shortsViewModel.shortsVideoState,
+                    { shortsViewModel.getShortsVideo() } ,
                     shortsViewModel.videoQueue
                 ) { shortsViewModel.listenToVideoQueue() }
             }

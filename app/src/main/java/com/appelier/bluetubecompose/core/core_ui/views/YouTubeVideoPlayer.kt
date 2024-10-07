@@ -15,21 +15,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.appelier.bluetubecompose.databinding.FragmentPlayVideoBinding
 import com.appelier.bluetubecompose.screen_player.OrientationState
 import com.appelier.bluetubecompose.screen_player.YouTubePlayerHandler
 import com.appelier.bluetubecompose.utils.VideoPlayerScreenTags.VIDEO_PLAYER
-import com.appelier.bluetubecompose.utils.getActivity
+import kotlinx.coroutines.flow.MutableStateFlow
 
 @Composable
 fun YoutubeVideoPlayer(
     videoId: String,
     modifier: Modifier = Modifier,
-    youTubePlayerPlayState:  MutableState<Boolean>,
+    isVideoPlaysFlow: MutableStateFlow<Boolean>,
     popBackStack: () -> Unit,
     updatePlaybackPosition: (Float) -> Unit,
     getPlaybackPosition: () -> Float,
 ) {
+    val isVideoPlays = isVideoPlaysFlow.collectAsStateWithLifecycle() as MutableState
     val playerOrientationState = remember { mutableStateOf(OrientationState.PORTRAIT) }
     val localContext = LocalContext.current
     val binding = remember { FragmentPlayVideoBinding.inflate(LayoutInflater.from(localContext)) }
@@ -38,10 +40,10 @@ fun YoutubeVideoPlayer(
         YouTubePlayerHandler(
             binding,
             playerOrientationState,
-            localContext.getActivity() ?: localContext as Activity,
+            localContext as Activity,
             lifecycleOwner,
             videoId,
-            youTubePlayerPlayState,
+            isVideoPlays,
             updatePlaybackPosition,
             getPlaybackPosition
         )

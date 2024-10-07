@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import javax.inject.Named
 
-
 interface VideoListRepository {
 
     fun fetchVideos(videoType: VideoType, viewModelScope: CoroutineScope)
@@ -28,6 +27,7 @@ class VideoListRepositoryImpl @Inject constructor(
 
     override fun fetchVideos(videoType: VideoType, viewModelScope: CoroutineScope)
     : Flow<PagingData<YoutubeVideo>> {
+
         return Pager(
             config = PagingConfig(
                 pageSize = 5,

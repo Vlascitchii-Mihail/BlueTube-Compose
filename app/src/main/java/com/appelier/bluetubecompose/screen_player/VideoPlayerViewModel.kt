@@ -11,6 +11,7 @@ import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideo
 import com.appelier.bluetubecompose.screen_video_list.repository.VideoListRepository
 import com.appelier.bluetubecompose.utils.VideoType
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
@@ -23,11 +24,15 @@ class VideoPlayerViewModel @Inject constructor(
     private val videoRepository: VideoListRepository,
 ) : ViewModel() {
 
-    private var _relatedVideoStateFlow: MutableState<StateFlow<PagingData<YoutubeVideo>>> ? = null
-    val relatedVideoStateFlow: State<StateFlow<PagingData<YoutubeVideo>>>? get() = _relatedVideoStateFlow
+    private val emptyPagingData = PagingData.empty<YoutubeVideo>()
+    private var _relatedVideoStateFlow: MutableState<StateFlow<PagingData<YoutubeVideo>>> = mutableStateOf(
+        MutableStateFlow(emptyPagingData)
+    )
+    private val relatedVideoStateFlow: State<StateFlow<PagingData<YoutubeVideo>>> get() = _relatedVideoStateFlow
     private var videoPlaybackPosition: Float = INITIAL_VIDEO_PLAYBACK_POSITION
+    var isVideoPlaysFlow = MutableStateFlow(true)
 
-    var youTubePlayerPlayState = mutableStateOf(true)
+    fun getRelatedVideosState() = relatedVideoStateFlow
 
     fun updatePlaybackPosition(newPlaybackTime: Float = INITIAL_VIDEO_PLAYBACK_POSITION) {
         videoPlaybackPosition = newPlaybackTime
@@ -39,7 +44,7 @@ class VideoPlayerViewModel @Inject constructor(
     }
 
     fun getSearchedRelatedVideos(query: String) {
-        if (_relatedVideoStateFlow == null) {
+        if (_relatedVideoStateFlow.value.value == emptyPagingData) {
             val relatedVideosFlow = videoRepository
                 .fetchVideos(VideoType.SearchedRelatedVideo(query), viewModelScope)
                 .cachedIn(viewModelScope)

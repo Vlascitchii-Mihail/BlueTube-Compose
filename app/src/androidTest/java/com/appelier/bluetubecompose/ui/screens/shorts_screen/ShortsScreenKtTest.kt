@@ -1,4 +1,4 @@
-package com.appelier.bluetubecompose.ui.screen_shorts
+package com.appelier.bluetubecompose.ui.screens.shorts_screen
 
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.mutableStateOf
@@ -56,10 +56,9 @@ class ShortsScreenKtTest {
             NavHost(navController = navController, startDestination = ScreenType.ShortsScreen) {
                 composable<ScreenType.ShortsScreen> {
                     ShortsScreen(
-                        videoPage,
-                        MutableSharedFlow(3),
-                        {  }
-                    )
+                        { videoPage },
+                        MutableSharedFlow(3)
+                    ) { }
                 }
             }
 
@@ -74,10 +73,9 @@ class ShortsScreenKtTest {
             NavHost(navController = navController, startDestination = ScreenType.ShortsScreen) {
                 composable<ScreenType.ShortsScreen> {
                     ShortsScreen(
-                        emptyVideoPage,
-                        MutableSharedFlow(3),
-                        {  }
-                    )
+                        { emptyVideoPage },
+                        MutableSharedFlow(3)
+                    ) { }
                 }
             }
         }

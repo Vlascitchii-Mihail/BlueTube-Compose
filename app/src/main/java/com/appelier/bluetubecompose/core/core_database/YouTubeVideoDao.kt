@@ -1,5 +1,6 @@
 package com.appelier.bluetubecompose.core.core_database
 
+import android.util.Log
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -56,6 +57,7 @@ interface YouTubeVideoDao {
     suspend fun getVideosFromPage(currentPageToken: String): PageWithVideos {
         val pageWithVideos = getPageWithEmptyVideos(currentPageToken)
         pageWithVideos.videos.initializeVideos()
+        Log.d("Database", "getVideosFromPage() called with: currentPageToken = $pageWithVideos")
         return pageWithVideos
     }
 
@@ -68,6 +70,7 @@ interface YouTubeVideoDao {
     suspend fun getFirstPageFromDb(): PageWithVideos {
         val firstPage = getFirstPage()
         firstPage.videos.initializeVideos()
+        Log.d("Database", "getFirstPageFromDb() called with: $firstPage")
         return firstPage
     }
 

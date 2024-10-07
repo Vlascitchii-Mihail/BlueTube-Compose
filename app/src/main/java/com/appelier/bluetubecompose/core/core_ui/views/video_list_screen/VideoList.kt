@@ -1,13 +1,16 @@
-package com.appelier.bluetubecompose.core.core_ui.views
+package com.appelier.bluetubecompose.core.core_ui.views.video_list_screen
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,18 +28,24 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
+import com.appelier.bluetubecompose.LocalWindowSizeClass
+import com.appelier.bluetubecompose.core.core_ui.views.PagerContentManager
 import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideo
 import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideo.Companion.DEFAULT_VIDEO_LIST
 import com.appelier.bluetubecompose.utils.VideoListScreenTags
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 @Composable
 fun YouTubeVideoList(
-    videos: LazyPagingItems<YoutubeVideo>,
+    videosStateFlow: () -> State<StateFlow<PagingData<YoutubeVideo>>>,
     modifier: Modifier,
     innerPadding: PaddingValues = PaddingValues(0.dp),
     navigateToPlayerScreen: (YoutubeVideo) -> Unit,
 ) {
+
+    val videosState by videosStateFlow.invoke()
+    val videos = videosState.collectAsLazyPagingItems()
 
     val keyboardController = LocalSoftwareKeyboardController.current
     val nestedScrollConnection = remember {
@@ -48,39 +57,29 @@ fun YouTubeVideoList(
         }
     }
 
-    Box(
-        modifier = modifier
+    PagerContentManager(
+        videos,
+        { videoState: LazyPagingItems<YoutubeVideo> ->
+            ItemsList(
+                videoState,
+                modifier,
+                navigateToPlayerScreen,
+                LocalWindowSizeClass.current.widthSizeClass
+            )
+        },
+        modifier
             .fillMaxSize()
             .nestedScroll(nestedScrollConnection)
-            .padding(innerPadding), contentAlignment = Alignment.Center
-    ) {
-        val refreshLoadState = videos.loadState.refresh
-        when {
-            refreshLoadState is LoadState.NotLoading -> ItemsList(videos, modifier, navigateToPlayerScreen)
-            refreshLoadState is LoadState.Loading && (videos.itemCount > 0) -> ItemsList(
-                videos,
-                modifier,
-                navigateToPlayerScreen
-            )
-            refreshLoadState is LoadState.Loading -> CircularProgressIndicator(
-                modifier
-                    .align(Alignment.Center)
-                    .height(48.dp)
-            )
-            videos.loadState.refresh is LoadState.Error -> PaginationErrorItem(
-                errorText = (videos.loadState.refresh as LoadState.Error).error.message,
-                modifier = modifier,
-                onRetryClick = { videos.refresh() }
-            )
-        }
-    }
+            .padding(innerPadding)
+    )
 }
 
 @Composable
 private fun ItemsList(
     videos: LazyPagingItems<YoutubeVideo>,
     modifier: Modifier,
-    navigateToPlayerScreen: (YoutubeVideo) -> Unit
+    navigateToPlayerScreen: (YoutubeVideo) -> Unit,
+    windowSize: WindowWidthSizeClass
 ) {
     LazyColumn(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -88,13 +87,27 @@ private fun ItemsList(
             .fillMaxSize()
             .testTag(VideoListScreenTags.VIDEO_LIST)
     ) {
-        items(
-            count = videos.itemCount,
-            key = videos.itemKey(),
-            contentType = videos.itemContentType()
-        ) { index ->
-            videos[index]?.let { VideoItem(youtubeVideo = it, defaultModifier = modifier, navigateToPlayerScreen) }
+        when(windowSize) {
+            WindowWidthSizeClass.Compact -> {
+                items(
+                    count = videos.itemCount,
+                    key = videos.itemKey(),
+                    contentType = videos.itemContentType()
+                ) { index ->
+                    videos[index]?.let { VideoItem(youtubeVideo = it, defaultModifier = modifier, navigateToPlayerScreen) }
+                }
+            }
+            else -> {
+                items(
+                    count = videos.itemCount,
+                    key = videos.itemKey(),
+                    contentType = videos.itemContentType()
+                ) { index ->
+                    videos[index]?.let { VideoItemLandscape(youtubeVideo = it, modifier = modifier, navigateToPlayerScreen) }
+                }
+            }
         }
+
         item {
             when(videos.loadState.append) {
                 is LoadState.Loading ->  CircularProgressIndicator(modifier.height(48.dp))
@@ -109,9 +122,9 @@ private fun ItemsList(
 @Composable
 private fun YouTubeVideoListPreview() {
     YouTubeVideoList(
-        videos = MutableStateFlow(PagingData.from(DEFAULT_VIDEO_LIST)).collectAsLazyPagingItems(),
+        videosStateFlow = { mutableStateOf(MutableStateFlow(PagingData.from(DEFAULT_VIDEO_LIST))) },
         modifier = Modifier,
         PaddingValues(8.dp),
-        {}
+        {},
     )
 }

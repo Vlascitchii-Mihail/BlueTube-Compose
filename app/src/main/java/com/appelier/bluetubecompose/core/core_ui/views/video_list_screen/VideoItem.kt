@@ -1,4 +1,4 @@
-package com.appelier.bluetubecompose.core.core_ui.views
+package com.appelier.bluetubecompose.core.core_ui.views.video_list_screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,7 +26,7 @@ import com.appelier.bluetubecompose.R
 import com.appelier.bluetubecompose.core.core_ui.theme.BlueTubeComposeTheme
 import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideo
 import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideo.Companion.DEFAULT_VIDEO
-import com.appelier.bluetubecompose.utils.VideoListScreenTags.CHANNEL_PREVIEW_IMG
+import com.appelier.bluetubecompose.utils.Core.CHANNEL_PREVIEW_IMG
 import com.appelier.bluetubecompose.utils.VideoListScreenTags.VIDEO_DURATION
 import com.appelier.bluetubecompose.utils.VideoListScreenTags.VIDEO_PREVIEW_IMG
 import com.appelier.bluetubecompose.utils.VideoListScreenTags.VIDEO_STATISTICS
@@ -49,7 +48,8 @@ fun VideoItem(
     ConstraintLayout(modifier = defaultModifier
         .fillMaxWidth()
         .clickable { navigateToPlayerScreen.invoke(youtubeVideo) }
-        .wrapContentHeight()) {
+        .wrapContentHeight()
+    ) {
 
         val (videoPreview, videoTitle, channelImg, videoDuration, statisticsFlow) = createRefs()
 
@@ -60,7 +60,7 @@ fun VideoItem(
             contentScale = ContentScale.Crop,
             modifier = defaultModifier
                 .fillMaxWidth()
-                .wrapContentSize()
+                .wrapContentHeight()
                 .clickable { navigateToPlayerScreen.invoke(youtubeVideo) }
                 .testTag(VIDEO_PREVIEW_IMG)
                 .constrainAs(videoPreview) {

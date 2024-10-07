@@ -88,14 +88,11 @@ dependencies {
     implementation(libs.androidx.material)
     implementation(libs.constraint.layout.compose)
     implementation(libs.constraint.layout.xml)
+    implementation(libs.window.configuration)
 
     //ViewModel
     implementation(libs.lifecycle.viewmodel.ktx)
     implementation(libs.viewmodel.compose)
-
-    //LiveData
-    implementation(libs.livedata)
-    implementation(libs.livedata.runtime)
 
     //coroutines
     implementation(libs.coroutines.core)
@@ -103,8 +100,6 @@ dependencies {
 
     //dagger hilt
     implementation(libs.hilt.android)
-    testImplementation("junit:junit:4.12")
-    testImplementation("junit:junit:4.12")
     ksp(libs.ksp.hilt.compiler)
     implementation(libs.hilt.navigation)
 
@@ -143,9 +138,9 @@ dependencies {
     testImplementation(libs.mockito)
     testImplementation(libs.mockito.inline)
     testImplementation(libs.test.coroutines)
+    testImplementation(libs.mockwebserver)
 
 //    android tests
-    androidTestImplementation(libs.mockwebserver)
     androidTestImplementation(libs.test.arch.core)
     androidTestImplementation(libs.dexmaker)
     androidTestImplementation(libs.mockito.kotlin.android)
