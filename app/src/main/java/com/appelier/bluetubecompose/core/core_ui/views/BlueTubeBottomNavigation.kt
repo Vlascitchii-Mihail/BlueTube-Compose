@@ -7,6 +7,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
@@ -116,7 +117,7 @@ fun BlueTubeBottomNavigation(
             animationSpec = tween(durationMillis = BOTTOM_NAV_APPEARANCE)
         ) + fadeOut(animationSpec = tween(durationMillis = BOTTOM_NAV_APPEARANCE))
     ) {
-        BottomNavigation(modifier = Modifier.testTag(BOTTOM_NAV)) {
+        BottomNavigation(modifier = Modifier.testTag(BOTTOM_NAV).fillMaxWidth()) {
             navItemsList.forEach { navItem ->
                 val isSelected =
                     navItem.getScreenSelectedState(currentDestination = currentDestination)

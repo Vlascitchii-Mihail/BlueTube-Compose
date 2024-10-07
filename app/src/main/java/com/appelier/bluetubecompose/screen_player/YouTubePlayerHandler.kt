@@ -15,7 +15,7 @@ class YouTubePlayerHandler(
     activity: Activity,
     private val currentComposeLifecycle: Lifecycle,
     private val videoId: String,
-    private var youTubePlayerPlayState:  MutableState<Boolean>,
+    private var isVideoPlays: MutableState<Boolean>,
     private val updatePlaybackPosition:(Float) -> Unit,
     private val getCurrentPlaybackPosition: () -> Float
 ) {
@@ -45,9 +45,9 @@ class YouTubePlayerHandler(
 
                 orientationHandler.initFullScreenWidgetState(player)
 
-                when {
-                    youTubePlayerPlayState.value -> youTubePlayer.loadVideo(videoId, getCurrentPlaybackPosition.invoke())
-                    else -> youTubePlayer.cueVideo(videoId, getCurrentPlaybackPosition.invoke())
+                when(isVideoPlays.value) {
+                    true -> youTubePlayer.loadVideo(videoId, getCurrentPlaybackPosition.invoke())
+                    false -> youTubePlayer.cueVideo(videoId, getCurrentPlaybackPosition.invoke())
                 }
             }
 
@@ -58,10 +58,10 @@ class YouTubePlayerHandler(
                 super.onStateChange(youTubePlayer, state)
                 when(state) {
                     PlayerConstants.PlayerState.PAUSED -> {
-                        youTubePlayerPlayState.value = false
+                        isVideoPlays.value = false
                     }
                     PlayerConstants.PlayerState.PLAYING -> {
-                        youTubePlayerPlayState.value = true
+                        isVideoPlays.value = true
                     }
                     else -> {}
                 }

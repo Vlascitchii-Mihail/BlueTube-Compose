@@ -1,5 +1,6 @@
 package com.appelier.bluetubecompose.core.core_paging
 
+import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.appelier.bluetubecompose.core.core_api.VideoApiService
@@ -94,6 +95,7 @@ class YoutubeVideoSource(
     }
 
     private suspend fun showVideosFromDb(pageToken: String = ""): YoutubeVideoResponse {
+        Log.d("Database", "showVideosFromDb() called with: pageToken = $pageToken")
         val dbVideos = databaseContentManager.getVideosFromDatabase(pageToken)
         dbVideos.nextPageToken?.let { updateCurrentPageToken(it) }
         return dbVideos
