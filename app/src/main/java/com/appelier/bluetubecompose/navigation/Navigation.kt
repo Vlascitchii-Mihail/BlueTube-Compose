@@ -77,6 +77,11 @@ fun Navigation(
                     video = arg,
                     relatedVideos = { playerScreenViewModel.getRelatedVideosState() },
                     isVideoPlaysFlow = playerScreenViewModel.isVideoPlaysFlow,
+                    updateVideoIsPlayState = { isPlaying ->
+                        playerScreenViewModel.updateVideoIsPlayState(
+                            isPlaying
+                        )
+                    },
                     navigateToPlayerScreen = { video: YoutubeVideo ->
                         navController.navigate(ScreenType.PlayerScreen(video)) {
                             launchSingleTop = true
@@ -88,14 +93,26 @@ fun Navigation(
                             playbackPosition
                         )
                     },
-                    getPlaybackPosition = { playerScreenViewModel.getCurrentPlaybackPosition() }
+                    getPlaybackPosition = { playerScreenViewModel.getCurrentPlaybackPosition() },
+                    playerOrientationState = playerScreenViewModel.playerOrientationState,
+                    updatePlayerOrientationState = { newPlayerOrientationState ->
+                        playerScreenViewModel.updatePlayerOrientationState(
+                            newPlayerOrientationState
+                        )
+                    },
+                    fullscreenWidgetIsClicked = playerScreenViewModel.fullscreenWidgetIsClicked,
+                    setFullscreenWidgetIsClicked = { isClicked ->
+                        playerScreenViewModel.setFullscreenWidgetIsClicked(
+                            isClicked
+                        )
+                    }
                 )
             }
             composable<ScreenType.ShortsScreen> {
                 val shortsViewModel: ShortsViewModel = hiltViewModel()
                 shortsViewModel.getShorts()
                 ShortsScreen(
-                    { shortsViewModel.getShortsVideo() } ,
+                    { shortsViewModel.getShortsVideo() },
                     shortsViewModel.videoQueue
                 ) { shortsViewModel.listenToVideoQueue() }
             }

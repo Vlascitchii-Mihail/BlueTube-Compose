@@ -6,10 +6,10 @@ import android.content.pm.ActivityInfo
 import android.provider.Settings
 import android.view.View
 import android.view.WindowManager
-import androidx.compose.runtime.MutableState
 import com.appelier.bluetubecompose.databinding.FragmentPlayVideoBinding
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.FullscreenListener
+import kotlinx.coroutines.flow.StateFlow
 
 const val PORTRAIT_ORIENTATION = 0
 const val LANDSCAPE_ORIENTATION = 270
@@ -18,13 +18,15 @@ const val LANDSCAPE_REVERSE_ORIENTATION = 90
 class OrientationHandler(
     private val binding: FragmentPlayVideoBinding,
     private val activity: Activity,
-    private val playerOrientationState: MutableState<OrientationState>,
+    private val playerOrientationState: OrientationState,
+    private val updatePlayerOrientationState: (OrientationState) -> Unit,
+    private val fullscreenWidgetIsClicked: StateFlow<Boolean>,
+    private val setFullscreenWidgetIsClicked: (Boolean) -> Unit,
 ) {
 
     private val landscapeSensorOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
-    private val landscapeReverseOrientation = ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE
-    private val portraitSensorOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
-    private val unspecifiedScreenOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+    private val reverseLandscapeOrientation = ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE
+    private val portraitOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
     init {
         setupFullScreenListener()
@@ -36,11 +38,13 @@ class OrientationHandler(
             override fun onEnterFullscreen(fullscreenView: View, exitFullscreen: () -> Unit) {
                 setFullScreenVisibility(fullscreenView)
                 changeToLandscapeOrientation()
+                activity.window?.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
             }
 
             override fun onExitFullscreen() {
                 setPortraitVisibility()
                 changeToPortraitOrientation()
+                activity.window?.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
             }
         })
     }
@@ -59,26 +63,18 @@ class OrientationHandler(
         }
     }
 
-    fun changeToLandscapeOrientation() {
-        if (activity.requestedOrientation != landscapeSensorOrientation) {
-            activity.requestedOrientation = landscapeSensorOrientation
-        }
-    }
-
-    fun changeToPortraitOrientation() {
-        if (activity.requestedOrientation != portraitSensorOrientation) {
-            activity.requestedOrientation = portraitSensorOrientation
-        }
-    }
-
     fun initFullScreenWidgetState(player: YouTubePlayer?) {
-        if (activity.requestedOrientation == landscapeSensorOrientation ||
-            activity.requestedOrientation == landscapeReverseOrientation) {
+        if (playerOrientationState == OrientationState.FULL_SCREEN) player?.toggleFullscreen()
+    }
+
+    fun setOnFullscreenClickListener(player: YouTubePlayer?) {
+        binding.fullScreenButton.setOnClickListener {
+            setFullscreenWidgetIsClicked.invoke(true)
             player?.toggleFullscreen()
         }
     }
 
-    private fun getAutoRotationEnabledState(context: Context): Boolean {
+    private fun getIsAutoRotationEnabled(context: Context): Boolean {
         return try {
             Settings.System.getInt(
                 context.contentResolver,
@@ -91,38 +87,46 @@ class OrientationHandler(
 
     fun setScreenAppearanceOrientationFlag(orientation: Int) {
         when {
-            PORTRAIT_ORIENTATION == orientation && getAutoRotationEnabledState(activity.applicationContext) ||
-                    activity.requestedOrientation == portraitSensorOrientation -> {
-                setupPortraitAppearance()
+            PORTRAIT_ORIENTATION == orientation && getIsAutoRotationEnabled(activity.applicationContext) && !fullscreenWidgetIsClicked.value
+            -> {
+                changeToPortraitOrientation()
             }
 
-            LANDSCAPE_ORIENTATION == orientation && getAutoRotationEnabledState(activity.applicationContext) ||
-                    activity.requestedOrientation == landscapeSensorOrientation -> {
-                setupLandscapeAppearance()
+            LANDSCAPE_ORIENTATION == orientation && getIsAutoRotationEnabled(activity.applicationContext) && !fullscreenWidgetIsClicked.value
+            -> {
+                changeToLandscapeOrientation()
             }
 
-            LANDSCAPE_REVERSE_ORIENTATION == orientation && getAutoRotationEnabledState(activity.applicationContext) ||
-                    activity.requestedOrientation == landscapeReverseOrientation -> {
-                setupLandscapeAppearance()
+            LANDSCAPE_REVERSE_ORIENTATION == orientation && getIsAutoRotationEnabled(activity.applicationContext) && !fullscreenWidgetIsClicked.value
+            -> {
+                changeToReverseLandscapeOrientation()
             }
             else -> {}
         }
+        setFullscreenWidgetIsClicked.invoke(false)
     }
 
-    private fun setupPortraitAppearance() {
-        playerOrientationState.value = OrientationState.PORTRAIT
-        changeToAutoRotation()
-        binding.ytPlayer.wrapContent()
-        activity.window?.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-    }
-    private fun changeToAutoRotation() {
-        activity.requestedOrientation = unspecifiedScreenOrientation
+    fun changeToPortraitOrientation() {
+        if (activity.requestedOrientation != portraitOrientation) {
+            updatePlayerOrientationState(OrientationState.PORTRAIT)
+            activity.requestedOrientation = portraitOrientation
+            activity.window?.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        }
     }
 
+    fun changeToLandscapeOrientation() {
+        if (activity.requestedOrientation != landscapeSensorOrientation) {
+            updatePlayerOrientationState(OrientationState.FULL_SCREEN)
+            activity.requestedOrientation = landscapeSensorOrientation
+            activity.window?.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        }
+    }
 
-    private fun setupLandscapeAppearance() {
-        playerOrientationState.value = OrientationState.FULL_SCREEN
-        activity.window?.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-        binding.ytPlayer.matchParent()
+    private fun changeToReverseLandscapeOrientation() {
+        if (activity.requestedOrientation != reverseLandscapeOrientation) {
+            updatePlayerOrientationState(OrientationState.FULL_SCREEN)
+            activity.requestedOrientation = reverseLandscapeOrientation
+            activity.window?.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        }
     }
 }

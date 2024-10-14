@@ -30,18 +30,22 @@ import com.appelier.bluetubecompose.R
 import com.appelier.bluetubecompose.core.core_database.CustomNavTypeSerializer
 import com.appelier.bluetubecompose.navigation.ScreenType
 import com.appelier.bluetubecompose.screen_player.PlayerScreen
+import com.appelier.bluetubecompose.screen_player.VideoPlayerViewModel
 import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideo
 import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideoResponse.Companion.DEFAULT_VIDEO_RESPONSE_WITH_CHANNEL_IMG
+import com.appelier.bluetubecompose.screen_video_list.repository.VideoListRepository
 import com.appelier.bluetubecompose.utils.VideoListScreenTags
 import com.appelier.bluetubecompose.utils.VideoPlayerScreenTags
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.flow.MutableStateFlow
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
 import kotlin.reflect.typeOf
 
 @RunWith(AndroidJUnit4::class)
@@ -60,6 +64,8 @@ class PlayerScreenKtTest {
     private val firstVideo = DEFAULT_VIDEO_RESPONSE_WITH_CHANNEL_IMG.items.first()
     private val secondVideo = DEFAULT_VIDEO_RESPONSE_WITH_CHANNEL_IMG.items[1]
     private var videoId: String = ""
+    private val repository: VideoListRepository = mock()
+    private val viewModel = VideoPlayerViewModel(repository)
 
     @Before
     fun init_player_screen() {
@@ -87,7 +93,8 @@ class PlayerScreenKtTest {
                     PlayerScreen(
                         video = video,
                         relatedVideos = { videoPage },
-                        MutableStateFlow(true),
+                        isVideoPlaysFlow = MutableStateFlow(true),
+                        {},
                         navigateToPlayerScreen = {
                             navController.navigate(ScreenType.PlayerScreen(secondVideo)) {
                                 launchSingleTop = true
@@ -95,7 +102,15 @@ class PlayerScreenKtTest {
                         },
                         popBackStack = {},
                         updatePlaybackPosition = {},
-                        getPlaybackPosition = { 0F }
+                        getPlaybackPosition = { 0F },
+                        playerOrientationState = viewModel.playerOrientationState,
+                        updatePlayerOrientationState = { newPlayerOrientationState ->
+                            viewModel.updatePlayerOrientationState(
+                                newPlayerOrientationState
+                            )
+                        },
+                        viewModel.fullscreenWidgetIsClicked,
+                        { isClicked -> viewModel.setFullscreenWidgetIsClicked(isClicked) }
                     )
                 }
             }
