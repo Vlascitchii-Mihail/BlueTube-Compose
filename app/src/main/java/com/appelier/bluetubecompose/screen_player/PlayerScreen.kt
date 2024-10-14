@@ -14,18 +14,22 @@ import com.appelier.bluetubecompose.core.core_ui.views.video_list_screen.VideoDe
 import com.appelier.bluetubecompose.core.core_ui.views.video_list_screen.YouTubeVideoList
 import com.appelier.bluetubecompose.core.core_ui.views.YoutubeVideoPlayer
 import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideo
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 @Composable
 fun PlayerScreen(
     video: YoutubeVideo,
     relatedVideos: () -> State<StateFlow<PagingData<YoutubeVideo>>>,
-    isVideoPlaysFlow: MutableStateFlow<Boolean>,
+    isVideoPlaysFlow: StateFlow<Boolean>,
+    updateVideoIsPlayState: (Boolean) -> Unit,
     navigateToPlayerScreen: (YoutubeVideo) -> Unit,
     popBackStack: () -> Unit,
     updatePlaybackPosition: (Float) -> Unit,
     getPlaybackPosition: () -> Float,
+    playerOrientationState: StateFlow<OrientationState>,
+    updatePlayerOrientationState: (OrientationState) -> Unit,
+    fullscreenWidgetIsClicked: StateFlow<Boolean>,
+    setFullscreenWidgetIsClicked: (Boolean) -> Unit
 ) {
     Scaffold(
         content = { paddingValue ->
@@ -37,9 +41,14 @@ fun PlayerScreen(
                     videoId = video.id,
                     Modifier,
                     isVideoPlaysFlow,
+                    updateVideoIsPlayState,
                     popBackStack,
                     updatePlaybackPosition,
                     getPlaybackPosition,
+                    playerOrientationState,
+                    updatePlayerOrientationState,
+                    fullscreenWidgetIsClicked,
+                    setFullscreenWidgetIsClicked
                 )
 
                 if (LocalConfiguration.current.orientation != ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE) {
