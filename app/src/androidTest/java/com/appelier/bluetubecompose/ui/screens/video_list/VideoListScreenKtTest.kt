@@ -25,6 +25,7 @@ import com.appelier.bluetubecompose.MainActivity
 import com.appelier.bluetubecompose.R
 import com.appelier.bluetubecompose.core.core_database.CustomNavTypeSerializer
 import com.appelier.bluetubecompose.navigation.ScreenType
+import com.appelier.bluetubecompose.screen_player.OrientationState
 import com.appelier.bluetubecompose.screen_player.PlayerScreen
 import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideo
 import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideo.Companion.DEFAULT_VIDEO_LIST
@@ -95,11 +96,16 @@ class VideoListScreenKtTest {
                     PlayerScreen(
                         video = video,
                         relatedVideos = { mutableStateOf(MutableStateFlow(PagingData.from(DEFAULT_VIDEO_LIST))) },
-                        MutableStateFlow(true),
+                        isVideoPlaysFlow = MutableStateFlow(true),
+                        {},
                         navigateToPlayerScreen = {},
                         popBackStack = {},
                         updatePlaybackPosition = {},
-                        getPlaybackPosition = { initialPlaybackPosition }
+                        getPlaybackPosition = { initialPlaybackPosition },
+                        MutableStateFlow(OrientationState.PORTRAIT),
+                        {},
+                        MutableStateFlow(false),
+                        {}
                     )
                 }
             }

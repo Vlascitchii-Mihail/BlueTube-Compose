@@ -1,7 +1,5 @@
 package com.appelier.bluetubecompose.screen_player
 
-import android.app.Activity
-import androidx.compose.runtime.MutableState
 import androidx.lifecycle.Lifecycle
 import com.appelier.bluetubecompose.databinding.FragmentPlayVideoBinding
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.PlayerConstants
@@ -11,17 +9,16 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.options.IFram
 
 class YouTubePlayerHandler(
     private val binding: FragmentPlayVideoBinding,
-    playerOrientationState: MutableState<OrientationState>,
-    activity: Activity,
     private val currentComposeLifecycle: Lifecycle,
     private val videoId: String,
-    private var isVideoPlays: MutableState<Boolean>,
-    private val updatePlaybackPosition:(Float) -> Unit,
-    private val getCurrentPlaybackPosition: () -> Float
+    private val isVideoPlays: Boolean,
+    private val updateVideoIsPlayState: (Boolean) -> Unit,
+    private val updatePlaybackPosition: (Float) -> Unit,
+    private val getCurrentPlaybackPosition: () -> Float,
+    private val orientationHandler: OrientationHandler,
 ) {
 
     var player: YouTubePlayer? = null
-    private val orientationHandler = OrientationHandler(binding, activity, playerOrientationState)
 
     init {
         setupPlayerWidgets()
@@ -44,8 +41,9 @@ class YouTubePlayerHandler(
                 player = youTubePlayer
 
                 orientationHandler.initFullScreenWidgetState(player)
+                orientationHandler.setOnFullscreenClickListener(player)
 
-                when(isVideoPlays.value) {
+                when (isVideoPlays) {
                     true -> youTubePlayer.loadVideo(videoId, getCurrentPlaybackPosition.invoke())
                     false -> youTubePlayer.cueVideo(videoId, getCurrentPlaybackPosition.invoke())
                 }
@@ -56,13 +54,15 @@ class YouTubePlayerHandler(
                 state: PlayerConstants.PlayerState
             ) {
                 super.onStateChange(youTubePlayer, state)
-                when(state) {
+                when (state) {
                     PlayerConstants.PlayerState.PAUSED -> {
-                        isVideoPlays.value = false
+                        updateVideoIsPlayState(false)
                     }
+
                     PlayerConstants.PlayerState.PLAYING -> {
-                        isVideoPlays.value = true
+                        updateVideoIsPlayState(true)
                     }
+
                     else -> {}
                 }
             }
@@ -72,13 +72,5 @@ class YouTubePlayerHandler(
                 updatePlaybackPosition.invoke(second)
             }
         }
-    }
-
-    fun changeToPortraitOrientation() {
-        orientationHandler.changeToPortraitOrientation()
-    }
-
-    fun setScreenAppearanceOrientationFlag(orientation: Int) {
-        orientationHandler.setScreenAppearanceOrientationFlag(orientation)
     }
 }

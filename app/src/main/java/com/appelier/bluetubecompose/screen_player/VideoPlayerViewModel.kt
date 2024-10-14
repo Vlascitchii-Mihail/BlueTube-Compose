@@ -29,8 +29,17 @@ class VideoPlayerViewModel @Inject constructor(
         MutableStateFlow(emptyPagingData)
     )
     private val relatedVideoStateFlow: State<StateFlow<PagingData<YoutubeVideo>>> get() = _relatedVideoStateFlow
+
     private var videoPlaybackPosition: Float = INITIAL_VIDEO_PLAYBACK_POSITION
-    var isVideoPlaysFlow = MutableStateFlow(true)
+
+    private val _isVideoPlaysFlow = MutableStateFlow(true)
+    val isVideoPlaysFlow: StateFlow<Boolean> = _isVideoPlaysFlow
+
+    private var _playerOrientationState = MutableStateFlow(OrientationState.PORTRAIT)
+    val playerOrientationState: StateFlow<OrientationState> = _playerOrientationState
+
+    private var _fullscreenWidgetIsClicked = MutableStateFlow(false)
+    val fullscreenWidgetIsClicked:StateFlow<Boolean> = _fullscreenWidgetIsClicked
 
     fun getRelatedVideosState() = relatedVideoStateFlow
 
@@ -52,5 +61,17 @@ class VideoPlayerViewModel @Inject constructor(
 
             _relatedVideoStateFlow = mutableStateOf(relatedVideosFlow)
         }
+    }
+
+    fun updateVideoIsPlayState(isPlaying: Boolean) {
+        _isVideoPlaysFlow.value = isPlaying
+    }
+
+    fun updatePlayerOrientationState(newPlayerOrientationState: OrientationState) {
+        _playerOrientationState.value = newPlayerOrientationState
+    }
+
+    fun setFullscreenWidgetIsClicked(isClicked: Boolean) {
+        _fullscreenWidgetIsClicked.value = isClicked
     }
 }
