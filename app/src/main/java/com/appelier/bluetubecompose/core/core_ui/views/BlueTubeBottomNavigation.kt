@@ -25,8 +25,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
-import androidx.navigation.NavDestination
-import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptionsBuilder
@@ -73,13 +71,6 @@ private val navItemsList = listOf(
 )
 
 @Composable
-private fun NavigationItem.getScreenSelectedState(currentDestination: NavDestination?): Boolean {
-    return currentDestination?.hierarchy?.any {
-        it.route?.contains(stringResource(id = this.screenDescriptionId)) ?: false
-    } == true
-}
-
-@Composable
 fun BlueTubeBottomNavigation(
     navController: NavHostController,
 ) {
@@ -117,10 +108,11 @@ fun BlueTubeBottomNavigation(
             animationSpec = tween(durationMillis = BOTTOM_NAV_APPEARANCE)
         ) + fadeOut(animationSpec = tween(durationMillis = BOTTOM_NAV_APPEARANCE))
     ) {
-        BottomNavigation(modifier = Modifier.testTag(BOTTOM_NAV).fillMaxWidth()) {
+        BottomNavigation(modifier = Modifier
+            .testTag(BOTTOM_NAV)
+            .fillMaxWidth()) {
             navItemsList.forEach { navItem ->
-                val isSelected =
-                    navItem.getScreenSelectedState(currentDestination = currentDestination)
+                val isSelected = currentDestination?.route?.contains(navItem.screen.toString()) ?: false
 
                 BottomNavigationItem(
                     modifier = Modifier.background(MaterialTheme.colorScheme.primary),
@@ -141,7 +133,7 @@ fun BlueTubeBottomNavigation(
                     label = {
                         Text(
                             text = navItem.screen.name,
-                            style = MaterialTheme.typography.titleSmall
+                            style = MaterialTheme.typography.titleSmall,
                         )
                     },
                     unselectedContentColor = MaterialTheme.colorScheme.onPrimary,
