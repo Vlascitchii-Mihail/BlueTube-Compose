@@ -11,7 +11,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import com.appelier.bluetubecompose.core.core_database.CustomNavTypeSerializer
 import com.appelier.bluetubecompose.core.core_ui.views.BlueTubeBottomNavigation
 import com.appelier.bluetubecompose.screen_player.PlayerScreen
 import com.appelier.bluetubecompose.screen_player.VideoPlayerViewModel
@@ -26,7 +25,7 @@ import kotlin.reflect.typeOf
 
 @Composable
 fun Navigation(
-    navController: NavHostController,
+    navController: NavHostController
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
