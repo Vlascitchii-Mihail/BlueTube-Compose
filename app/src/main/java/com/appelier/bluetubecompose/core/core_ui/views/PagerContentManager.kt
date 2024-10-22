@@ -7,6 +7,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
@@ -14,6 +15,7 @@ import androidx.paging.compose.LazyPagingItems
 import com.appelier.bluetubecompose.R
 import com.appelier.bluetubecompose.core.core_ui.views.video_list_screen.PaginationErrorItem
 import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideo
+import com.appelier.bluetubecompose.utils.Core
 
 @Composable
 fun PagerContentManager(
@@ -23,20 +25,27 @@ fun PagerContentManager(
 ) {
     Box(modifier = modifier, contentAlignment = Alignment.Center) {
         val refreshLoadState = videoState.loadState.refresh
-        Log.d("recomposition", "PagerContentManager() called")
 
-        when {
-            refreshLoadState is LoadState.NotLoading && videoState.itemCount > 0 -> contentList.invoke(videoState)
-            refreshLoadState is LoadState.Loading && videoState.itemCount > 0 ->
-                contentList.invoke(videoState)
-            refreshLoadState is LoadState.Loading -> CircularProgressIndicator(
+        Log.d("Empty", "videoState.itemCount = ${videoState.itemCount}")
+        when (refreshLoadState) {
+            is LoadState.NotLoading -> {
+                if (videoState.itemCount == 0) {
+                    PaginationErrorItem(
+                        errorText = castLoadState(refreshLoadState, stringResource(id = R.string.error_msg_empty_list) ),
+                        onRetryClick = { videoState.refresh() }
+                    )
+                } else contentList.invoke(videoState)
+            }
+
+            is LoadState.Loading -> CircularProgressIndicator(
                 Modifier
                     .align(Alignment.Center)
                     .height(48.dp)
+                    .testTag(Core.CIRCULAR_PROGRESS_INDICATOR)
             )
-            refreshLoadState is LoadState.Error || videoState.itemCount == 0 ->
-                PaginationErrorItem(
-                errorText = castLoadState(refreshLoadState, stringResource(id = R.string.error_msg_empty_list) ),
+
+            is LoadState.Error -> PaginationErrorItem(
+                errorText = castLoadState(refreshLoadState, stringResource(id = R.string.error_msg_empty_list)),
                 onRetryClick = { videoState.refresh() }
             )
         }
