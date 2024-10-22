@@ -4,11 +4,11 @@ import androidx.activity.compose.setContent
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.onNodeWithText
 import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -16,12 +16,11 @@ import androidx.navigation.testing.TestNavHostController
 import androidx.paging.PagingData
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.appelier.bluetubecompose.MainActivity
-import com.appelier.bluetubecompose.R
 import com.appelier.bluetubecompose.navigation.ScreenType
 import com.appelier.bluetubecompose.screen_shorts.screen.ShortsScreen
 import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideo
 import com.appelier.bluetubecompose.utils.Core
-import com.appelier.bluetubecompose.utils.VideoItemTag
+import com.appelier.bluetubecompose.utils.ShortsItemTag
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -86,10 +85,10 @@ class ShortsScreenKtTest {
         init_shorts_screen()
 
         with(composeAndroidTestRule) {
-            onAllNodesWithTag(VideoItemTag.SHORTS_VIDEO_PLAYER).onFirst().assertIsDisplayed()
+            onAllNodesWithTag(ShortsItemTag.SHORTS_VIDEO_PLAYER).onFirst().assertIsDisplayed()
             onAllNodesWithTag(Core.CHANNEL_PREVIEW_IMG).onFirst().assertIsDisplayed()
-            onAllNodesWithTag(VideoItemTag.SHORTS_CHANNEL_TITLE).onFirst().assertIsDisplayed()
-            onAllNodesWithTag(VideoItemTag.SHORTS_VIDEO_TITLE).onFirst().assertIsDisplayed()
+            onAllNodesWithTag(ShortsItemTag.SHORTS_CHANNEL_TITLE).onFirst().assertIsDisplayed()
+            onAllNodesWithTag(ShortsItemTag.SHORTS_VIDEO_TITLE).onFirst().assertIsDisplayed()
         }
     }
 
@@ -99,9 +98,7 @@ class ShortsScreenKtTest {
 
         with(composeAndroidTestRule) {
             onNodeWithTag(Core.PAGING_ERROR_MSG).assertIsDisplayed()
-
-            val btnText = activity.getString(R.string.paging_error_retry_btn)
-            onNodeWithText(btnText).assertIsDisplayed()
+            onNodeWithTag(Core.CIRCULAR_PROGRESS_INDICATOR).assertIsNotDisplayed()
         }
     }
 }

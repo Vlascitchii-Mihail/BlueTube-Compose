@@ -27,7 +27,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.appelier.bluetubecompose.MainActivity
 import com.appelier.bluetubecompose.R
-import com.appelier.bluetubecompose.core.core_database.CustomNavTypeSerializer
+import com.appelier.bluetubecompose.navigation.CustomNavTypeSerializer
 import com.appelier.bluetubecompose.navigation.ScreenType
 import com.appelier.bluetubecompose.screen_player.PlayerScreen
 import com.appelier.bluetubecompose.screen_player.VideoPlayerViewModel

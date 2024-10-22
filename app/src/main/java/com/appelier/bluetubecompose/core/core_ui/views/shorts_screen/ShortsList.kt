@@ -39,10 +39,10 @@ fun ShortsList(
 
     VerticalPager(
         state = pagerState,
-        key = videos.itemKey(),
+        key = videos.itemKey { it },
         pageSize = PageSize.Fill,
-    ) { index: Int ->
-        videos[index]?.let {
+    ) { pageIndex: Int ->
+        videos[pageIndex]?.let {
                 ShortsItem(
                     youTubeVideo = it,
                     videoQueue
