@@ -21,9 +21,9 @@ import com.appelier.bluetubecompose.R
 import com.appelier.bluetubecompose.screen_shorts.screen.ShortsPlayerHandler
 import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideo
 import com.appelier.bluetubecompose.utils.Core.CHANNEL_PREVIEW_IMG
-import com.appelier.bluetubecompose.utils.VideoItemTag.SHORTS_CHANNEL_TITLE
-import com.appelier.bluetubecompose.utils.VideoItemTag.SHORTS_VIDEO_PLAYER
-import com.appelier.bluetubecompose.utils.VideoItemTag.SHORTS_VIDEO_TITLE
+import com.appelier.bluetubecompose.utils.ShortsItemTag.SHORTS_CHANNEL_TITLE
+import com.appelier.bluetubecompose.utils.ShortsItemTag.SHORTS_VIDEO_PLAYER
+import com.appelier.bluetubecompose.utils.ShortsItemTag.SHORTS_VIDEO_TITLE
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.integration.compose.placeholder

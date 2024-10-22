@@ -26,7 +26,7 @@ fun PaginationErrorItem(
     modifier: Modifier = Modifier,
     onRetryClick: () -> Unit
 ) {
-    LaunchedEffect(Unit) { delay(500) }
+    LaunchedEffect(Unit) { delay(1000) }
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = modifier.testTag(VIDEO_LIST_ERROR)) {
         Text(
             text = errorText ?: stringResource(id = R.string.paging_error_msg_txt),
