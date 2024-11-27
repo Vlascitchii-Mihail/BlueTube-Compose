@@ -14,7 +14,6 @@ import androidx.compose.ui.unit.DpSize
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 
-
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 val LocalWindowSizeClass = compositionLocalOf { WindowSizeClass.calculateFromSize(DpSize.Zero) }
 

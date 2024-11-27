@@ -35,6 +35,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.appelier.bluetubecompose.R
+import com.appelier.bluetubecompose.search_video.SearchState
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -48,7 +49,7 @@ private const val SEARCH_INPUT_DELAY = 1500L
 fun SearchAppBarBlueTube(
     searchText: StateFlow<String>,
     onTextChange: (String) -> Unit,
-    onCloseClicked: () -> Unit,
+    updateSearchState: (newSearchState: SearchState) -> Unit,
     onSearchClicked: () -> Unit,
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -113,7 +114,7 @@ fun SearchAppBarBlueTube(
                 IconButton(
                     onClick = {
                         if(searchQuery.isNotEmpty()) onTextChange("")
-                        else onCloseClicked.invoke()
+                        else updateSearchState.invoke(SearchState.CLOSED)
                     }
                 ) {
                     Icon(
@@ -152,7 +153,7 @@ fun PreviewSearchAppBarBlueTube() {
     SearchAppBarBlueTube(
         searchText = searchText,
         onTextChange = {},
-        onCloseClicked = {},
+        updateSearchState = {},
         onSearchClicked = {},
     )
 }

@@ -80,8 +80,8 @@ dependencies {
     implementation(libs.androidx.activity.compose)
 
     //ui
-    implementation(platform("androidx.compose:compose-bom:2023.08.00"))
-    implementation(libs.ui)
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.compose.ui)
     implementation(libs.ui.graphics)
     implementation(libs.ui.tooling.preview)
     implementation(libs.material3)

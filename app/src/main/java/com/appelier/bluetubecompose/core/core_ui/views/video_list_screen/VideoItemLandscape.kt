@@ -50,7 +50,10 @@ fun VideoItemLandscape(
         .padding(start = 4.dp)
         .fillMaxWidth()
         .height(100.dp)
-        .clickable { navigateToPlayerScreen.invoke(youtubeVideo) }
+        .clickable(
+            onClickLabel = stringResource(R.string.video_medium_preview),
+            onClick = { navigateToPlayerScreen.invoke(youtubeVideo) }
+        )
     ) {
         val (videoPreview, videoTitle, channelImg, videoDuration, statisticsFlow) = createRefs()
 
