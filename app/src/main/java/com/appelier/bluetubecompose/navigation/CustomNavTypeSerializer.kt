@@ -14,7 +14,7 @@ class CustomNavTypeSerializer<T: Parcelable>(
 ): NavType<T>(isNullableAllowed = false) {
     override fun get(bundle: Bundle, key: String): T? =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            bundle.getParcelable(key, clazz) as T
+            bundle.getParcelable(key, clazz)
         } else {
             @Suppress("DEPRECATION")
             bundle.getParcelable(key)

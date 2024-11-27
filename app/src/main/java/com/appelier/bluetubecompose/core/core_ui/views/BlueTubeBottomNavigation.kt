@@ -73,6 +73,7 @@ private val navItemsList = listOf(
 @Composable
 fun BlueTubeBottomNavigation(
     navController: NavHostController,
+    modifier: Modifier = Modifier
 ) {
     val bottomNavigationVisibilityState = rememberSaveable {
         mutableStateOf(BottomNavigationVisibilityState.VISIBLE)
@@ -108,7 +109,7 @@ fun BlueTubeBottomNavigation(
             animationSpec = tween(durationMillis = BOTTOM_NAV_APPEARANCE)
         ) + fadeOut(animationSpec = tween(durationMillis = BOTTOM_NAV_APPEARANCE))
     ) {
-        BottomNavigation(modifier = Modifier
+        BottomNavigation(modifier = modifier
             .testTag(BOTTOM_NAV)
             .fillMaxWidth()) {
             navItemsList.forEach { navItem ->

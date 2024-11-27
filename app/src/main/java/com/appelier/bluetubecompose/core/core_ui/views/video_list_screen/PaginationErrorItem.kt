@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -18,7 +17,6 @@ import com.appelier.bluetubecompose.R
 import com.appelier.bluetubecompose.core.core_ui.views.BlueTubeButton
 import com.appelier.bluetubecompose.utils.Core.PAGING_ERROR_MSG
 import com.appelier.bluetubecompose.utils.VideoListScreenTags.VIDEO_LIST_ERROR
-import kotlinx.coroutines.delay
 
 @Composable
 fun PaginationErrorItem(
@@ -26,7 +24,6 @@ fun PaginationErrorItem(
     modifier: Modifier = Modifier,
     onRetryClick: () -> Unit
 ) {
-    LaunchedEffect(Unit) { delay(1000) }
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = modifier.testTag(VIDEO_LIST_ERROR)) {
         Text(
             text = errorText ?: stringResource(id = R.string.paging_error_msg_txt),

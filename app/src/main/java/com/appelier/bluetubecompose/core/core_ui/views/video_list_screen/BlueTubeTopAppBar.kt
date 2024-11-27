@@ -21,6 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.appelier.bluetubecompose.R
 import com.appelier.bluetubecompose.core.core_ui.theme.BlueberryBlue
+import com.appelier.bluetubecompose.search_video.SearchState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -28,7 +29,7 @@ fun BlueTubeTopAppBar(
     title: String,
     icon: ImageVector,
     scrollBehavior: TopAppBarScrollBehavior,
-    searchAction: () -> Unit
+    updateSearchState: (newSearchState: SearchState) -> Unit
 ) {
     TopAppBar(
         title = {
@@ -48,7 +49,7 @@ fun BlueTubeTopAppBar(
         },
         actions = {
             IconButton(
-                onClick = { searchAction.invoke() },
+                onClick = { updateSearchState.invoke(SearchState.OPENED) },
             ) {
                 Icon(
                     imageVector = icon,

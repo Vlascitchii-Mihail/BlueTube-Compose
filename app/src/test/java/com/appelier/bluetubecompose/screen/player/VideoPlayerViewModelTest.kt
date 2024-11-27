@@ -1,5 +1,6 @@
 package com.appelier.bluetubecompose.screen.player
 
+import com.appelier.bluetubecompose.core.core_api.network_observer.NetworkConnectivityObserver
 import com.appelier.bluetubecompose.screen_player.VideoPlayerViewModel
 import com.appelier.bluetubecompose.screen_video_list.repository.VideoListRepository
 import org.junit.Assert.assertEquals
@@ -16,7 +17,8 @@ private const val NEW_VIDEO_PLAYBACK_POSITION = 5F
 class VideoPlayerViewModelTest {
 
     private val repository: VideoListRepository = mock()
-    private val viewModel = VideoPlayerViewModel(repository)
+    private val networkConnectivityObserver: NetworkConnectivityObserver = mock()
+    private val viewModel = VideoPlayerViewModel(repository, networkConnectivityObserver)
 
     @Test
     fun `current playback position updates`() {
