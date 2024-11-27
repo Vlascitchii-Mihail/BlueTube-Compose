@@ -1,6 +1,5 @@
 package com.appelier.bluetubecompose.core.core_ui.views
 
-import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.CircularProgressIndicator
@@ -20,22 +19,14 @@ import com.appelier.bluetubecompose.utils.Core
 @Composable
 fun PagerContentManager(
     videoState: LazyPagingItems<YoutubeVideo>,
-    contentList: @Composable (videoState: LazyPagingItems<YoutubeVideo>) -> Unit,
+    contentList: @Composable () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier, contentAlignment = Alignment.Center) {
         val refreshLoadState = videoState.loadState.refresh
 
-        Log.d("Empty", "videoState.itemCount = ${videoState.itemCount}")
         when (refreshLoadState) {
-            is LoadState.NotLoading -> {
-                if (videoState.itemCount == 0) {
-                    PaginationErrorItem(
-                        errorText = castLoadState(refreshLoadState, stringResource(id = R.string.error_msg_empty_list) ),
-                        onRetryClick = { videoState.refresh() }
-                    )
-                } else contentList.invoke(videoState)
-            }
+            is LoadState.NotLoading -> contentList.invoke()
 
             is LoadState.Loading -> CircularProgressIndicator(
                 Modifier

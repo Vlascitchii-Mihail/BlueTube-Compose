@@ -1,6 +1,5 @@
 package com.appelier.bluetubecompose.core.core_paging
 
-import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.appelier.bluetubecompose.core.core_api.VideoApiService
@@ -66,10 +65,29 @@ class YoutubeVideoSource(
         return response
     }
 
-    private suspend fun fetchVideos(nextPageToken: String): YoutubeVideoResponse {
-        val videos = apiService.fetchVideos(nextPageToken = nextPageToken).body()
+    override fun getRefreshKey(state: PagingState<String, YoutubeVideo>): String? {
+        var current: String? = " "
+        val anchorPosition = state.anchorPosition
 
-        return if (videos != null) {
+        viewModelScope.launch {
+            if (anchorPosition != null) {
+                current = state.closestPageToPosition(anchorPosition)?.prevKey?.let {
+                    apiService.fetchVideos(nextPageToken = it).body()?.nextPageToken
+                }
+            }
+        }
+        return current
+    }
+
+    private suspend fun fetchVideos(nextPageToken: String): YoutubeVideoResponse {
+        var videos: YoutubeVideoResponse? = null
+        try {
+            videos = apiService.fetchVideos(nextPageToken = nextPageToken).body()
+        } catch (ex: IOException) {
+            showVideosFromDb(nextPageToken)
+        }
+
+        return if (videos != null && videos.items.isNotEmpty()) {
             showVideosFromNetwork(videos)
         } else {
             showVideosFromDb(nextPageToken)
@@ -95,7 +113,6 @@ class YoutubeVideoSource(
     }
 
     private suspend fun showVideosFromDb(pageToken: String = ""): YoutubeVideoResponse {
-        Log.d("Database", "showVideosFromDb() called with: pageToken = $pageToken")
         val dbVideos = databaseContentManager.getVideosFromDatabase(pageToken)
         dbVideos.nextPageToken?.let { updateCurrentPageToken(it) }
         return dbVideos
@@ -103,9 +120,15 @@ class YoutubeVideoSource(
 
     private suspend fun fetchSearchedVideos(query: String, nextPageToken: String)
             : YoutubeVideoResponse {
-        val searchedVideos = apiService.searchVideo(query, nextPageToken = nextPageToken).body()
 
-        return if (searchedVideos != null) {
+        var searchedVideos: SearchVideoResponse? = null
+        try {
+            searchedVideos = apiService.searchVideo(query, nextPageToken = nextPageToken).body()
+        } catch (ex: IOException) {
+            ex.printStackTrace()
+        }
+
+        return if (searchedVideos != null && searchedVideos.items.isNotEmpty()) {
             val videos: List<YoutubeVideo> = convertSearchVideoToVideosList(searchedVideos.items)
             val response = YoutubeVideoResponse(
                 nextPageToken = searchedVideos.nextPageToken,
@@ -117,7 +140,13 @@ class YoutubeVideoSource(
     }
 
     private suspend fun fetchSearchedRelatedVideos(query: String, nextPageToken: String): YoutubeVideoResponse {
-        val searchedVideos = apiService.searchVideo(query, nextPageToken = nextPageToken).body()
+        var searchedVideos: SearchVideoResponse? = null
+
+        try {
+            searchedVideos = apiService.searchVideo(query, nextPageToken = nextPageToken).body()
+        } catch (ex: IOException) {
+            showVideosFromDb(nextPageToken)
+        }
 
         return if (searchedVideos != null) {
             val newSearchedVideos = searchedVideos.deleteFirstSameVideo()
@@ -134,9 +163,14 @@ class YoutubeVideoSource(
     }
 
     private suspend fun fetchShorts(nextPageToken: String): YoutubeVideoResponse {
-        val shorts = apiService.fetchShorts(nextPageToken = nextPageToken).body()
+        var shorts: SearchVideoResponse? = null
+        try {
+            shorts = apiService.fetchShorts(nextPageToken = nextPageToken).body()
+        } catch (ex: IOException) {
+            showVideosFromDb(nextPageToken)
+        }
 
-        return if (shorts != null) {
+        return if (shorts != null && shorts.items.isNotEmpty()) {
             val shortsVideos = convertSearchVideoToVideosList(shorts.items)
             val response = YoutubeVideoResponse(
                 nextPageToken = shorts.nextPageToken,
@@ -204,20 +238,6 @@ class YoutubeVideoSource(
             }
         }
         return channelUrlList.awaitAll()
-    }
-
-    override fun getRefreshKey(state: PagingState<String, YoutubeVideo>): String? {
-        var current: String? = " "
-        val anchorPosition = state.anchorPosition
-
-        viewModelScope.launch {
-            if (anchorPosition != null) {
-                current = state.closestPageToPosition(anchorPosition)?.prevKey?.let {
-                    apiService.fetchVideos(nextPageToken = it).body()?.nextPageToken
-                }
-            }
-        }
-        return current
     }
 
     private fun updateCurrentPageToken(nextPageToken: String) {

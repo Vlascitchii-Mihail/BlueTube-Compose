@@ -42,12 +42,15 @@ import com.bumptech.glide.integration.compose.placeholder
 @Composable
 fun VideoItem(
     youtubeVideo: YoutubeVideo,
-    defaultModifier: Modifier,
+    modifier: Modifier,
     navigateToPlayerScreen: (YoutubeVideo) -> Unit
 ) {
-    ConstraintLayout(modifier = defaultModifier
+    ConstraintLayout(modifier = modifier
         .fillMaxWidth()
-        .clickable { navigateToPlayerScreen.invoke(youtubeVideo) }
+        .clickable (
+            onClickLabel = stringResource(R.string.video_compact_preview),
+            onClick = { navigateToPlayerScreen.invoke(youtubeVideo) }
+        )
         .wrapContentHeight()
     ) {
 
@@ -58,7 +61,7 @@ fun VideoItem(
             loading = placeholder(R.drawable.sceleton_android_ompose_thumbnail),
             contentDescription = stringResource(id = R.string.video_preview) + youtubeVideo.snippet.title,
             contentScale = ContentScale.Crop,
-            modifier = defaultModifier
+            modifier = modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
                 .clickable { navigateToPlayerScreen.invoke(youtubeVideo) }
@@ -74,7 +77,7 @@ fun VideoItem(
             text = formatVideoDuration(youtubeVideo.contentDetails.duration),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.tertiary,
-            modifier = defaultModifier
+            modifier = modifier
                 .semantics { contentDescription = VIDEO_DURATION }
                 .padding(8.dp)
                 .clip(MaterialTheme.shapes.small)
@@ -91,7 +94,7 @@ fun VideoItem(
             loading = placeholder(R.drawable.sceleton),
             contentDescription = stringResource(R.string.channel_name) + youtubeVideo.snippet.channelTitle,
             contentScale = ContentScale.Crop,
-            modifier = defaultModifier
+            modifier = modifier
                 .testTag(CHANNEL_PREVIEW_IMG)
                 .padding(8.dp)
                 .width(50.dp)
@@ -110,7 +113,7 @@ fun VideoItem(
             color = MaterialTheme.colorScheme.onBackground,
             maxLines = 2,
             textAlign = TextAlign.Start,
-            modifier = defaultModifier
+            modifier = modifier
                 .testTag(VIDEO_TITLE)
                 .clickable { navigateToPlayerScreen.invoke(youtubeVideo) }
                 .padding(top = 8.dp, end = 8.dp)
@@ -133,7 +136,7 @@ fun VideoItem(
             color = MaterialTheme.colorScheme.onBackground,
             maxLines = 2,
             textAlign = TextAlign.Start,
-            modifier = defaultModifier
+            modifier = modifier
                 .testTag(VIDEO_STATISTICS)
                 .clickable { navigateToPlayerScreen.invoke(youtubeVideo) }
                 .padding(end = 8.dp, top = 8.dp, bottom = 8.dp)

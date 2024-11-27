@@ -11,17 +11,25 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.appelier.bluetubecompose.R
+import com.appelier.bluetubecompose.core.core_api.network_observer.ConnectivityStatus
 import com.appelier.bluetubecompose.databinding.FragmentPlayVideoBinding
 import com.appelier.bluetubecompose.screen_player.OrientationHandler
 import com.appelier.bluetubecompose.screen_player.OrientationState
 import com.appelier.bluetubecompose.screen_player.YouTubePlayerHandler
 import com.appelier.bluetubecompose.utils.VideoPlayerScreenTags.VIDEO_PLAYER
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
+import com.bumptech.glide.integration.compose.placeholder
 import kotlinx.coroutines.flow.StateFlow
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun YoutubeVideoPlayer(
     videoId: String,
@@ -35,6 +43,7 @@ fun YoutubeVideoPlayer(
     updatePlayerOrientationState: (OrientationState) -> Unit,
     fullscreenWidgetIsClicked: StateFlow<Boolean>,
     setFullscreenWidgetIsClicked: (Boolean) -> Unit,
+    connectivityStatus: ConnectivityStatus,
 ) {
 
     val isVideoPlays by isVideoPlaysFlow.collectAsStateWithLifecycle()
@@ -54,7 +63,7 @@ fun YoutubeVideoPlayer(
         )
     }
 
-    val youTubePlayerHandler = remember {
+    remember {
         YouTubePlayerHandler(
             binding,
             lifecycleOwner,
@@ -91,11 +100,25 @@ fun YoutubeVideoPlayer(
         }
     }
 
-    AndroidView(
-        modifier = getModifier(localPlayerOrientationState)
-            .testTag(VIDEO_PLAYER),
-        factory = { context ->
-            binding.llPlayerContainer
+    when(connectivityStatus) {
+        ConnectivityStatus.Available -> {
+            AndroidView(
+                modifier = getModifier(localPlayerOrientationState)
+                    .testTag(VIDEO_PLAYER),
+                factory = { context ->
+                    binding.llPlayerContainer
+                }
+            )
         }
-    )
+
+        ConnectivityStatus.Lost -> {
+            GlideImage(
+                model = placeholder(R.drawable.sceleton_android_ompose_thumbnail),
+                loading = placeholder(R.drawable.sceleton_android_ompose_thumbnail),
+                contentDescription = stringResource(id = R.string.video_thumbnail_description),
+                modifier = getModifier(localPlayerOrientationState),
+                contentScale = ContentScale.Crop
+            )
+        }
+    }
 }

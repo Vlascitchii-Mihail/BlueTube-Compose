@@ -1,7 +1,6 @@
 package com.appelier.bluetubecompose.ui.screens.video_player
 
 import androidx.activity.compose.setContent
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
@@ -27,6 +26,8 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.appelier.bluetubecompose.MainActivity
 import com.appelier.bluetubecompose.R
+import com.appelier.bluetubecompose.core.core_api.network_observer.ConnectivityStatus
+import com.appelier.bluetubecompose.core.core_api.network_observer.NetworkConnectivityObserver
 import com.appelier.bluetubecompose.navigation.CustomNavTypeSerializer
 import com.appelier.bluetubecompose.navigation.ScreenType
 import com.appelier.bluetubecompose.screen_player.PlayerScreen
@@ -39,6 +40,7 @@ import com.appelier.bluetubecompose.utils.VideoPlayerScreenTags
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOf
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Before
@@ -46,6 +48,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.spy
 import kotlin.reflect.typeOf
 
 @RunWith(AndroidJUnit4::class)
@@ -54,31 +57,47 @@ class PlayerScreenKtTest {
 
     @get:Rule
     val composeAndroidTestRule = createAndroidComposeRule(MainActivity::class.java)
+
     @get:Rule
     val hiltRule = HiltAndroidRule(this)
+
     @get:Rule
     val screenOrientation = ScreenOrientationRule(ScreenOrientation.PORTRAIT)
 
     private lateinit var navController: TestNavHostController
-    private val videoPage = mutableStateOf(MutableStateFlow(PagingData.from(YoutubeVideo.DEFAULT_VIDEO_LIST)))
     private val firstVideo = DEFAULT_VIDEO_RESPONSE_WITH_CHANNEL_IMG.items.first()
     private val secondVideo = DEFAULT_VIDEO_RESPONSE_WITH_CHANNEL_IMG.items[1]
     private var videoId: String = ""
     private val repository: VideoListRepository = mock()
-    private val viewModel = VideoPlayerViewModel(repository)
+    private lateinit var viewModel: VideoPlayerViewModel
+
+    private lateinit var videoThumbnailDescription: String
 
     @Before
     fun init_player_screen() {
         hiltRule.inject()
+        videoThumbnailDescription =
+            composeAndroidTestRule.activity.getString(R.string.video_thumbnail_description)
         setNavigationScreenIntoActivity()
     }
 
     private fun setNavigationScreenIntoActivity() {
         composeAndroidTestRule.activity.setContent {
+
+            viewModel = spy(
+                VideoPlayerViewModel(
+                    repository,
+                    NetworkConnectivityObserver(composeAndroidTestRule.activity.applicationContext)
+                )
+            )
+
             navController = TestNavHostController(LocalContext.current)
             navController.navigatorProvider.addNavigator(ComposeNavigator())
 
-            NavHost(navController = navController, startDestination = ScreenType.PlayerScreen(firstVideo)) {
+            NavHost(
+                navController = navController,
+                startDestination = ScreenType.PlayerScreen(firstVideo)
+            ) {
                 composable<ScreenType.PlayerScreen>(
                     typeMap = mapOf(
                         typeOf<YoutubeVideo>() to CustomNavTypeSerializer(
@@ -92,9 +111,14 @@ class PlayerScreenKtTest {
 
                     PlayerScreen(
                         video = video,
-                        relatedVideos = { videoPage },
+                        relatedVideos = MutableStateFlow(
+                            PagingData.from(
+                                DEFAULT_VIDEO_RESPONSE_WITH_CHANNEL_IMG.items
+                            )
+                        ),
+                        getRelatedVideos = { query: String -> },
                         isVideoPlaysFlow = MutableStateFlow(true),
-                        {},
+                        updateVideoIsPlayState = { isPlaying: Boolean -> },
                         navigateToPlayerScreen = {
                             navController.navigate(ScreenType.PlayerScreen(secondVideo)) {
                                 launchSingleTop = true
@@ -109,8 +133,13 @@ class PlayerScreenKtTest {
                                 newPlayerOrientationState
                             )
                         },
-                        viewModel.fullscreenWidgetIsClicked,
-                        { isClicked -> viewModel.setFullscreenWidgetIsClicked(isClicked) }
+                        fullscreenWidgetIsClicked = viewModel.fullscreenWidgetIsClicked,
+                        setFullscreenWidgetIsClicked = { isClicked ->
+                            viewModel.setFullscreenWidgetIsClicked(
+                                isClicked
+                            )
+                        },
+                        connectivityStatus = flowOf(ConnectivityStatus.Available)
                     )
                 }
             }
@@ -118,21 +147,23 @@ class PlayerScreenKtTest {
     }
 
     @Test
-    fun player_videoDescription_and_RelatedVideos_are_displayed(){
+    fun player_videoDescription_and_RelatedVideos_are_displayed() {
         with(composeAndroidTestRule) {
-           onNodeWithTag(VideoPlayerScreenTags.VIDEO_PLAYER).assertIsDisplayed()
-           onNodeWithTag(VideoPlayerScreenTags.VIDEO_DESCRIPTION).assertIsDisplayed()
-           onNodeWithTag(VideoListScreenTags.VIDEO_LIST).assertIsDisplayed()
+            onNodeWithTag(VideoPlayerScreenTags.VIDEO_PLAYER).assertIsDisplayed()
+            onNodeWithTag(VideoPlayerScreenTags.VIDEO_DESCRIPTION).assertIsDisplayed()
+            onNodeWithTag(VideoListScreenTags.VIDEO_LIST).assertIsDisplayed()
         }
     }
 
     @Test
     fun onClick_to_RelatedVideos_opens_new_PlayerScreen() {
-        composeAndroidTestRule.onAllNodesWithTag(VideoListScreenTags.VIDEO_PREVIEW_IMG).onFirst().performClick()
+        composeAndroidTestRule.onAllNodesWithTag(VideoListScreenTags.VIDEO_PREVIEW_IMG).onFirst()
+            .performClick()
         assertNotEquals("", videoId)
         assertEquals(firstVideo.id, videoId)
 
-        composeAndroidTestRule.onAllNodesWithTag(VideoListScreenTags.VIDEO_PREVIEW_IMG).onFirst().performClick()
+        composeAndroidTestRule.onAllNodesWithTag(VideoListScreenTags.VIDEO_PREVIEW_IMG).onFirst()
+            .performClick()
         assertNotEquals(firstVideo.id, videoId)
         assertEquals(secondVideo.id, videoId)
     }

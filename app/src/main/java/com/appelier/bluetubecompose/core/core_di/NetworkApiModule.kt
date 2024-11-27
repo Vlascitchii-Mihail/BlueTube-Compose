@@ -1,13 +1,16 @@
 package com.appelier.bluetubecompose.core.core_di
 
+import android.content.Context
 import com.appelier.bluetubecompose.core.core_api.Constants.Companion.BASE_URL
 import com.appelier.bluetubecompose.core.core_api.InterceptorApiRequest
 import com.appelier.bluetubecompose.core.core_api.VideoApiService
+import com.appelier.bluetubecompose.core.core_api.network_observer.NetworkConnectivityObserver
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -47,4 +50,9 @@ object NetworkApiModule {
     @Provides
     fun provideVideoListApi(retrofit: Retrofit): VideoApiService =
         retrofit.create(VideoApiService::class.java)
+
+    @Singleton
+    @Provides
+    fun provideNetworkConnectivityObserver(@ApplicationContext context: Context) =
+        NetworkConnectivityObserver(context)
 }

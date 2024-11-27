@@ -27,7 +27,7 @@ class DatabaseContentManagerTest {
     }
 
     @Test
-    fun `check setting page token to VideoResponse`() {
+    fun `check setCurrentPageTokenToVideos() to VideoResponse`() {
         val videoResponse =
             databaseContentManager.setCurrentPageTokenToVideos(
                 INITIAL_PAGE_TOKEN,
