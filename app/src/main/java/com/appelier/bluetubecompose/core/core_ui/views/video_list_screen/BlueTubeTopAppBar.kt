@@ -59,7 +59,8 @@ fun BlueTubeTopAppBar(
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.onPrimary
+            containerColor = MaterialTheme.colorScheme.onPrimary,
+            scrolledContainerColor = MaterialTheme.colorScheme.onPrimary
         ),
         scrollBehavior = scrollBehavior
     )

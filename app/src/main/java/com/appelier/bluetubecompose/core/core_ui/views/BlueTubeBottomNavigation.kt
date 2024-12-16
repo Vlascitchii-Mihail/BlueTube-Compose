@@ -112,7 +112,8 @@ fun BlueTubeBottomNavigation(
         BottomNavigation(modifier = modifier
             .background(MaterialTheme.colorScheme.background)
             .testTag(BOTTOM_NAV)
-            .fillMaxWidth()) {
+            .fillMaxWidth()
+        ) {
             navItemsList.forEach { navItem ->
                 val isSelected = currentDestination?.route?.contains(navItem.screen.toString()) ?: false
 
