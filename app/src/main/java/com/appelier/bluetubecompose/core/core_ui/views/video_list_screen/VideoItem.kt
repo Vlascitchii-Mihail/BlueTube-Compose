@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -58,7 +59,7 @@ fun VideoItem(
 
         GlideImage(
             model = youtubeVideo.snippet.thumbnails.medium.url,
-            loading = placeholder(R.drawable.sceleton_android_ompose_thumbnail),
+            loading = placeholder(R.drawable.sceleton_thumbnail),
             contentDescription = stringResource(id = R.string.video_preview) + youtubeVideo.snippet.title,
             contentScale = ContentScale.Crop,
             modifier = modifier
@@ -76,7 +77,7 @@ fun VideoItem(
         Text(
             text = formatVideoDuration(youtubeVideo.contentDetails.duration),
             style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.tertiary,
+            color = colorResource(R.color.white),
             modifier = modifier
                 .semantics { contentDescription = VIDEO_DURATION }
                 .padding(8.dp)

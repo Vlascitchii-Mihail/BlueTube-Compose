@@ -15,19 +15,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
-private val DarkColorScheme = darkColorScheme(
-    primary = BlueberryBlue,
-    //button text
-    onPrimary = Black,
-    //screen background
-    background = Black,
-    onBackground = White,
-    secondary = Black_60,
-    onSecondary = UltramarineBlue,
-    tertiary = White,
-
-)
-
 private val LightColorScheme = lightColorScheme(
 
     //buttons, bottomNavIcons, bottomNavTintColor, text
@@ -43,6 +30,18 @@ private val LightColorScheme = lightColorScheme(
     onTertiary = Red,
     surface = Red,
     onSurface = Red,
+    )
+
+private val DarkColorScheme = darkColorScheme(
+    primary = BlueberryBlue,
+    //button text
+    onPrimary = Black,
+    //screen background
+    background = Black,
+    onBackground = White,
+    secondary = Black_60,
+    onSecondary = UltramarineBlue,
+    tertiary = White,
 
 )
 

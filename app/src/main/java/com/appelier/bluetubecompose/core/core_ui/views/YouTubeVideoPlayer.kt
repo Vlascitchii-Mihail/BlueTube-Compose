@@ -4,10 +4,13 @@ import android.app.Activity
 import android.view.LayoutInflater
 import android.view.OrientationEventListener
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -27,6 +30,7 @@ import com.appelier.bluetubecompose.utils.VideoPlayerScreenTags.VIDEO_PLAYER
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.integration.compose.placeholder
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
 
 @OptIn(ExperimentalGlideComposeApi::class)
@@ -87,10 +91,18 @@ fun YoutubeVideoPlayer(
         onDispose { orientationEventListener.disable() }
     }
 
+    LaunchedEffect(Unit) {
+        delay(6000)
+        orientationHandler.clickToFullScreenWidget()
+    }
+
     BackHandler {
         if (playerOrientationState.value == OrientationState.FULL_SCREEN)
-            orientationHandler.changeToPortraitOrientation()
-        else popBackStack.invoke()
+            orientationHandler.clickToFullScreenWidget()
+        else {
+            orientationHandler.setSensorOrientation()
+            popBackStack.invoke()
+        }
     }
 
     fun getModifier(localPlayerOrientationState: OrientationState): Modifier {
@@ -104,6 +116,7 @@ fun YoutubeVideoPlayer(
         ConnectivityStatus.Available -> {
             AndroidView(
                 modifier = getModifier(localPlayerOrientationState)
+                    .background(MaterialTheme.colorScheme.background)
                     .testTag(VIDEO_PLAYER),
                 factory = { context ->
                     binding.llPlayerContainer
@@ -113,8 +126,8 @@ fun YoutubeVideoPlayer(
 
         ConnectivityStatus.Lost -> {
             GlideImage(
-                model = placeholder(R.drawable.sceleton_android_ompose_thumbnail),
-                loading = placeholder(R.drawable.sceleton_android_ompose_thumbnail),
+                model = placeholder(R.drawable.sceleton_thumbnail),
+                loading = placeholder(R.drawable.sceleton_thumbnail),
                 contentDescription = stringResource(id = R.string.video_thumbnail_description),
                 modifier = getModifier(localPlayerOrientationState),
                 contentScale = ContentScale.Crop

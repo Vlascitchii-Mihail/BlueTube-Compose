@@ -1,5 +1,6 @@
 package com.appelier.bluetubecompose.screen_settings
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -17,7 +18,9 @@ import com.appelier.bluetubecompose.utils.NavigationTags.SETTINGS_SCREEN
 fun SettingsScreen() {
 
     Scaffold(
-        modifier = Modifier.testTag(SETTINGS_SCREEN),
+        modifier = Modifier
+            .background(MaterialTheme.colorScheme.background)
+            .testTag(SETTINGS_SCREEN),
         content = { paddingValue ->
             Column(modifier = Modifier.fillMaxSize().padding(paddingValue)) {
                 TextBodyLargeCentered(

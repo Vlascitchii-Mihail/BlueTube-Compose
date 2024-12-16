@@ -1,12 +1,14 @@
 package com.appelier.bluetubecompose.screen_player
 
 import android.content.pm.ActivityInfo
-import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -19,7 +21,6 @@ import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideo
 import com.appelier.bluetubecompose.utils.SnackbarController
 import com.appelier.bluetubecompose.utils.SnackbarEvent
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 @Composable
@@ -44,7 +45,6 @@ fun PlayerScreen(
     )
     LaunchedEffect(networkConnectivityStatus) {
         if (networkConnectivityStatus == ConnectivityStatus.Lost) {
-            Log.d("Snack", "PlayerScreen LaunchedEffect() event called")
             SnackbarController.sendEvent(
                 event = SnackbarEvent(
                     message = "Wrong internet connection"
@@ -56,6 +56,7 @@ fun PlayerScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
     ) {
         YoutubeVideoPlayer(
             videoId = video.id,
@@ -75,15 +76,14 @@ fun PlayerScreen(
         if (LocalConfiguration.current.orientation != ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE) {
             VideoDescription(video = video)
 
-            getRelatedVideos.invoke(video.snippet.title)
-
-            val relatedVideoState = MutableStateFlow(relatedVideos).collectAsStateWithLifecycle()
             YouTubeVideoList(
-                getVideoState = { relatedVideoState },
+                getVideoState = {
+                    getRelatedVideos.invoke(video.snippet.title)
+                    mutableStateOf(relatedVideos)
+                },
                 modifier = Modifier,
                 navigateToPlayerScreen = navigateToPlayerScreen,
             )
         }
-
     }
 }

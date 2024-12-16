@@ -1,6 +1,5 @@
 package com.appelier.bluetubecompose.core.core_ui.views
 
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.Lifecycle
@@ -23,7 +22,6 @@ fun <T>ObserveAsEvents(
         lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
             withContext(Dispatchers.Main.immediate) {
                 flow.collect{ value: T ->
-                    Log.d("Snack", "ObserveAsEvents() called with: value = $value")
                     onEvent.invoke(value)
                 }
             }
