@@ -1,7 +1,9 @@
 package com.appelier.bluetubecompose.screen_video_list.screen
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
@@ -54,6 +56,7 @@ fun VideoListScreen(
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     Scaffold(
         modifier = Modifier
+            .background(MaterialTheme.colorScheme.background)
             .nestedScroll(scrollBehavior.nestedScrollConnection)
             .testTag(VIDEO_LIST_SCREEN),
         topBar = {

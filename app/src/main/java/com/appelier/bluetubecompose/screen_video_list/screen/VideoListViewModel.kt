@@ -1,6 +1,5 @@
 package com.appelier.bluetubecompose.screen_video_list.screen
 
-import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -31,7 +30,7 @@ class VideoListViewModel @Inject constructor(
     private val emptyPagingData = PagingData.empty<YoutubeVideo>()
     private var _videoStateFlow: MutableState<StateFlow<PagingData<YoutubeVideo>>> =
         mutableStateOf(MutableStateFlow(emptyPagingData))
-    val videoStateFlow: State<StateFlow<PagingData<YoutubeVideo>>> = _videoStateFlow
+    private val videoStateFlow: State<StateFlow<PagingData<YoutubeVideo>>> = _videoStateFlow
 
     private var _searchState: MutableStateFlow<SearchState> = MutableStateFlow(SearchState.CLOSED)
     val searchState: StateFlow<SearchState> = _searchState
@@ -44,7 +43,6 @@ class VideoListViewModel @Inject constructor(
 
     fun fetchPopularVideos() {
         if ( _videoStateFlow.value.value == emptyPagingData) {
-            Log.d("GET", "fetchPopularVideos() called")
             _videoStateFlow.value = videoRepository
                 .fetchVideos(VideoType.Videos, viewModelScope).cachedIn(viewModelScope)
                 .stateIn(viewModelScope, SharingStarted.Lazily, PagingData.empty())

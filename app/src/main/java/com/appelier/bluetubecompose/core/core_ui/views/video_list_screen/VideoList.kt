@@ -21,6 +21,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
@@ -42,7 +43,9 @@ fun YouTubeVideoList(
     innerPadding: PaddingValues = PaddingValues(0.dp),
     navigateToPlayerScreen: (YoutubeVideo) -> Unit,
     ) {
-    val videos = getVideoState.invoke().value.collectAsLazyPagingItems()
+    val videosFlow = getVideoState.invoke().value
+    videosFlow.collectAsStateWithLifecycle()
+    val videosPagingItem = videosFlow.collectAsLazyPagingItems()
 
     val keyboardController = LocalSoftwareKeyboardController.current
     val nestedScrollConnection = remember {
@@ -55,10 +58,10 @@ fun YouTubeVideoList(
     }
 
     PagerContentManager(
-        videoState = videos,
+        videoState = videosPagingItem,
         contentList = {
             ItemsList(
-                videos,
+                videosPagingItem,
                 modifier,
                 navigateToPlayerScreen,
                 LocalWindowSizeClass.current.widthSizeClass
@@ -78,6 +81,7 @@ fun ItemsList(
     navigateToPlayerScreen: (YoutubeVideo) -> Unit,
     windowSize: WindowWidthSizeClass
 ) {
+
     LazyColumn(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
@@ -89,11 +93,16 @@ fun ItemsList(
             key = videos.itemKey(),
             contentType = videos.itemContentType()
         ) { index ->
+
             when(windowSize) {
                 WindowWidthSizeClass.Compact ->
                     videos[index]?.let { VideoItem(youtubeVideo = it, modifier = modifier, navigateToPlayerScreen) }
-                else ->
+                WindowWidthSizeClass.Medium ->
                     videos[index]?.let { VideoItemLandscape(youtubeVideo = it, modifier = modifier, navigateToPlayerScreen) }
+                WindowWidthSizeClass.Expanded ->
+                    videos[index]?.let { VideoItemLandscape(youtubeVideo = it, modifier = modifier, navigateToPlayerScreen) }
+                else ->
+                    videos[index]?.let { VideoItem(youtubeVideo = it, modifier = modifier, navigateToPlayerScreen) }
             }
         }
 

@@ -1,13 +1,14 @@
 package com.appelier.bluetubecompose.core.core_ui.views.video_list_screen
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.Text
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,19 +36,21 @@ fun VideoDescription(video: YoutubeVideo, modifier: Modifier = Modifier) {
             .fillMaxWidth()
             .padding(8.dp)
             .testTag(VideoPlayerScreenTags.VIDEO_DESCRIPTION)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         Text(
             text = video.snippet.title,
             modifier = modifier.padding(vertical = 4.dp),
             maxLines = 2,
-            style = MaterialTheme.typography.titleMedium
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onBackground
         )
-
         Text(
             text = formatViews(video.statistics.viewCount) + stringResource(id = R.string.views) +
                     "\t\t" + formatDate(video.snippet.publishedAt),
             modifier = modifier.padding(vertical = 4.dp),
-            style = MaterialTheme.typography.bodySmall
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onBackground
         )
 
         Row(
@@ -56,7 +59,7 @@ fun VideoDescription(video: YoutubeVideo, modifier: Modifier = Modifier) {
         ) {
             GlideImage(
                 model = video.snippet.channelImgUrl,
-                loading = placeholder(R.drawable.sceleton_android_ompose_thumbnail),
+                loading = placeholder(R.drawable.sceleton_thumbnail),
                 contentDescription = stringResource(R.string.channel_name) + video.snippet.channelTitle,
                 contentScale = ContentScale.Crop,
                 modifier = modifier
@@ -70,13 +73,15 @@ fun VideoDescription(video: YoutubeVideo, modifier: Modifier = Modifier) {
             Text(
                 text = video.snippet.channelTitle,
                 modifier = modifier.padding(end = 8.dp),
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onBackground
             )
 
             Text(
                 text = formatViews(video.statistics.viewCount),
                 modifier = modifier.padding(end = 8.dp),
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onBackground
             )
         }
     }

@@ -110,6 +110,7 @@ fun BlueTubeBottomNavigation(
         ) + fadeOut(animationSpec = tween(durationMillis = BOTTOM_NAV_APPEARANCE))
     ) {
         BottomNavigation(modifier = modifier
+            .background(MaterialTheme.colorScheme.background)
             .testTag(BOTTOM_NAV)
             .fillMaxWidth()) {
             navItemsList.forEach { navItem ->
