@@ -5,6 +5,7 @@ import com.appelier.bluetubecompose.screen_video_list.model.videos.YoutubeVideoR
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import kotlin.math.abs
 
 const val THOUSAND = 1_000
 const val MILLION = 1_000_000
@@ -15,7 +16,7 @@ const val SECONDS_PER_MINUTE = 60
 const val SECONDS_PER_HOUR = 3600
 const val HOURS_PER_DAY = 24
 const val DAYS_PER_MONTH = 31
-const val DAYS_PER_YEAR = 36
+const val DAYS_PER_YEAR = 365
 
 const val MINUTES_PER_HOUR = 60
 
@@ -28,6 +29,7 @@ fun formatViews(views: Long): String {
     }
 }
 
+//date = 2017-01-22T21:08:03Z
 fun formatDate(date: String?): String {
     val postedDate: LocalDateTime = if (date != null) {
         LocalDateTime.parse(
@@ -37,10 +39,10 @@ fun formatDate(date: String?): String {
     } else LocalDateTime.now()
 
     val currentDate = LocalDateTime.now()
-    val postedAgo = Duration.between(postedDate, currentDate)
-    val seconds = postedAgo.seconds
-    val hours = postedAgo.toHours()
-    val days = postedAgo.toDays()
+    val postedAgo = Duration.between(currentDate, postedDate)
+    val seconds = abs(postedAgo.seconds)
+    val hours = abs(postedAgo.toHours())
+    val days = abs(postedAgo.toDays())
 
     return when(true) {
         (seconds < SECONDS_PER_HOUR) -> "${seconds / SECONDS_PER_MINUTE} minutes ago"
@@ -52,7 +54,7 @@ fun formatDate(date: String?): String {
     }
 }
 
-//PT2M2S
+//duration = PT2M2S
 fun formatVideoDuration(duration: String): String {
     val videoDuration = Duration.parse(duration)
 

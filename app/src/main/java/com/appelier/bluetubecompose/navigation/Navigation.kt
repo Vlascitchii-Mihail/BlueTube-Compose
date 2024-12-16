@@ -88,6 +88,7 @@ fun Navigation(
             ) {
                 composable<ScreenType.VideoList> {
                     val videoListViewModel: VideoListViewModel = hiltViewModel()
+                    //check if this function calls many times
                     videoListViewModel.fetchPopularVideos()
                     VideoListScreen(
                         connectivityStatus = videoListViewModel.connectivityObserver,
@@ -130,7 +131,6 @@ fun Navigation(
                 ) { navBackStackEntry ->
                     val arg = navBackStackEntry.toRoute<ScreenType.PlayerScreen>().video
                     val playerScreenViewModel: VideoPlayerViewModel = hiltViewModel()
-                    playerScreenViewModel.getSearchedRelatedVideos(arg.snippet.title)
                     PlayerScreen(
                         video = arg,
                         relatedVideos = playerScreenViewModel.relatedVideoStateFlow,

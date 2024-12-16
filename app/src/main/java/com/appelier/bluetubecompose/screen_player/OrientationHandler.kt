@@ -129,4 +129,12 @@ class OrientationHandler(
             activity.window?.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
         }
     }
+
+    fun setSensorOrientation() {
+        activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+    }
+
+    fun clickToFullScreenWidget() {
+        binding.fullScreenButton.performClick()
+    }
 }

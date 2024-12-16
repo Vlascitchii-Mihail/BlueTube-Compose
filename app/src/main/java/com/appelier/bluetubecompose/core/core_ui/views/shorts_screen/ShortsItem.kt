@@ -1,5 +1,6 @@
 package com.appelier.bluetubecompose.core.core_ui.views.shorts_screen
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -9,20 +10,19 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.appelier.bluetubecompose.R
 import com.appelier.bluetubecompose.core.core_api.network_observer.ConnectivityStatus
 import com.appelier.bluetubecompose.screen_shorts.screen.ShortsPlayerHandler
@@ -37,7 +37,6 @@ import com.bumptech.glide.integration.compose.placeholder
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.flowOf
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
@@ -50,15 +49,10 @@ fun ShortsItem(
     val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current.lifecycle
     val shortsPlayerHandler = remember { ShortsPlayerHandler(lifecycleOwner, youTubeVideo.id, videoQueue) }
 
-//    val networkConnectivityStatus by connectivityStatus.collectAsStateWithLifecycle(
-//        initialValue = ConnectivityStatus.Available
-//    )
-    val shortsDescriptionTextColor = if(connectivityStatus is ConnectivityStatus.Available)
-        MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.secondary
-
     ConstraintLayout(
         modifier = modifier
             .fillMaxSize()
+            .background(colorResource(R.color.black))
     ) {
         val (videoPlayer, channelImg, channelTitle, videoTitle) = createRefs()
 
@@ -85,8 +79,8 @@ fun ShortsItem(
             ConnectivityStatus.Lost -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     GlideImage(
-                        model = placeholder(R.drawable.sceleton_android_ompose_thumbnail),
-                        loading = placeholder(R.drawable.sceleton_android_ompose_thumbnail),
+                        model = placeholder(R.drawable.sceleton_thumbnail),
+                        loading = placeholder(R.drawable.sceleton_thumbnail),
                         contentDescription = stringResource(id = R.string.video_thumbnail_description),
                         modifier = Modifier.fillMaxWidth(),
                         contentScale = ContentScale.Crop
@@ -98,7 +92,7 @@ fun ShortsItem(
         GlideImage(
             model = youTubeVideo.snippet.channelImgUrl,
             contentDescription = stringResource(id = R.string.channel_name) + youTubeVideo.snippet.channelTitle,
-            loading = placeholder(R.drawable.sceleton_android_ompose_thumbnail),
+            loading = placeholder(R.drawable.sceleton_thumbnail),
             modifier = modifier
                 .testTag(CHANNEL_PREVIEW_IMG)
                 .padding(8.dp)
@@ -113,7 +107,7 @@ fun ShortsItem(
         Text(
             text = youTubeVideo.snippet.channelTitle,
             style = MaterialTheme.typography.bodySmall,
-            color = shortsDescriptionTextColor,
+            color = colorResource(R.color.white),
             maxLines = 1,
             textAlign = TextAlign.Start,
             modifier = modifier
@@ -128,7 +122,7 @@ fun ShortsItem(
         Text(
             text = youTubeVideo.snippet.title,
             style = MaterialTheme.typography.bodySmall,
-            color = shortsDescriptionTextColor,
+            color = colorResource(R.color.white),
             maxLines = 2,
             textAlign = TextAlign.Start,
             modifier = modifier
