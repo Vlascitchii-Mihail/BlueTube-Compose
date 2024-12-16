@@ -91,11 +91,6 @@ fun YoutubeVideoPlayer(
         onDispose { orientationEventListener.disable() }
     }
 
-    LaunchedEffect(Unit) {
-        delay(6000)
-        orientationHandler.clickToFullScreenWidget()
-    }
-
     BackHandler {
         if (playerOrientationState.value == OrientationState.FULL_SCREEN)
             orientationHandler.clickToFullScreenWidget()
