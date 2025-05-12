@@ -54,6 +54,9 @@ serialization = "1.6.3"
 ksp-compiler = "1.9.20-1.0.14"
 navigation-testing = "2.7.7"
 parcelize = "1.8.10"
+appcompat = "1.7.0"
+material-version = "1.12.0"
+junit-version = "4.12"
 
 
 [libraries]
@@ -125,18 +128,19 @@ test-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", ve
 mockwebserver = { module = "com.squareup.okhttp3:mockwebserver", version.ref = "mockwebserver" }
 test-arch-core = { module = "androidx.arch.core:core-testing", version.ref = "test-arch-core" }
 dexmaker = { module = "com.linkedin.dexmaker:dexmaker-mockito-inline", version.ref = "dexmaker"}
-mockito-kotlin-android = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockito-kotlin-android" }
 androidx-test-ext = { module = "androidx.test.ext:junit", version.ref = "androidx-test-ext" }
 androidx-test-espresso = { module = "androidx.test.espresso:espresso-core", version.ref = "androidx-test-espresso" }
 #Dagger-Hilt Test
 android-hilt-test = { module = "com.google.dagger:hilt-android-testing", version.ref = "hilt" }
-ksp-android-test = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt"}
+ksp-hilt-android-test = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt"}
 #compose test
 androidx-compose-ui-test = { module = "androidx.compose.ui:ui-test-junit4" }
 navigation-compose-testing = { module = "androidx.navigation:navigation-testing", version.ref = "navigation-testing" }
 compose-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
 #orientation test
 espresso-device = { module = "androidx.test.espresso:espresso-device", version.ref = "espresso_device"}
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material-version" }
 
 
 [plugins]
@@ -146,4 +150,5 @@ kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", vers
 ksp = { id =  "com.google.devtools.ksp", version.ref = "ksp-compiler" }
 hilt-plugin = { id = "com.google.dagger.hilt.android", version.ref = "hilt"}
 parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "parcelize" }
+android-library = { id = "com.android.library", version.ref = "android-application" }
 
