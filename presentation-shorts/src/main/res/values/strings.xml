@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--Shorts Screen-->
+    <string name="shorts_screen">Shorts Screen</string>
+    <string name="channel_name">Channel name is </string>
+    <string name="video_thumbnail_description">Video thumbnail description</string>
+
+</resources>

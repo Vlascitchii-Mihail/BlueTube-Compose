@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--Player Screen-->
+    <string name="video_thumbnail_description">Video thumbnail description</string>
+    <string name="channel_name">Channel name is </string>
+</resources>
