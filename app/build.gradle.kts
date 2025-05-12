@@ -6,7 +6,6 @@ plugins {
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt.plugin)
-    alias(libs.plugins.parcelize)
 }
 
 android {
@@ -20,7 +19,8 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "com.appelier.bluetubecompose.BlueTubeTestRunner"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -74,6 +74,16 @@ android {
 }
 
 dependencies {
+    implementation(project(":presentation-settings"))
+    implementation(project(":presentation-video-list"))
+    implementation(project(":presentation-shorts"))
+    implementation(project(":presentation-player"))
+    implementation(project(":presentation-common"))
+    implementation(project(":domain"))
+    implementation(project(":data-repository"))
+    implementation(project(":data-remote"))
+    implementation(project(":data-local"))
+
     //core
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -91,8 +101,8 @@ dependencies {
     implementation(libs.window.configuration)
 
     //ViewModel
-    implementation(libs.lifecycle.viewmodel.ktx)
-    implementation(libs.viewmodel.compose)
+//    implementation(libs.lifecycle.viewmodel.ktx)
+//    implementation(libs.viewmodel.compose)
 
     //coroutines
     implementation(libs.coroutines.core)
@@ -107,52 +117,23 @@ dependencies {
     implementation(libs.navigation)
     implementation(libs.kotlinx.serialization.json)
 
-    //retrofit
-    implementation(libs.retrofit)
-    implementation(libs.okhttp3)
-    implementation(libs.okhttp.urlconnection)
-    implementation(libs.moshi)
-    implementation(libs.moshi.kotlin)
-    implementation(libs.moshi.converter)
-    implementation(libs.moshi.adapter)
-    ksp(libs.moshi.compiler)
-    implementation(libs.interceptor)
-
-    //room
-    implementation(libs.room.runtime)
-    implementation(libs.room.ktx)
-    ksp(libs.room.compiler)
-
-    //Paging
-    implementation(libs.paging)
-    implementation(libs.paging.compose)
-
-    //Glide
-    implementation(libs.glide)
-
-    //Youtube player
-    implementation(libs.youtube.player)
-
     //unit test
     testImplementation(libs.junit)
     testImplementation(libs.mockito)
     testImplementation(libs.mockito.inline)
     testImplementation(libs.test.coroutines)
-    testImplementation(libs.mockwebserver)
 
 //    android tests
     androidTestImplementation(libs.test.arch.core)
+    //add opportunity to spy ony object
     androidTestImplementation(libs.dexmaker)
-    androidTestImplementation(libs.mockito.kotlin.android)
+    androidTestImplementation(libs.mockito)
     androidTestImplementation(libs.androidx.test.ext)
     androidTestImplementation(libs.androidx.test.espresso)
-    androidTestImplementation(platform("androidx.compose:compose-bom:2023.08.00"))
-    androidTestImplementation(libs.android.hilt.test)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test)
-    androidTestImplementation(libs.navigation.compose.testing)
-    androidTestImplementation(libs.espresso.device)
+//    androidTestImplementation(libs.navigation.compose.testing)
 
-    kspAndroidTest(libs.ksp.android.test)
     debugImplementation(libs.compose.ui.tooling)
     debugImplementation(libs.compose.test.manifest)
 }

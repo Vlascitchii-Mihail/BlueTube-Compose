@@ -1,0 +1,36 @@
+package com.vlascitchii.presentation_common.utils
+
+object Core {
+    const val CHANNEL_PREVIEW_IMG = "channel preview img"
+    const val PAGING_ERROR_MSG = "paging_error_message"
+    const val CIRCULAR_PROGRESS_INDICATOR = "circular progress indicator"
+}
+
+object NavigationTags {
+    const val NAVIGATION = "navigation"
+    const val BOTTOM_NAV = "bottom nav"
+    const val VIDEO_LIST_SCREEN = "video list screen"
+    const val SHORTS_SCREEN = "shorts list screen"
+    const val SETTINGS_SCREEN = "settings list screen"
+}
+
+object VideoListScreenTags {
+    const val VIDEO_PREVIEW_IMG = "video preview img"
+    const val VIDEO_TITLE = "video title"
+    const val VIDEO_DURATION = "video duration"
+    const val VIDEO_STATISTICS = "video statistics"
+    const val VIDEO_LIST = "video list"
+    const val VIDEO_LIST_ERROR = "video list error"
+    const val VIDEO_LIST_RETRY_ITEM = "video list retry item"
+}
+
+object VideoPlayerScreenTags {
+    const val VIDEO_PLAYER = "video player"
+    const val VIDEO_DESCRIPTION = "video description"
+}
+
+object ShortsItemTag {
+    const val SHORTS_VIDEO_PLAYER = "shorts_video_player"
+    const val SHORTS_CHANNEL_TITLE = "shorts_channel_title"
+    const val SHORTS_VIDEO_TITLE = "shorts_video_title"
+}
