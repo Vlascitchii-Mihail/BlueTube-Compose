@@ -1,10 +1,11 @@
-package com.vlascitchii.data_local.di_mock_api
+package com.appelier.bluetubecompose.di_mock_api
 
 import android.content.Context
 import androidx.room.Room
 import com.vlascitchii.data_local.database.YouTubeDatabase
 import com.vlascitchii.data_local.database.YouTubeVideoDao
 import com.vlascitchii.data_local.di.DatabaseModule
+import com.vlascitchii.data_local.source.utils.DatabaseContentManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -30,4 +31,9 @@ object TestDiIntegrationModule {
     fun provideFakeYouTubeVideoDao(database: YouTubeDatabase): YouTubeVideoDao {
         return database.youTubeVideoDao
     }
+
+    @Singleton
+    @Provides
+    fun provideFakeDatabaseContentManager(youTubeVideoDao: YouTubeVideoDao) =
+        DatabaseContentManager(youTubeVideoDao)
 }

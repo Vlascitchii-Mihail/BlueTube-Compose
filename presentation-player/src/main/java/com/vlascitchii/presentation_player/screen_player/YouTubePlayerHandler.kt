@@ -5,6 +5,7 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.PlayerConstan
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.options.IFramePlayerOptions
+import com.vlascitchii.presentation_player.databinding.FragmentPlayVideoBinding
 
 class YouTubePlayerHandler(
     private val binding: FragmentPlayVideoBinding,
