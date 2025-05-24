@@ -52,6 +52,7 @@ android-application = "8.2.2"
 jetbrains-kotlin = "1.9.24"
 serialization = "1.6.3"
 ksp-compiler = "1.9.20-1.0.14"
+
 navigation-testing = "2.7.7"
 parcelize = "1.8.10"
 appcompat = "1.7.0"
@@ -148,6 +149,7 @@ android-application = { id = "com.android.application", version.ref = "android-a
 jetbrains-kotlin = { id = "org.jetbrains.kotlin.android", version.ref = "jetbrains-kotlin"}
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "activity-compose" }
 ksp = { id =  "com.google.devtools.ksp", version.ref = "ksp-compiler" }
+kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "jetbrains-kotlin"}
 hilt-plugin = { id = "com.google.dagger.hilt.android", version.ref = "hilt"}
 parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "parcelize" }
 android-library = { id = "com.android.library", version.ref = "android-application" }

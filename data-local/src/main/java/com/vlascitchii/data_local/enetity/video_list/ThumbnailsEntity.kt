@@ -19,8 +19,6 @@ import com.vlascitchii.data_local.enetity.video_list.videos.VideoSnippetEntity
     ],
     indices = [Index(value = ["snippetId"])]
 )
-//@Parcelize
-//@Serializable
 data class ThumbnailsEntity(
     @Ignore
     var medium: ThumbnailAttributesEntity = ThumbnailAttributesEntity(),
@@ -28,4 +26,3 @@ data class ThumbnailsEntity(
     var thumbnailsId: String = "",
     var snippetId: String = ""
     )
-//    : Parcelable

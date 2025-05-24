@@ -19,7 +19,7 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.appelier.bluetubecompose.BlueTubeTestRunner"
 
         vectorDrawables {
             useSupportLibrary = true
@@ -49,7 +49,6 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
-        viewBinding = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.14"
@@ -100,10 +99,6 @@ dependencies {
     implementation(libs.constraint.layout.xml)
     implementation(libs.window.configuration)
 
-    //ViewModel
-//    implementation(libs.lifecycle.viewmodel.ktx)
-//    implementation(libs.viewmodel.compose)
-
     //coroutines
     implementation(libs.coroutines.core)
     implementation(libs.coroutines.android)
@@ -112,6 +107,11 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.ksp.hilt.compiler)
     implementation(libs.hilt.navigation)
+
+    //room
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
 
     //navigation
     implementation(libs.navigation)
@@ -132,7 +132,11 @@ dependencies {
     androidTestImplementation(libs.androidx.test.espresso)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test)
-//    androidTestImplementation(libs.navigation.compose.testing)
+    androidTestImplementation(libs.navigation.compose.testing)
+
+    //hilt testing
+    androidTestImplementation(libs.android.hilt.test)
+    kspAndroidTest(libs.ksp.hilt.android.test)
 
     debugImplementation(libs.compose.ui.tooling)
     debugImplementation(libs.compose.test.manifest)

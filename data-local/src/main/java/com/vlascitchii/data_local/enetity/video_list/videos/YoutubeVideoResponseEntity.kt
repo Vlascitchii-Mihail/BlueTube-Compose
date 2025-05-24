@@ -2,19 +2,15 @@ package com.vlascitchii.data_local.enetity.video_list.videos
 
 import androidx.room.Embedded
 import androidx.room.Relation
+import com.vlascitchii.data_local.enetity.INITIAL_PAGE_TOKEN
 import com.vlascitchii.data_local.enetity.PageEntity
 import com.vlascitchii.data_local.enetity.video_list.ThumbnailAttributesEntity
 import com.vlascitchii.data_local.enetity.video_list.ThumbnailsEntity
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 
-//TODO: check if the @Embedded annotation will insert the
-// parentColumn = "currentPageToken" from the PageEntity
 data class YoutubeVideoResponseEntity(
     @Embedded val pageEntity: PageEntity,
-//    val nextPageToken: String? = null,
-//    var currentPageToken: String = "",
-//    val prevPageToken: String? = null,
     @Relation(
         parentColumn = "currentPageToken",
         entityColumn = "pageToken"
@@ -26,9 +22,7 @@ data class YoutubeVideoResponseEntity(
 
         private val offsetFormatter: DateTimeFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
         val testDateTime: OffsetDateTime = offsetFormatter.parse("2007-12-03T10:15:30+01:00", OffsetDateTime::from)
-        const val INITIAL_PAGE_TOKEN = ""
 
-//TODO: compare with previous lists and delete this one if previous can be used for testing the database
         val TEST_DATABASE_VIDEO_LIST = listOf(
             YoutubeVideoEntity(
                 id = "bbM6aSB6iMQ",

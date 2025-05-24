@@ -10,7 +10,7 @@ import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.vlascitchii.presentation_common.entity.videos.YoutubeVideoUiModel
-import com.appelier.bluetubecompose.network_observer.ConnectivityStatus
+import com.vlascitchii.presentation_common.network_observer.ConnectivityStatus
 import com.vlascitchii.presentation_common.ui.PagerContentManager
 import com.vlascitchii.presentation_common.ui.screen.CommonScreen
 import com.vlascitchii.presentation_common.ui.state.UiState
@@ -24,7 +24,7 @@ fun ShortsScreen(
     shortsStateFlow: StateFlow<UiState<StateFlow<PagingData<YoutubeVideoUiModel>>>>,
     videoQueue: MutableSharedFlow<YouTubePlayer?>,
     listenToVideoQueue: () -> Unit,
-    connectivityStatus: Flow<com.appelier.bluetubecompose.network_observer.ConnectivityStatus>,
+    connectivityStatus: Flow<ConnectivityStatus>,
 ) {
     Surface(modifier = Modifier.testTag(com.vlascitchii.presentation_common.utils.NavigationTags.SHORTS_SCREEN)) {
         shortsStateFlow.collectAsStateWithLifecycle().value.let { uiStatePagingData: UiState<StateFlow<PagingData<YoutubeVideoUiModel>>> ->

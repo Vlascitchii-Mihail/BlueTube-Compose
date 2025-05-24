@@ -16,20 +16,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.integration.compose.placeholder
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 import com.vlascitchii.presentation_common.entity.videos.YoutubeVideoUiModel
-import com.appelier.bluetubecompose.network_observer.ConnectivityStatus
+import com.vlascitchii.presentation_common.network_observer.ConnectivityStatus
 import com.vlascitchii.presentation_common.utils.Core.CHANNEL_PREVIEW_IMG
 import com.vlascitchii.presentation_common.utils.ShortsItemTag.SHORTS_CHANNEL_TITLE
 import com.vlascitchii.presentation_common.utils.ShortsItemTag.SHORTS_VIDEO_PLAYER
@@ -44,9 +44,9 @@ fun ShortsItem(
     youTubeVideo: YoutubeVideoUiModel,
     videoQueue: MutableSharedFlow<YouTubePlayer?> = MutableSharedFlow(),
     modifier: Modifier = Modifier,
-    connectivityStatus: com.appelier.bluetubecompose.network_observer.ConnectivityStatus
+    connectivityStatus: ConnectivityStatus
 ) {
-    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current.lifecycle
+    val lifecycleOwner = LocalLifecycleOwner.current.lifecycle
     val shortsPlayerHandler = remember { ShortsPlayerHandler(lifecycleOwner, youTubeVideo.id, videoQueue) }
 
     ConstraintLayout(
@@ -57,7 +57,7 @@ fun ShortsItem(
         val (videoPlayer, channelImg, channelTitle, videoTitle) = createRefs()
 
         when(connectivityStatus) {
-            com.appelier.bluetubecompose.network_observer.ConnectivityStatus.Available -> {
+            ConnectivityStatus.Available -> {
                 AndroidView(
                     factory = { context ->
                         val youTubePlayerView = YouTubePlayerView(context)
@@ -76,7 +76,7 @@ fun ShortsItem(
                 )
             }
 
-            com.appelier.bluetubecompose.network_observer.ConnectivityStatus.Lost -> {
+            ConnectivityStatus.Lost -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     GlideImage(
                         model = placeholder(R.drawable.sceleton_thumbnail),
@@ -139,11 +139,11 @@ fun ShortsItem(
 @Preview
 @Composable
 fun ShortsNetworkAvailableItemPreview() {
-    ShortsItem(YoutubeVideoUiModel.DEFAULT_VIDEO, connectivityStatus = com.appelier.bluetubecompose.network_observer.ConnectivityStatus.Available)
+    ShortsItem(YoutubeVideoUiModel.DEFAULT_VIDEO, connectivityStatus = ConnectivityStatus.Available)
 }
 
 @Preview
 @Composable
 fun ShortsNetworkUnavailableItemPreview() {
-    ShortsItem(YoutubeVideoUiModel.DEFAULT_VIDEO, connectivityStatus = com.appelier.bluetubecompose.network_observer.ConnectivityStatus.Lost)
+    ShortsItem(YoutubeVideoUiModel.DEFAULT_VIDEO, connectivityStatus = ConnectivityStatus.Lost)
 }

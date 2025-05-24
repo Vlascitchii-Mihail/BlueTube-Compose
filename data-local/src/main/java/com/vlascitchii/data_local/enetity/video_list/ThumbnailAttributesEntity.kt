@@ -17,10 +17,7 @@ import androidx.room.PrimaryKey
     ],
     indices = [Index(value = ["thumbnailsId"])]
 )
-//@Parcelize
-//@Serializable
 data class ThumbnailAttributesEntity(
-//    @Serializable(with = com.vlascitchii.data_local.database.URLSanitizer::class)
     val url: String = "",
     val height: Int = 0,
     val width: Int = 0,
@@ -28,4 +25,3 @@ data class ThumbnailAttributesEntity(
     var thumbnailAttributesId: String = "",
     var thumbnailsId: String = ""
     )
-//    : Parcelable

@@ -11,7 +11,6 @@ import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -20,7 +19,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.PagingData
 import com.vlascitchii.presentation_common.entity.videos.YoutubeVideoUiModel
 import com.vlascitchii.presentation_common.entity.videos.YoutubeVideoUiModel.Companion.DEFAULT_VIDEO_LIST
-import com.appelier.bluetubecompose.network_observer.ConnectivityStatus
+import com.vlascitchii.presentation_common.network_observer.ConnectivityStatus
+import com.vlascitchii.presentation_common.ui.state.UiState
 import com.vlascitchii.presentation_common.ui.video_list.YouTubeVideoList
 import com.vlascitchii.presentation_common.utils.SnackbarController
 import com.vlascitchii.presentation_common.utils.SnackbarEvent
@@ -34,15 +34,15 @@ import kotlinx.coroutines.flow.flowOf
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VideoListScreen(
-    connectivityStatus: Flow<com.appelier.bluetubecompose.network_observer.ConnectivityStatus>,
+    connectivityStatus: Flow<ConnectivityStatus>,
     listScreenAppBar: @Composable (scrollAppBarBehaviour: TopAppBarScrollBehavior) -> Unit,
     videoList: @Composable (padding: PaddingValues) -> Unit
 ) {
     val networkConnectivityStatus by connectivityStatus.collectAsStateWithLifecycle(
-        initialValue = com.appelier.bluetubecompose.network_observer.ConnectivityStatus.Available
+        initialValue = ConnectivityStatus.Available
     )
     LaunchedEffect(networkConnectivityStatus) {
-        if (networkConnectivityStatus == com.appelier.bluetubecompose.network_observer.ConnectivityStatus.Lost) {
+        if (networkConnectivityStatus == ConnectivityStatus.Lost) {
             SnackbarController.sendEvent(
                 event = SnackbarEvent(
                     message = "Wrong internet connection"
@@ -70,17 +70,21 @@ fun VideoListScreen(
 @Preview
 @Composable
 fun VideoListScreenPreview() {
-    val videoStateFlow: StateFlow<PagingData<YoutubeVideoUiModel>> = MutableStateFlow(PagingData.from(DEFAULT_VIDEO_LIST ))
+    val videoStateFlow: StateFlow<UiState<StateFlow<PagingData<YoutubeVideoUiModel>>>> =
+        MutableStateFlow(UiState.Success(MutableStateFlow(PagingData.from(DEFAULT_VIDEO_LIST))))
+
     val closedSearchViewState = remember { MutableStateFlow(SearchState.CLOSED) }
     val searchText = remember { MutableStateFlow("Test text") }
 
     VideoListScreen(
-        connectivityStatus = flowOf(com.appelier.bluetubecompose.network_observer.ConnectivityStatus.Available),
+        connectivityStatus = flowOf(ConnectivityStatus.Available),
         listScreenAppBar = {
             ListScreenAppBar(
                 searchViewState = closedSearchViewState,
                 searchTextState = searchText,
-                scrollAppBarBehaviour = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState()),
+                scrollAppBarBehaviour = TopAppBarDefaults.enterAlwaysScrollBehavior(
+                    rememberTopAppBarState()
+                ),
                 onTextChange = { searchInput: String -> },
                 onSearchClicked = {},
                 updateSearchState = {}
@@ -88,7 +92,7 @@ fun VideoListScreenPreview() {
         },
         videoList = {
             YouTubeVideoList(
-                getVideoState = { mutableStateOf(videoStateFlow) },
+                getVideoState = { videoStateFlow },
                 navigateToPlayerScreen = {}
             )
         }
@@ -99,17 +103,21 @@ fun VideoListScreenPreview() {
 @Preview
 @Composable
 fun VideoSearchListScreenPreview() {
-    val videoStateFlow: StateFlow<PagingData<YoutubeVideoUiModel>> = MutableStateFlow(PagingData.from(DEFAULT_VIDEO_LIST ))
+    val videoStateFlow: StateFlow<UiState<StateFlow<PagingData<YoutubeVideoUiModel>>>> =
+        MutableStateFlow(UiState.Success(MutableStateFlow(PagingData.from(DEFAULT_VIDEO_LIST))))
+
     val openedSearchViewState = remember { MutableStateFlow(SearchState.OPENED) }
     val searchText = remember { MutableStateFlow("Test text") }
 
     VideoListScreen(
-        connectivityStatus = flowOf(com.appelier.bluetubecompose.network_observer.ConnectivityStatus.Available),
+        connectivityStatus = flowOf(ConnectivityStatus.Available),
         listScreenAppBar = {
             ListScreenAppBar(
                 searchViewState = openedSearchViewState,
                 searchTextState = searchText,
-                scrollAppBarBehaviour = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState()),
+                scrollAppBarBehaviour = TopAppBarDefaults.enterAlwaysScrollBehavior(
+                    rememberTopAppBarState()
+                ),
                 onTextChange = { searchInput: String -> },
                 onSearchClicked = {},
                 updateSearchState = {}
@@ -117,7 +125,7 @@ fun VideoSearchListScreenPreview() {
         },
         videoList = {
             YouTubeVideoList(
-                getVideoState = { mutableStateOf(videoStateFlow) },
+                getVideoState = { videoStateFlow },
                 navigateToPlayerScreen = {}
             )
         }

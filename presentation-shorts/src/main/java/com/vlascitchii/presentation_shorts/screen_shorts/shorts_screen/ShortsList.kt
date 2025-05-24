@@ -15,7 +15,7 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemKey
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.vlascitchii.presentation_common.entity.videos.YoutubeVideoUiModel
-import com.appelier.bluetubecompose.network_observer.ConnectivityStatus
+import com.vlascitchii.presentation_common.network_observer.ConnectivityStatus
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 
@@ -24,16 +24,16 @@ fun ShortsList(
     videos: LazyPagingItems<YoutubeVideoUiModel>,
     videoQueue: MutableSharedFlow<YouTubePlayer?>,
     listenToVideoQueue: () -> Unit,
-    connectivityStatus: Flow<com.appelier.bluetubecompose.network_observer.ConnectivityStatus>,
+    connectivityStatus: Flow<ConnectivityStatus>,
 ) {
     val context = LocalContext.current
     val pagerState = rememberPagerState(pageCount = { videos.itemCount })
     val networkConnectivityStatus by connectivityStatus.collectAsStateWithLifecycle(
-        initialValue = com.appelier.bluetubecompose.network_observer.ConnectivityStatus.Available
+        initialValue = ConnectivityStatus.Available
     )
 
     LaunchedEffect(networkConnectivityStatus) {
-        if (networkConnectivityStatus == com.appelier.bluetubecompose.network_observer.ConnectivityStatus.Lost) {
+        if (networkConnectivityStatus == ConnectivityStatus.Lost) {
             com.vlascitchii.presentation_common.utils.SnackbarController.sendEvent(
                 event = com.vlascitchii.presentation_common.utils.SnackbarEvent(
                     message = "Wrong internet connection"

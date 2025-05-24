@@ -1,9 +1,9 @@
 package com.vlascitchii.data_local.source.utils
 
 import com.vlascitchii.data_local.database.YouTubeVideoDao
+import com.vlascitchii.data_local.enetity.INITIAL_PAGE_TOKEN
 import com.vlascitchii.data_local.enetity.video_list.videos.YoutubeVideoEntity
 import com.vlascitchii.data_local.enetity.video_list.videos.YoutubeVideoResponseEntity
-import com.vlascitchii.data_local.enetity.video_list.videos.YoutubeVideoResponseEntity.Companion.INITIAL_PAGE_TOKEN
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
@@ -25,8 +25,15 @@ class DatabaseContentManager(private val youTubeVideoDao: YouTubeVideoDao) {
         return this
     }
 
-    suspend fun insertPageFrom(videoResponseEntity: YoutubeVideoResponseEntity) {
-        youTubeVideoDao.insertPages(videoResponseEntity.pageEntity)
+    suspend fun insertPageFrom(youtubeVideoResponseEntity: YoutubeVideoResponseEntity) {
+        youTubeVideoDao.insertPages(youtubeVideoResponseEntity.pageEntity)
+    }
+
+    suspend fun YoutubeVideoResponseEntity.bindAndInsertVideoWith(loadDate: OffsetDateTime) {
+        this.items.forEach { video: YoutubeVideoEntity ->
+            video.bindVideosFromResponseWithData(loadDate)
+            youTubeVideoDao.insertVideo(video)
+        }
     }
 
     fun YoutubeVideoEntity.bindVideosFromResponseWithData(loadDate: OffsetDateTime) {
@@ -77,15 +84,15 @@ class DatabaseContentManager(private val youTubeVideoDao: YouTubeVideoDao) {
         }
     }
 
-    fun updateCurrentPageToken(nextPageToken: String?) {
-        nextPageToken?.let { sourceCurrentPageToken = it }
+    fun updateCurrentPageToken(videoResponseEntity:  YoutubeVideoResponseEntity?) {
+        videoResponseEntity?.pageEntity?.nextPageToken?.let { sourceCurrentPageToken = it }
     }
 
-    suspend fun getFirstPageFromDatabase(): Flow<YoutubeVideoResponseEntity> {
+    fun getFirstPageFromDatabase(): Flow<YoutubeVideoResponseEntity> {
         return youTubeVideoDao.getFirstPageFromDb()
     }
 
-    suspend fun getParticularPageFromDatabase(nextPageToken: String): Flow<YoutubeVideoResponseEntity> {
+    fun getParticularPageFromDatabase(nextPageToken: String): Flow<YoutubeVideoResponseEntity> {
         return youTubeVideoDao.getVideosFromPage(nextPageToken)
     }
 }

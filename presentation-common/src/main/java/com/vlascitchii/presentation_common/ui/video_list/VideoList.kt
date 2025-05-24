@@ -42,7 +42,7 @@ fun YouTubeVideoList(
     innerPadding: PaddingValues = PaddingValues(0.dp),
     localWindowSizeClass: WindowWidthSizeClass = WindowWidthSizeClass.Compact,
     navigateToPlayerScreen: (YoutubeVideoUiModel) -> Unit,
-    ) {
+) {
     val videosFlow = getVideoState.invoke()
 
     videosFlow.collectAsStateWithLifecycle().value.let { uiStatePagingData: UiState<StateFlow<PagingData<YoutubeVideoUiModel>>> ->
@@ -51,8 +51,11 @@ fun YouTubeVideoList(
 
             val keyboardController = LocalSoftwareKeyboardController.current
             val nestedScrollConnection = remember {
-                object: NestedScrollConnection {
-                    override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                object : NestedScrollConnection {
+                    override fun onPreScroll(
+                        available: Offset,
+                        source: NestedScrollSource
+                    ): Offset {
                         keyboardController?.hide()
                         return Offset.Zero
                     }
@@ -98,21 +101,48 @@ fun ItemsList(
             contentType = videos.itemContentType()
         ) { index ->
 
-            when(windowSize) {
+            when (windowSize) {
                 WindowWidthSizeClass.Compact ->
-                    videos[index]?.let { VideoItem(youtubeVideoUiModel = it, modifier = modifier, navigateToPlayerScreen) }
+                    videos[index]?.let {
+                        VideoItem(
+                            youtubeVideoUiModel = it,
+                            modifier = modifier,
+                            navigateToPlayerScreen
+                        )
+                    }
+
                 WindowWidthSizeClass.Medium ->
-                    videos[index]?.let { VideoItemLandscape(youtubeVideo = it, modifier = modifier, navigateToPlayerScreen) }
+                    videos[index]?.let {
+                        VideoItemLandscape(
+                            youtubeVideo = it,
+                            modifier = modifier,
+                            navigateToPlayerScreen
+                        )
+                    }
+
                 WindowWidthSizeClass.Expanded ->
-                    videos[index]?.let { VideoItemLandscape(youtubeVideo = it, modifier = modifier, navigateToPlayerScreen) }
+                    videos[index]?.let {
+                        VideoItemLandscape(
+                            youtubeVideo = it,
+                            modifier = modifier,
+                            navigateToPlayerScreen
+                        )
+                    }
+
                 else ->
-                    videos[index]?.let { VideoItem(youtubeVideoUiModel = it, modifier = modifier, navigateToPlayerScreen) }
+                    videos[index]?.let {
+                        VideoItem(
+                            youtubeVideoUiModel = it,
+                            modifier = modifier,
+                            navigateToPlayerScreen
+                        )
+                    }
             }
         }
 
         item {
-            when(videos.loadState.append) {
-                is LoadState.Loading ->  CircularProgressIndicator(modifier.height(48.dp))
+            when (videos.loadState.append) {
+                is LoadState.Loading -> CircularProgressIndicator(modifier.height(48.dp))
                 is LoadState.Error -> PaginationRetryItem(onRetryClick = { videos.retry() })
                 is LoadState.NotLoading -> Unit
             }
@@ -125,7 +155,17 @@ fun ItemsList(
 private fun YouTubeVideoListCompactPreview() {
     YouTubeVideoList(
         modifier = Modifier,
-        getVideoState = { MutableStateFlow(UiState.Success(MutableStateFlow(PagingData.from(DEFAULT_VIDEO_LIST))))  },
+        getVideoState = {
+            MutableStateFlow(
+                UiState.Success(
+                    MutableStateFlow(
+                        PagingData.from(
+                            DEFAULT_VIDEO_LIST
+                        )
+                    )
+                )
+            )
+        },
         PaddingValues(8.dp),
         localWindowSizeClass = WindowWidthSizeClass.Compact
     ) {}
@@ -136,7 +176,17 @@ private fun YouTubeVideoListCompactPreview() {
 private fun YouTubeVideoListMediumPreview() {
     YouTubeVideoList(
         modifier = Modifier,
-        getVideoState = { MutableStateFlow(UiState.Success(MutableStateFlow(PagingData.from(DEFAULT_VIDEO_LIST))))  },
+        getVideoState = {
+            MutableStateFlow(
+                UiState.Success(
+                    MutableStateFlow(
+                        PagingData.from(
+                            DEFAULT_VIDEO_LIST
+                        )
+                    )
+                )
+            )
+        },
         PaddingValues(8.dp),
         localWindowSizeClass = WindowWidthSizeClass.Medium
     ) {}
@@ -147,7 +197,17 @@ private fun YouTubeVideoListMediumPreview() {
 private fun YouTubeVideoListExpandedPreview() {
     YouTubeVideoList(
         modifier = Modifier,
-        getVideoState = { MutableStateFlow(UiState.Success(MutableStateFlow(PagingData.from(DEFAULT_VIDEO_LIST))))  },
+        getVideoState = {
+            MutableStateFlow(
+                UiState.Success(
+                    MutableStateFlow(
+                        PagingData.from(
+                            DEFAULT_VIDEO_LIST
+                        )
+                    )
+                )
+            )
+        },
         PaddingValues(8.dp),
         localWindowSizeClass = WindowWidthSizeClass.Expanded
     ) {}
