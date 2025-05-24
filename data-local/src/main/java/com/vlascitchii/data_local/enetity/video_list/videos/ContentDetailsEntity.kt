@@ -17,12 +17,9 @@ import androidx.room.PrimaryKey
     ],
     indices = [Index(value = ["videoId"])]
 )
-//@Parcelize
-//@Serializable
 data class ContentDetailsEntity(
     val duration: String = "",
     @PrimaryKey(autoGenerate = false)
     var contentDetailsId: String = "",
     var videoId: String = ""
 )
-//    : Parcelable

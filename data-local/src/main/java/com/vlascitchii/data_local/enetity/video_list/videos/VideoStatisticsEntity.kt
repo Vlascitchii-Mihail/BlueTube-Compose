@@ -17,8 +17,6 @@ import androidx.room.PrimaryKey
     ],
     indices = [Index(value = ["videoId"])]
 )
-//@Parcelize
-//@Serializable
 data class VideoStatisticsEntity(
     val viewCount: Long = 0,
     val likeCount: Long = 0,
@@ -26,4 +24,3 @@ data class VideoStatisticsEntity(
     var statisticsId: String = "",
     var videoId: String = "",
     )
-//    : Parcelable

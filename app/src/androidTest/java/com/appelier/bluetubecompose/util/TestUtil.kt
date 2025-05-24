@@ -1,4 +1,4 @@
-package com.vlascitchii.data_local.util
+package com.appelier.bluetubecompose.util
 
 import junit.framework.AssertionFailedError
 import junit.framework.TestCase.assertEquals

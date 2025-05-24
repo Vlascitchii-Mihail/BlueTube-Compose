@@ -29,6 +29,6 @@ fun SettingsScreen() {
                     color = MaterialTheme.colorScheme.primary
                 )
             }
-        },
+        }
     )
 }

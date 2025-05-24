@@ -3,8 +3,6 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt.plugin)
-    alias(libs.plugins.kotlinx.serialization)
-//    alias(libs.plugins.parcelize)
 }
 
 android {
@@ -14,7 +12,7 @@ android {
     defaultConfig {
         minSdk = 26
 
-        testInstrumentationRunner = "com.appelier.bluetubecompose.BlueTubeTestRunner"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }
 
@@ -54,7 +52,6 @@ dependencies {
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
     ksp(libs.room.compiler)
-    implementation(libs.kotlinx.serialization.json)
 
     //coroutines
     implementation(libs.coroutines.core)
@@ -68,8 +65,6 @@ dependencies {
 
     //android tests
     androidTestImplementation(libs.test.arch.core)
-    androidTestImplementation(libs.android.hilt.test)
-    kspAndroidTest(libs.ksp.hilt.android.test)
     androidTestImplementation(libs.androidx.test.ext)
     //add opportunity to spy ony object
     androidTestImplementation(libs.dexmaker)

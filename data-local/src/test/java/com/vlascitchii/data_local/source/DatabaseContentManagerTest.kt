@@ -1,18 +1,20 @@
 package com.vlascitchii.data_local.source
 
-import com.vlascitchii.data_local.enetity.video_list.videos.YoutubeVideoResponseEntity
-import com.vlascitchii.data_local.enetity.video_list.videos.YoutubeVideoResponseEntity.Companion.INITIAL_PAGE_TOKEN
-import com.vlascitchii.data_local.enetity.video_list.videos.YoutubeVideoResponseEntity.Companion.TEST_DATABASE_VIDEO_RESPONSE
 import com.vlascitchii.data_local.database.YouTubeVideoDao
 import com.vlascitchii.data_local.database.convertToLocalYoutubeVideoResponseEntity
-import com.vlascitchii.data_local.source.utils.rule.DispatcherTestRule
+import com.vlascitchii.data_local.enetity.INITIAL_PAGE_TOKEN
 import com.vlascitchii.data_local.enetity.video_list.videos.YoutubeVideoEntity
+import com.vlascitchii.data_local.enetity.video_list.videos.YoutubeVideoResponseEntity
+import com.vlascitchii.data_local.enetity.video_list.videos.YoutubeVideoResponseEntity.Companion.TEST_DATABASE_VIDEO_RESPONSE
+import com.vlascitchii.data_local.enetity.video_list.videos.YoutubeVideoResponseEntity.Companion.testDateTime
 import com.vlascitchii.data_local.source.utils.DatabaseContentManager
 import com.vlascitchii.data_local.source.utils.assertListEqualsTo
+import com.vlascitchii.data_local.source.utils.rule.DispatcherTestRule
 import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse.Companion.RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -41,7 +43,7 @@ class DatabaseContentManagerTest {
     }
 
     @Test
-    fun `check setCurrentPageTokenToVideos() sets the currentPageToken to YoutubeVideoResponseEntity and to each VideoEntity`() {
+    fun `setCurrentPageTokenToVideos() sets the currentPageToken to YoutubeVideoResponseEntity and to each VideoEntity`() {
         val videoResponseWithCurrentPageToken = with(databaseContentManager) {
             testVideoResponseEntity.setCurrentPageTokenToVideos(INITIAL_PAGE_TOKEN)
         }
@@ -60,6 +62,18 @@ class DatabaseContentManagerTest {
         databaseContentManager.insertPageFrom(testVideoResponseEntity)
 
         verify(youTubeDao, times(1)).insertPages(testVideoResponseEntity.pageEntity)
+    }
+
+    @Test
+    fun `bindVideosFromResponseWithData() binds videos in response and inserts to the DB`() = runTest {
+        with(databaseContentManager) {
+            testVideoResponseEntity.bindAndInsertVideoWith(testDateTime)
+        }
+
+        testVideoResponseEntity.items.forEach { video: YoutubeVideoEntity ->
+            verify(youTubeDao).insertVideo(video)
+        }
+        assertEquals(TEST_DATABASE_VIDEO_RESPONSE, testVideoResponseEntity)
     }
 
     @Test
@@ -144,7 +158,7 @@ class DatabaseContentManagerTest {
     }
 
     @Test
-    fun `deleteExtraVideos() deletes 5 videos if overall size is greater than 100`() = runTest {
+    fun `deleteExtraVideos() calls youTubeDao deleteExtraFiveVideos if overall size is greater than 100`() = runTest {
         whenever(youTubeDao.getVideosCount()).thenReturn(flowOf(110))
 
         databaseContentManager.deleteExtraVideos()
@@ -155,7 +169,9 @@ class DatabaseContentManagerTest {
     @Test
     fun `updateCurrentPageToken() updates the sourceCurrentPageToken`() {
         val testToken = "Test token"
-        databaseContentManager.updateCurrentPageToken(testToken)
+        val testPage = TEST_DATABASE_VIDEO_RESPONSE.pageEntity.copy(nextPageToken = testToken)
+        val testDatabaseResponse = TEST_DATABASE_VIDEO_RESPONSE.copy(pageEntity = testPage)
+        databaseContentManager.updateCurrentPageToken(testDatabaseResponse)
 
         assertEquals(databaseContentManager.sourceCurrentPageToken, testToken)
     }
@@ -163,7 +179,9 @@ class DatabaseContentManagerTest {
     @Test
     fun `updateCurrentPageToken() doesn't updates the sourceCurrentPageToken if we pass null`() {
         val testToken = null
-        databaseContentManager.updateCurrentPageToken(testToken)
+        val testPage = TEST_DATABASE_VIDEO_RESPONSE.pageEntity.copy(nextPageToken = testToken)
+        val testDatabaseResponse = TEST_DATABASE_VIDEO_RESPONSE.copy(pageEntity = testPage)
+        databaseContentManager.updateCurrentPageToken(testDatabaseResponse)
 
         assertNotEquals(databaseContentManager.sourceCurrentPageToken, testToken)
     }

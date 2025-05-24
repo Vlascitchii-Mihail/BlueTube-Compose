@@ -6,9 +6,9 @@ import android.content.pm.ActivityInfo
 import android.provider.Settings
 import android.view.View
 import android.view.WindowManager
-import com.appelier.bluetubecompose.databinding.FragmentPlayVideoBinding
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.FullscreenListener
+import com.vlascitchii.presentation_player.databinding.FragmentPlayVideoBinding
 import kotlinx.coroutines.flow.StateFlow
 
 const val PORTRAIT_ORIENTATION = 0

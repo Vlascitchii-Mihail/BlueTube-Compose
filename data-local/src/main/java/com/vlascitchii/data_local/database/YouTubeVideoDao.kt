@@ -5,17 +5,17 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import com.vlascitchii.data_local.enetity.PageEntity
+import com.vlascitchii.data_local.enetity.video_list.ThumbnailAttributesEntity
+import com.vlascitchii.data_local.enetity.video_list.ThumbnailsEntity
 import com.vlascitchii.data_local.enetity.video_list.videos.ContentDetailsEntity
 import com.vlascitchii.data_local.enetity.video_list.videos.VideoSnippetEntity
 import com.vlascitchii.data_local.enetity.video_list.videos.VideoStatisticsEntity
 import com.vlascitchii.data_local.enetity.video_list.videos.YoutubeVideoEntity
-import com.vlascitchii.data_local.enetity.PageEntity
-import com.vlascitchii.data_local.enetity.video_list.ThumbnailAttributesEntity
-import com.vlascitchii.data_local.enetity.video_list.ThumbnailsEntity
 import com.vlascitchii.data_local.enetity.video_list.videos.YoutubeVideoResponseEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
-
+import kotlinx.coroutines.flow.map
 
 @Dao
 interface YouTubeVideoDao {
@@ -23,6 +23,7 @@ interface YouTubeVideoDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPages(pageEntity: PageEntity)
 
+    //TODO: unite / join with fun insertPages(pageEntity: PageEntity)
     @Transaction
     @Query("")
     suspend fun insertVideo(video: YoutubeVideoEntity) {
@@ -57,13 +58,14 @@ interface YouTubeVideoDao {
 
 
 
-    //TODO:try to return Flow and delete the suspend modifier
     @Transaction
     @Query("")
-    suspend fun getVideosFromPage(currentPageToken: String): Flow<YoutubeVideoResponseEntity> {
+    fun getVideosFromPage(currentPageToken: String): Flow<YoutubeVideoResponseEntity> {
         val videoResponseEntity = getPageByToken(currentPageToken)
-        videoResponseEntity.first().items.initializeVideos()
-        return videoResponseEntity
+        return videoResponseEntity.map { videoResponse: YoutubeVideoResponseEntity ->
+            videoResponse.items.initializeVideos()
+            videoResponse
+        }
     }
 
     @Transaction
@@ -75,15 +77,16 @@ interface YouTubeVideoDao {
 
     @Transaction
     @Query("")
-    suspend fun getFirstPageFromDb(): Flow<YoutubeVideoResponseEntity> {
+    fun getFirstPageFromDb(): Flow<YoutubeVideoResponseEntity> {
         val firstPage = getFirstPage()
-        firstPage.first().items.initializeVideos()
-        return firstPage
+        return firstPage.map { responseEntity: YoutubeVideoResponseEntity ->
+            responseEntity.items.initializeVideos()
+            responseEntity
+        }
     }
 
-    //TODO: may be it is better not to return a flow
     @Transaction
-    @Query("SELECT * FROM pages WHERE currentPageToken IN(SELECT pageToken FROM youtube_video ORDER BY loadedDate LIMIT 5)")
+    @Query("SELECT * FROM pages WHERE currentPageToken = ''")
     fun getFirstPage(): Flow<YoutubeVideoResponseEntity>
 
 

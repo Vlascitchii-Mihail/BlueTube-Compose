@@ -17,6 +17,7 @@ import com.vlascitchii.presentation_common.network_observer.ConnectivityStatus
 import com.vlascitchii.presentation_common.ui.screen.CommonScreen
 import com.vlascitchii.presentation_common.ui.state.UiState
 import com.vlascitchii.presentation_common.ui.video_list.YouTubeVideoList
+import com.vlascitchii.presentation_common.utils.SnackbarController.sendEvent
 import com.vlascitchii.presentation_player.screen_player.OrientationState
 import com.vlascitchii.presentation_player.screen_player.VideoDescription
 import com.vlascitchii.presentation_player.screen_player.YoutubeVideoPlayer
@@ -48,7 +49,7 @@ fun PlayerScreen(
             )
             LaunchedEffect(networkConnectivityStatus) {
                 if (networkConnectivityStatus == ConnectivityStatus.Lost) {
-                    com.vlascitchii.presentation_common.utils.SnackbarController.sendEvent(
+                    sendEvent(
                         event = com.vlascitchii.presentation_common.utils.SnackbarEvent(
                             message = "Wrong internet connection"
                         )
@@ -59,7 +60,7 @@ fun PlayerScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.background)
+//                    .background(MaterialTheme.colorScheme.background)
             ) {
                 YoutubeVideoPlayer(
                     videoId = video.id,

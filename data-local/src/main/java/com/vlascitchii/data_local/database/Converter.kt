@@ -16,15 +16,6 @@ import com.vlascitchii.domain.enetity.video_list.videos.VideoSnippet
 import com.vlascitchii.domain.enetity.video_list.videos.VideoStatistics
 import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideo
 import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.descriptors.PrimitiveKind
-import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
-import java.net.URLDecoder
-import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 
