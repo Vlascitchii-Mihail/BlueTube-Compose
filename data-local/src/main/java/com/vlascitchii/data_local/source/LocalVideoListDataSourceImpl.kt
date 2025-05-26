@@ -7,7 +7,9 @@ import com.vlascitchii.data_local.source.utils.DatabaseContentManager
 import com.vlascitchii.data_repository.data_source.local.LocalVideoListDataSource
 import com.vlascitchii.domain.custom_coroutine_scopes.AppCoroutineScope
 import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse
+import com.vlascitchii.domain.util.UseCaseException
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
@@ -26,19 +28,24 @@ class LocalVideoListDataSourceImpl @Inject constructor(
         youTubeVideoResponse: YoutubeVideoResponse,
         loadDate: OffsetDateTime,
     ) {
-        with(databaseContentManager) {
-            val videoResponseEntity = youTubeVideoResponse.convertToLocalYoutubeVideoResponseEntity()
-                .setCurrentPageTokenToVideos(sourceCurrentPageToken)
+        try {
+            with(databaseContentManager) {
+                val videoResponseEntity =
+                    youTubeVideoResponse.convertToLocalYoutubeVideoResponseEntity()
+                        .setCurrentPageTokenToVideos(sourceCurrentPageToken)
 
-            println("videoResponseEntity = $videoResponseEntity")
+                println("videoResponseEntity = $videoResponseEntity")
 
-            videoCoroutineScope.launch {
-                insertPageFrom(videoResponseEntity)
-                videoResponseEntity.bindAndInsertVideoWith(loadDate)
-                deleteExtraVideos()
+                videoCoroutineScope.launch {
+                    insertPageFrom(videoResponseEntity)
+                    videoResponseEntity.bindAndInsertVideoWith(loadDate)
+                    deleteExtraVideos()
+                }
+
+                updateCurrentPageToken(videoResponseEntity)
             }
-
-            updateCurrentPageToken(videoResponseEntity)
+        } catch (ex: Exception) {
+            throw UseCaseException.LocalStorageException(ex)
         }
     }
 
@@ -52,5 +59,7 @@ class LocalVideoListDataSourceImpl @Inject constructor(
             updateCurrentPageToken(videoResponse.first())
             emit(videoResponse.first().convertToDomainYoutubeVideoResponse())
         }
-    }.flowOn(videoCoroutineScope.dispatcher)
+    }
+        .flowOn(videoCoroutineScope.dispatcher)
+        .catch { throw UseCaseException.LocalStorageException(it) }
 }

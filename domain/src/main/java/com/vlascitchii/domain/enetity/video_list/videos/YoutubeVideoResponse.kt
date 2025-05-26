@@ -2,6 +2,8 @@ package com.vlascitchii.domain.enetity.video_list.videos
 
 import com.vlascitchii.domain.enetity.video_list.ThumbnailAttributes
 import com.vlascitchii.domain.enetity.video_list.Thumbnails
+import java.time.OffsetDateTime
+import java.time.format.DateTimeFormatter
 
 data class YoutubeVideoResponse(
     val nextPageToken: String? = null,
@@ -11,6 +13,9 @@ data class YoutubeVideoResponse(
 ) {
 
     companion object {
+        private val offsetFormatter: DateTimeFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
+        val testDateTime: OffsetDateTime = offsetFormatter.parse("2007-12-03T10:15:30+01:00", OffsetDateTime::from)
+
         private val VIDEO_LIST_NO_CHANNEL_IMG_URL = listOf(
             YoutubeVideo(
                 id = "bbM6aSB6iMQ",
