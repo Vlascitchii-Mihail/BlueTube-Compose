@@ -33,6 +33,6 @@ class RemoteVideoListDataSourceImpl @Inject constructor(
         }
 
     }.catch {
-        throw it
+        throw UseCaseException.VideoListLoadException(it)
     }.flowOn(videoCoroutineScope.dispatcher)
 }

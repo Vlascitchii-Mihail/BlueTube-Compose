@@ -6,11 +6,11 @@ import com.vlascitchii.data_local.enetity.INITIAL_PAGE_TOKEN
 import com.vlascitchii.data_local.enetity.video_list.videos.YoutubeVideoEntity
 import com.vlascitchii.data_local.enetity.video_list.videos.YoutubeVideoResponseEntity
 import com.vlascitchii.data_local.enetity.video_list.videos.YoutubeVideoResponseEntity.Companion.TEST_DATABASE_VIDEO_RESPONSE
-import com.vlascitchii.data_local.enetity.video_list.videos.YoutubeVideoResponseEntity.Companion.testDateTime
 import com.vlascitchii.data_local.source.utils.DatabaseContentManager
 import com.vlascitchii.data_local.source.utils.assertListEqualsTo
 import com.vlascitchii.data_local.source.utils.rule.DispatcherTestRule
 import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse.Companion.RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG
+import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse.Companion.testDateTime
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -79,7 +79,7 @@ class DatabaseContentManagerTest {
     @Test
     fun `bindVideosFromResponseWithData() sets the video key values for relation database`() {
         with(databaseContentManager) {
-            testVideoResponseEntity.items.first().bindVideosFromResponseWithData(YoutubeVideoResponseEntity.testDateTime)
+            testVideoResponseEntity.items.first().bindVideosFromResponseWithData(testDateTime)
 
             assertEquals(TEST_DATABASE_VIDEO_RESPONSE.items.first(), testVideoResponseEntity.items.first())
         }
@@ -89,7 +89,7 @@ class DatabaseContentManagerTest {
     fun `setTimeStamp() sets a TimeStamp`() {
         with(databaseContentManager) {
             testVideoResponseEntity.items.forEach { videoEntity: YoutubeVideoEntity ->
-                videoEntity.setTimeStamp(YoutubeVideoResponseEntity.testDateTime)
+                videoEntity.setTimeStamp(testDateTime)
             }
         }
 

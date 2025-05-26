@@ -1,12 +1,12 @@
 package com.appelier.bluetubecompose.instrumented
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.vlascitchii.data_local.enetity.video_list.videos.YoutubeVideoResponseEntity
 import com.vlascitchii.data_local.source.LocalVideoListDataSourceImpl
 import com.vlascitchii.data_local.source.utils.DatabaseContentManager
 import com.vlascitchii.domain.custom_coroutine_scopes.AppCoroutineScope
 import com.vlascitchii.domain.custom_coroutine_scopes.VideoCoroutineScope
 import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse.Companion.RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG
+import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse.Companion.testDateTime
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.delay
@@ -47,7 +47,7 @@ class LocalVideoListDataSourceImplTest {
 
         localVideoListDataSourceImpl.insertVideosToDatabaseWithTimeStamp(
             expectedYouTubeVideoResponse,
-            YoutubeVideoResponseEntity.testDateTime
+            testDateTime
         )
 
         delay(2000)

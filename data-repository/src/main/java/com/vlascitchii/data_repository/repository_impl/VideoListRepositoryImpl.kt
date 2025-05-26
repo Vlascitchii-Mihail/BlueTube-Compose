@@ -5,9 +5,7 @@ import com.vlascitchii.data_repository.data_source.remote.RemoteSearchDataSource
 import com.vlascitchii.data_repository.data_source.remote.RemoteVideoListDataSource
 import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse
 import com.vlascitchii.domain.repository.VideoListRepository
-import com.vlascitchii.domain.util.UseCaseException
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onEach
 import java.time.OffsetDateTime
 
@@ -24,10 +22,6 @@ class VideoListRepositoryImpl(
                     youtubeVideoResponse,
                     OffsetDateTime.now()
                 )
-            }.catch {
-                localVideoListDataSource.getVideosFromDatabase(nextPageToken)
-                //TODO: check if it is a correct solution
-                throw it
             }
     }
 
@@ -41,10 +35,6 @@ class VideoListRepositoryImpl(
                     youtubeVideoResponse,
                     OffsetDateTime.now()
                 )
-            }.catch {
-                localVideoListDataSource.getVideosFromDatabase(nextPageToken)
-                //TODO: check if it is a correct solution
-                throw it
             }
     }
 }

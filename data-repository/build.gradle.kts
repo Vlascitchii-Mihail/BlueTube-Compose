@@ -1,8 +1,6 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin)
-//    alias(libs.plugins.ksp)
-//    alias(libs.plugins.hilt.plugin)
 }
 
 android {
@@ -46,12 +44,11 @@ dependencies {
     implementation(libs.paging)
     implementation(libs.paging.compose)
 
-    //dagger hilt
-//    implementation(libs.hilt.android)
-//    ksp(libs.ksp.hilt.compiler)
-//    implementation(libs.hilt.navigation)
-
     testImplementation(libs.junit)
+    testImplementation(libs.mockito)
+    testImplementation(libs.mockito.inline)
+    testImplementation(libs.test.coroutines)
+
     androidTestImplementation(libs.androidx.test.ext)
     androidTestImplementation(libs.androidx.test.espresso)
 }

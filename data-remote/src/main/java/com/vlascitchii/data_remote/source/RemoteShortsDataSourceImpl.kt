@@ -41,6 +41,6 @@ class RemoteShortsDataSourceImpl @Inject constructor(
             )
         }
     }.catch {
-        throw it
+        throw UseCaseException.ShortsLoadException(it)
     }.flowOn(videoCoroutineScope.dispatcher)
 }

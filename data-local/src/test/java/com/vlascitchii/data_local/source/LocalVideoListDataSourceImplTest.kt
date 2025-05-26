@@ -1,13 +1,13 @@
 package com.vlascitchii.data_local.source
 
 import com.vlascitchii.data_local.database.convertToLocalYoutubeVideoResponseEntity
-import com.vlascitchii.data_local.enetity.video_list.videos.YoutubeVideoResponseEntity.Companion.testDateTime
 import com.vlascitchii.data_local.source.utils.DatabaseContentManager
 import com.vlascitchii.data_local.source.utils.rule.DispatcherTestRule
 import com.vlascitchii.data_repository.data_source.local.LocalVideoListDataSource
 import com.vlascitchii.domain.custom_coroutine_scopes.AppCoroutineScope
 import com.vlascitchii.domain.custom_coroutine_scopes.VideoCoroutineScope
 import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse.Companion.RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG
+import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse.Companion.testDateTime
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
