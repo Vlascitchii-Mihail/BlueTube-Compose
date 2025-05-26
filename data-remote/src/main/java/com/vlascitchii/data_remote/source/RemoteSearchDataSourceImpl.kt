@@ -60,7 +60,7 @@ class RemoteSearchDataSourceImpl @Inject constructor(
                 )
             }
         }.catch {
-            throw it
+            throw UseCaseException.SearchLoadException(it)
         }.flowOn(videoCoroutineScope.dispatcher)
 
     private fun SearchVideoResponseApiModel.deleteFirstSameVideo(): SearchVideoResponseApiModel {

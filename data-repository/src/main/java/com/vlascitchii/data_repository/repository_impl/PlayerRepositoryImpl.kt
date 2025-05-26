@@ -22,10 +22,6 @@ class PlayerRepositoryImpl(
                     youtubeVideoResponse,
                     OffsetDateTime.now()
                 )
-            }.catch {
-                localVideoListDataSource.getVideosFromDatabase(nextPageToken)
-                //TODO: check if it is a correct solution
-                throw it
             }
     }
 }

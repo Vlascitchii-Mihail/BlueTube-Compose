@@ -1,10 +1,10 @@
 package com.vlascitchii.data_local.database
 
-import com.vlascitchii.data_local.enetity.video_list.videos.YoutubeVideoResponseEntity
 import com.vlascitchii.data_local.enetity.video_list.videos.YoutubeVideoResponseEntity.Companion.TEST_DATABASE_VIDEO_RESPONSE
 import com.vlascitchii.data_local.source.utils.assertListEqualsTo
 import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse.Companion.RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG
-import org.junit.Assert.*
+import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse.Companion.testDateTime
+import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class ConverterTest {
@@ -14,7 +14,7 @@ class ConverterTest {
 
     @Test
     fun `fromOffsetDateTime() converts OffsetDateTime to string`() {
-        val result = dbConverter.fromOffsetDateTime(YoutubeVideoResponseEntity.testDateTime)
+        val result = dbConverter.fromOffsetDateTime(testDateTime)
 
         assertEquals(dateInString, result)
 
@@ -24,7 +24,7 @@ class ConverterTest {
     fun `toOffsetDateTime() converts dateInString to OffsetDateTime`() {
         val result = dbConverter.toOffsetDateTime(dateInString)
 
-        assertEquals(YoutubeVideoResponseEntity.testDateTime, result)
+        assertEquals(testDateTime, result)
     }
 
     @Test
