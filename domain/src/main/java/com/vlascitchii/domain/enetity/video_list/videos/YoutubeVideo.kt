@@ -2,7 +2,6 @@ package com.vlascitchii.domain.enetity.video_list.videos
 
 import com.vlascitchii.domain.enetity.video_list.ThumbnailAttributes
 import com.vlascitchii.domain.enetity.video_list.Thumbnails
-import java.time.OffsetDateTime
 
 data class YoutubeVideo(
     val id: String,
@@ -10,7 +9,6 @@ data class YoutubeVideo(
     var snippet: VideoSnippet = VideoSnippet(),
     var statistics: VideoStatistics = VideoStatistics(),
     var contentDetails: ContentDetails = ContentDetails(),
-//    var loadedDate: OffsetDateTime? = null
 ) {
 
     companion object {

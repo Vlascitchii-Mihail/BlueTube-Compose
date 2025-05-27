@@ -8,8 +8,8 @@ import com.vlascitchii.domain.util.UseCaseException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 
-class CommonPagerPager(
-    private val executeUseCase: (String) -> Flow<YoutubeVideoResponse>
+class CommonPager(
+    private val executeRepository: (String) -> Flow<YoutubeVideoResponse>
 ) : PagingSource<String, YoutubeVideo>() {
 
     override fun getRefreshKey(state: PagingState<String, YoutubeVideo>): String? {
@@ -22,7 +22,7 @@ class CommonPagerPager(
         val nextPageToken = params.key ?: ""
 
         return try {
-            val youtubeVideoResponse = executeUseCase(nextPageToken).first()
+            val youtubeVideoResponse = executeRepository(nextPageToken).first()
 
             LoadResult.Page(
                 data = youtubeVideoResponse.items,
