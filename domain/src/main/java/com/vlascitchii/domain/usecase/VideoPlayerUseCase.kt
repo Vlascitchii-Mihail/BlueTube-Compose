@@ -3,7 +3,7 @@ package com.vlascitchii.domain.usecase
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideo
-import com.vlascitchii.domain.paging.CommonPagerPager
+import com.vlascitchii.domain.paging.CommonPager
 import com.vlascitchii.domain.repository.PlayerRepository
 import com.vlascitchii.domain.usecase.util.Configuration
 import kotlinx.coroutines.flow.Flow
@@ -24,7 +24,7 @@ class VideoPlayerUseCase(
                 prefetchDistance = 15
             ),
             pagingSourceFactory = {
-                CommonPagerPager { pageToken: String ->
+                CommonPager { pageToken: String ->
                     request.pageToken = pageToken
                     playerRepository.getSearchRelayedVideos(request.query, request.pageToken)
                 }
