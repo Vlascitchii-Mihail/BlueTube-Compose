@@ -38,8 +38,8 @@ import com.vlascitchii.data_local.enetity.video_list.videos.YoutubeVideoEntity.C
 import com.vlascitchii.data_remote.enetity_api_model.video_list_api_model.videos_api_model.YoutubeVideoResponseApiModel
 import com.vlascitchii.data_remote.enetity_api_model.video_list_api_model.videos_api_model.YoutubeVideoResponseApiModel.Companion.RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG
 import com.vlascitchii.presentation_common.utils.Core.CHANNEL_PREVIEW_IMG
-import com.vlascitchii.presentation_common.utils.VideoListScreenTags
-import com.vlascitchii.presentation_common.utils.VideoPlayerScreenTags
+import com.vlascitchii.presentation_video_list.screen.ui.ListScreenAppBar
+import com.vlascitchii.presentation_video_list.util.state.SearchState
 //import dagger.hilt.android.testing.HiltAndroidRule
 //import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -62,8 +62,8 @@ class VideoListScreenKtTest {
     @get:Rule
     val dispatcherTestRule = com.vlascitchii.data_local.rule.DispatcherTestRule()
 
-    private val testSearchState: MutableStateFlow<com.vlascitchii.presentation_video_list.search_video.SearchState> = MutableStateFlow(
-        com.vlascitchii.presentation_video_list.search_video.SearchState.CLOSED)
+    private val testSearchState: MutableStateFlow<SearchState> = MutableStateFlow(
+        SearchState.CLOSED)
     private val testSearchTextState: MutableStateFlow<String> = MutableStateFlow("")
     private lateinit var navController: TestNavHostController
     private var video = RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.items.first()
@@ -90,7 +90,7 @@ class VideoListScreenKtTest {
                             context = composeAndroidTestRule.activity.applicationContext
                         ).observe(),
                         listScreenAppBar = {
-                            com.vlascitchii.presentation_video_list.video_list_screen.ListScreenAppBar(
+                            ListScreenAppBar(
                                 searchViewState = testSearchState,
                                 searchTextState = testSearchTextState,
                                 scrollAppBarBehaviour = TopAppBarDefaults.enterAlwaysScrollBehavior(
@@ -108,7 +108,7 @@ class VideoListScreenKtTest {
                                         )
                                     )
                                 },
-                                updateSearchState = { newSearchState: com.vlascitchii.presentation_video_list.search_video.SearchState ->
+                                updateSearchState = { newSearchState: SearchState ->
                                     testSearchState.value = newSearchState
                                 }
                             )

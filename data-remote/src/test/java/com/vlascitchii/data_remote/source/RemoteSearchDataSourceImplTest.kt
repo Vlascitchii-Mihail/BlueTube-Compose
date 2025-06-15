@@ -19,8 +19,11 @@ import com.vlascitchii.data_repository.data_source.remote.RemoteSearchDataSource
 import com.vlascitchii.domain.custom_coroutine_scopes.AppCoroutineScope
 import com.vlascitchii.domain.custom_coroutine_scopes.VideoCoroutineScope
 import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse.Companion.RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG
+import com.vlascitchii.domain.util.UseCaseException
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -46,8 +49,6 @@ class RemoteSearchDataSourceImplTest {
         videoCoroutineScope = VideoCoroutineScope(dispatcher = dispatcherTestRule.testDispatcher)
         remoteSearchDataSource = RemoteSearchDataSourceImpl(searchApiService, videoCoroutineScope)
         mockWebServerScheduler = mockWebServerApiProvider.mockWebServerScheduler
-
-        initMockWebResponse()
     }
 
     @After
@@ -77,6 +78,8 @@ class RemoteSearchDataSourceImplTest {
 
     @Test
     fun `search() returns a YoutubeVideoResponse with proper video URL and ID`() = runTest {
+        initMockWebResponse()
+
         val searchVideoResponse = remoteSearchDataSource.search("Test query", "Test page token").first()
 
         val expectedChannelURLList = RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.items.map { video -> video.snippet.channelImgUrl }
@@ -91,6 +94,8 @@ class RemoteSearchDataSourceImplTest {
 
     @Test
     fun `searchRelatedVideos() deletes the first same video from the result`() = runTest {
+        initMockWebResponse()
+
         val searchVideoResponse =
             remoteSearchDataSource.searchRelatedVideos("Test query", "TEst page token").first()
         val actualItemSize = searchVideoResponse.items.size
@@ -101,11 +106,22 @@ class RemoteSearchDataSourceImplTest {
 
     @Test
     fun `searchVideos() doesn't delete the first the same video from the result`() = runTest {
+        initMockWebResponse()
+
         val searchVideoResponse =
             remoteSearchDataSource.searchVideos("Test query", "TEst page token")
         val actualItemSize = searchVideoResponse.first().items.size
         val expectedItemsSize = 5
 
         assertEquals(expectedItemsSize, actualItemSize)
+    }
+
+    @Test
+    fun `fun search() returns UseCaseException`() = runTest {
+        mockWebServerScheduler.enqueueError()
+
+        remoteSearchDataSource.search("Test query", "Test page token").catch { error: Throwable ->
+            assertTrue(error is UseCaseException.SearchLoadException)
+        }.collect()
     }
 }

@@ -1,10 +1,11 @@
 package com.vlascitchii.domain.repository
 
-import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse
+import androidx.paging.PagingData
+import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideo
 import kotlinx.coroutines.flow.Flow
 
 interface VideoListRepository {
 
-    fun getVideos(nextPageToken: String): Flow<YoutubeVideoResponse>
-    fun getSearchVideos(query: String, nextPageToken: String): Flow<YoutubeVideoResponse>
+    fun getPopularVideos(): Flow<PagingData<YoutubeVideo>>
+    fun getSearchVideos(query: String): Flow<PagingData<YoutubeVideo>>
 }

@@ -22,6 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -32,15 +33,17 @@ import com.appelier.bluetubecompose.navigation.bottom_navigation.BlueTubeBottomN
 import com.vlascitchii.data_local.enetity.video_list.videos.YoutubeVideoEntity
 import com.vlascitchii.presentation_common.entity.videos.YoutubeVideoUiModel
 import com.vlascitchii.presentation_common.network_observer.ObserveAsEvents
+import com.vlascitchii.presentation_common.ui.video_list.YouTubeVideoList
 import com.vlascitchii.presentation_common.utils.SnackbarController
 import com.vlascitchii.presentation_player.screen_player.screen.PlayerScreen
 import com.vlascitchii.presentation_player.screen_player.screen.VideoPlayerViewModel
 import com.vlascitchii.presentation_shorts.screen_shorts.screen.ShortsScreen
 import com.vlascitchii.presentation_shorts.screen_shorts.screen.ShortsViewModel
-import com.vlascitchii.presentation_video_list.screen_video_list.screen.VideoListScreen
-import com.vlascitchii.presentation_video_list.screen_video_list.screen.VideoListViewModel
-import com.vlascitchii.presentation_video_list.video_list_screen.ListScreenAppBar
-import com.vlascitchii.presentation_common.ui.video_list.YouTubeVideoList
+import com.vlascitchii.presentation_video_list.screen.VideoListScreen
+import com.vlascitchii.presentation_video_list.screen.VideoListViewModel
+import com.vlascitchii.presentation_video_list.screen.ui.ListScreenAppBar
+import com.vlascitchii.presentation_video_list.util.state.SearchState
+import com.vlascitchii.presentation_video_list.util.state.VideoType
 import com.vlascitchii.presenttion_settings.screen_settings.SettingsScreen
 import kotlinx.coroutines.launch
 import kotlin.reflect.typeOf
@@ -87,15 +90,23 @@ fun YouTubeNavigation(
         ) {
             NavHost(
                 navController = navController,
-                startDestination = ScreenType.VideoList,
+                startDestination = ScreenType.VideoList(VideoType.PopularVideo),
                 modifier = Modifier
 //                    .testTag(NAVIGATION)
                     .align(Alignment.TopCenter)
             ) {
-                composable<ScreenType.VideoList> {
+                composable<ScreenType.VideoList>(
+                    typeMap = mapOf(
+                        typeOf<VideoType>() to CustomNavTypeSerializer(
+                            VideoType::class.java,
+                            VideoType.serializer()
+                        )
+                    )
+                ) { navBackStackEntry: NavBackStackEntry ->
+                    val videoTypeArg = navBackStackEntry.toRoute<ScreenType.VideoList>().videoType
                     val videoListViewModel: VideoListViewModel = hiltViewModel()
                     //check if this function calls many times
-                    videoListViewModel.fetchPopularVideos()
+                    videoListViewModel.fetchVideoPagingData(videoTypeArg)
                     VideoListScreen(
                         connectivityStatus = videoListViewModel.connectivityObserver,
                         listScreenAppBar = { scrollAppBarBehaviour: TopAppBarScrollBehavior ->
@@ -108,8 +119,14 @@ fun YouTubeNavigation(
                                         searchInput
                                     )
                                 },
-                                onSearchClicked = { videoListViewModel.setSearchVideosFlow() },
-                                updateSearchState = { newSearchState: com.vlascitchii.presentation_video_list.search_video.SearchState ->
+                                onSearchClicked = {
+                                    navController.navigate(
+                                        ScreenType.VideoList(
+                                            VideoType.SearchVideo(videoListViewModel.searchTextState.value)
+                                        )
+                                    )
+                                },
+                                updateSearchState = { newSearchState: SearchState ->
                                     videoListViewModel.updateSearchState(
                                         newSearchState
                                     )
@@ -119,7 +136,8 @@ fun YouTubeNavigation(
                         videoList = { padding: PaddingValues ->
                             val windowSizeClass = LocalWindowSizeClass.current.widthSizeClass
                             YouTubeVideoList(
-                                getVideoState = { videoListViewModel.getVideos() },
+                                videosFlow = videoListViewModel.videoStateFlow,
+//                                videosFlow = { videoListViewModel.getVideos() },
                                 innerPadding = padding,
                                 localWindowSizeClass = windowSizeClass,
                                 navigateToPlayerScreen = { video: YoutubeVideoUiModel ->
@@ -131,7 +149,7 @@ fun YouTubeNavigation(
                 }
                 composable<ScreenType.PlayerScreen>(
                     typeMap = mapOf(
-                        typeOf<YoutubeVideoEntity>() to CustomNavTypeSerializer(
+                        typeOf<YoutubeVideoUiModel>() to CustomNavTypeSerializer(
                             YoutubeVideoUiModel::class.java,
                             YoutubeVideoUiModel.serializer()
                         )
@@ -196,7 +214,8 @@ fun YouTubeNavigation(
 
             val snackbarDescription = stringResource(R.string.snackbar_description)
             SnackbarHost(
-                modifier = Modifier.align(Alignment.BottomCenter)
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
                     .semantics { contentDescription = snackbarDescription },
                 hostState = snackbarHostState
             )

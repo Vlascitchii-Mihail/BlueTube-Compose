@@ -32,11 +32,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "11"
     }
     buildFeatures {
         buildConfig = true
@@ -74,6 +74,7 @@ dependencies {
     testImplementation(libs.mockwebserver)
     testImplementation(libs.mockito)
     testImplementation(libs.mockito.inline)
+    testImplementation(libs.kotlin.test)
 
     //android test
     androidTestImplementation(libs.androidx.test.ext)

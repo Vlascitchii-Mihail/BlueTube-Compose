@@ -4,13 +4,9 @@ import com.vlascitchii.data_remote.enetity_api_model.video_list_api_model.videos
 import com.vlascitchii.data_remote.enetity_api_model.video_search_api_model.SearchVideoItemApiModel
 import com.vlascitchii.data_remote.networking.service.ParticularVideoApiService
 import com.vlascitchii.domain.custom_coroutine_scopes.AppCoroutineScope
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.withContext
 
 interface RemoteConverter {
 
@@ -18,9 +14,9 @@ interface RemoteConverter {
     val remoteConverterDataScope: AppCoroutineScope
 
     //TODO: try to migrate to the kotlin flows
-    suspend fun List<SearchVideoItemApiModel>.convertToVideosList(): List<YoutubeVideoApiModel> =
+    suspend fun List<SearchVideoItemApiModel>.convertToApiVideosList(): List<YoutubeVideoApiModel> =
         coroutineScope {
-            this@convertToVideosList.map { searchedVideoApiModel ->
+            this@convertToApiVideosList.map { searchedVideoApiModel ->
                 async {
                     searchedVideoApiModel.convertToVideo()
                 }

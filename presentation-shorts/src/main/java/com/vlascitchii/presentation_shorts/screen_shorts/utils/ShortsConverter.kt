@@ -1,30 +1,15 @@
 package com.vlascitchii.presentation_shorts.screen_shorts.utils
 
-import androidx.paging.Pager
 import androidx.paging.PagingData
-import androidx.paging.cachedIn
-import com.vlascitchii.domain.custom_coroutine_scopes.AppCoroutineScope
-import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideo
 import com.vlascitchii.domain.usecase.ShortsUseCase
 import com.vlascitchii.presentation_common.entity.util.CommonResultConverter
 import com.vlascitchii.presentation_common.entity.videos.YoutubeVideoUiModel
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
-import javax.inject.Named
 
-class ShortsConverter @Inject constructor(
-    @Named("video")
-    private val videoCoroutineScope: AppCoroutineScope
-) : CommonResultConverter<ShortsUseCase.Response, StateFlow<PagingData<YoutubeVideoUiModel>>>() {
+class ShortsConverter @Inject constructor()
+    : CommonResultConverter<ShortsUseCase.Response, PagingData<YoutubeVideoUiModel>>() {
 
-    override fun convertSuccess(data: ShortsUseCase.Response): StateFlow<PagingData<YoutubeVideoUiModel>> {
-        return convertResultPager(data.pager)
-    }
-
-    private fun convertResultPager(pager: Pager<String, YoutubeVideo>): StateFlow<PagingData<YoutubeVideoUiModel>> {
-        return convertPager(pager).cachedIn(videoCoroutineScope)
-            .stateIn(videoCoroutineScope, SharingStarted.Lazily, PagingData.empty())
+    override fun convertSuccess(data: ShortsUseCase.Response): PagingData<YoutubeVideoUiModel> {
+        return convertPager(data.shortsPopularVideoPagingData)
     }
 }

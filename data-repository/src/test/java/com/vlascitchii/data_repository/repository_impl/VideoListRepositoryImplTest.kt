@@ -3,26 +3,28 @@ package com.vlascitchii.data_repository.repository_impl
 import com.vlascitchii.data_repository.data_source.local.LocalVideoListDataSource
 import com.vlascitchii.data_repository.data_source.remote.RemoteSearchDataSource
 import com.vlascitchii.data_repository.data_source.remote.RemoteVideoListDataSource
-import com.vlascitchii.data_repository.rule.DispatcherTestRule
-import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse
+import com.vlascitchii.data_repository.util.DispatcherTestRule
+import com.vlascitchii.data_repository.util.TestPagingDataDiffer
+import com.vlascitchii.data_repository.util.assertListEqualsTo
 import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse.Companion.RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class VideoListRepositoryImplTest {
 
     @get:Rule
-    val dispatcherTestRule = DispatcherTestRule()
+    var dispatcherTestRule = DispatcherTestRule()
 
     private val remoteVideoListDataSource: RemoteVideoListDataSource = mock()
     private val remoteSearchDataSource: RemoteSearchDataSource = mock()
@@ -36,40 +38,59 @@ class VideoListRepositoryImplTest {
 
     private val initialPageToken = ""
     private val testQuery = "Test query"
-    private val expectedResult = flowOf(RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG)
+    private val expectedDataSourceResult = flowOf(RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG)
+    private val testPagingDataDiffer = TestPagingDataDiffer(dispatcherTestRule.testDispatcher).pagingDiffer
 
     @Before
     fun init() {
         whenever(remoteVideoListDataSource.fetchVideos(initialPageToken))
-            .thenReturn(expectedResult)
+            .thenReturn(expectedDataSourceResult)
 
         whenever(remoteSearchDataSource.searchVideos(testQuery, initialPageToken))
-            .thenReturn(expectedResult)
+            .thenReturn(expectedDataSourceResult)
     }
 
     @Test
-    fun `fun getVideos() returns correct Flow with YoutubeVideoResponse`() = runTest {
-        val actualResult = videoListRepositoryImpl.getVideos(initialPageToken)
-        assertEquals(expectedResult.first(), actualResult.first())
+    fun fun_getPopularVideos_returns_Flow_which_is_not_empty() = runTest {
+        val pagingData = videoListRepositoryImpl.getPopularVideos().first()
+        val testJob = launch { testPagingDataDiffer.submitData(pagingData) }
+
+        advanceUntilIdle()
+        testJob.cancel()
+
+        assertTrue(testPagingDataDiffer.snapshot().isNotEmpty())
     }
 
     @Test
-    fun `fun getVideos() inserts each received videos into DB`() = runTest {
-        videoListRepositoryImpl.getVideos(initialPageToken).collect()
+    fun fun_getPopularVideos_returns_correctFlow_with_PagingData_YoutubeVideo() = runTest {
+        val pagingData = videoListRepositoryImpl.getPopularVideos().first()
+        val testJob = launch { testPagingDataDiffer.submitData(pagingData) }
 
-        verify(localVideoListDataSource).insertVideosToDatabaseWithTimeStamp(any<YoutubeVideoResponse>(), any())
+        advanceUntilIdle()
+        testJob.cancel()
+
+        RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.items.assertListEqualsTo(testPagingDataDiffer.snapshot())
     }
 
     @Test
-    fun `fun getSearchVideos() returns videos by query`() = runTest {
-        val actualResult = videoListRepositoryImpl.getSearchVideos(testQuery, initialPageToken)
-        assertEquals(expectedResult.first(), actualResult.first())
+    fun fun_getSearchVideos_returns_Flow_which_is_not_empty() = runTest {
+        val pagingData = videoListRepositoryImpl.getSearchVideos(testQuery).first()
+        val testJob = launch { testPagingDataDiffer.submitData(pagingData) }
+
+        advanceUntilIdle()
+        testJob.cancel()
+
+        assertTrue(testPagingDataDiffer.snapshot().isNotEmpty())
     }
 
     @Test
-    fun `fun getSearchVideos() inserts each received videos into DB`() = runTest {
-        videoListRepositoryImpl.getSearchVideos(testQuery, initialPageToken).collect()
+    fun fun_getSearchVideos_returns_videos_by_query() = runTest {
+        val pagingData = videoListRepositoryImpl.getSearchVideos(testQuery).first()
+        val testJob = launch { testPagingDataDiffer.submitData(pagingData) }
 
-        verify(localVideoListDataSource).insertVideosToDatabaseWithTimeStamp(any<YoutubeVideoResponse>(), any())
+        advanceUntilIdle()
+        testJob.cancel()
+
+        RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.items.assertListEqualsTo(testPagingDataDiffer.snapshot())
     }
 }

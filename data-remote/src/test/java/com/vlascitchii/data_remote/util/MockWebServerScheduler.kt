@@ -39,4 +39,9 @@ class MockWebServerScheduler(private val mockWebServer: MockWebServer) {
     private fun readJson(jsonFilePath: String): String {
         return File(jsonFilePath).readText(Charsets.UTF_8)
     }
+
+    fun enqueueError() {
+        val videoResponse = MockResponse().setResponseCode(500).setBody("Test error")
+        mockWebServer.enqueue(videoResponse)
+    }
 }
