@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import com.vlascitchii.domain.usecase.VideoPlayerUseCase
+import com.vlascitchii.domain.util.VideoResult
 import com.vlascitchii.presentation_common.entity.videos.YoutubeVideoUiModel
 import com.vlascitchii.presentation_common.network_observer.ConnectivityStatus
 import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityObserver
@@ -27,10 +28,9 @@ class VideoPlayerViewModel @Inject constructor(
     private val networkConnectivityObserver: NetworkConnectivityObserver
 ) : ViewModel() {
 
-    private val emptyPagingData = PagingData.empty<YoutubeVideoUiModel>()
-    private var _relatedVideoStateFlow: MutableStateFlow<UiState<StateFlow<PagingData<YoutubeVideoUiModel>>>> =
-        MutableStateFlow<UiState<StateFlow<PagingData<YoutubeVideoUiModel>>>>(UiState.Loading)
-    val relatedVideoStateFlow: StateFlow<UiState<StateFlow<PagingData<YoutubeVideoUiModel>>>> get() = _relatedVideoStateFlow
+    private var _relatedVideoStateFlow: MutableStateFlow<UiState<PagingData<YoutubeVideoUiModel>>> =
+        MutableStateFlow<UiState<PagingData<YoutubeVideoUiModel>>>(UiState.Loading)
+    val relatedVideoStateFlow: StateFlow<UiState<PagingData<YoutubeVideoUiModel>>> get() = _relatedVideoStateFlow
 
     private var videoPlaybackPosition: Float = INITIAL_VIDEO_PLAYBACK_POSITION
 
@@ -54,13 +54,20 @@ class VideoPlayerViewModel @Inject constructor(
 
     fun getSearchedRelatedVideos(query: String) {
         viewModelScope.launch {
-            if (_relatedVideoStateFlow.value == emptyPagingData) {
-                videoPlayerUseCase.execute(VideoPlayerUseCase.Request(query)).map {
-                    videoPlayerConverter.convert(it)
-                }.collect {
-                    _relatedVideoStateFlow.value = it
+            videoPlayerUseCase.execute(VideoPlayerUseCase.Request(query))
+                .map { playerSearchVideoResult: VideoResult<VideoPlayerUseCase.Response> ->
+                    videoPlayerConverter.convert(playerSearchVideoResult)
+                }.collect { uiState->
+                    _relatedVideoStateFlow.value = uiState
                 }
-            }
+
+//            if (_relatedVideoStateFlow.value == emptyPagingData) {
+//                videoPlayerUseCase.execute(VideoPlayerUseCase.Request(query)).map {
+//                    videoPlayerConverter.convert(it)
+//                }.collect {
+//                    _relatedVideoStateFlow.value = it
+//                }
+//            }
         }
     }
 

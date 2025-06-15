@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt.plugin)
+    alias(libs.plugins.kotlinx.serialization)
+    alias(libs.plugins.parcelize)
 }
 
 android {
@@ -31,11 +33,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "11"
     }
 }
 
@@ -53,12 +55,16 @@ dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.compose.ui)
     implementation(libs.ui.graphics)
+    debugImplementation(libs.compose.ui.tooling)
     implementation(libs.ui.tooling.preview)
     implementation(libs.material3)
     implementation(libs.androidx.material)
     implementation(libs.constraint.layout.compose)
     implementation(libs.constraint.layout.xml)
     implementation(libs.window.configuration)
+
+    //serialization
+    implementation(libs.kotlinx.serialization.json)
 
     //Paging
     implementation(libs.paging)
@@ -68,7 +74,13 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.ksp.hilt.compiler)
 
+    //unit test
     testImplementation(libs.junit)
+    testImplementation(libs.mockito)
+    testImplementation(libs.mockito.inline)
+    testImplementation(libs.test.coroutines)
+
+    //androidTest
     androidTestImplementation(libs.androidx.test.ext)
     androidTestImplementation(libs.androidx.test.espresso)
     androidTestImplementation(libs.espresso.device)

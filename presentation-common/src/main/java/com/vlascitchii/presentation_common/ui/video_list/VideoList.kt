@@ -26,6 +26,7 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
+import com.vlascitchii.presentation_common.entity.videos.YoutubeVideoResponseUiModel
 import com.vlascitchii.presentation_common.entity.videos.YoutubeVideoUiModel
 import com.vlascitchii.presentation_common.entity.videos.YoutubeVideoUiModel.Companion.DEFAULT_VIDEO_LIST
 import com.vlascitchii.presentation_common.ui.PagerContentManager
@@ -34,20 +35,19 @@ import com.vlascitchii.presentation_common.ui.screen.CommonScreen
 import com.vlascitchii.presentation_common.ui.state.UiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flowOf
 
 @Composable
 fun YouTubeVideoList(
     modifier: Modifier = Modifier,
-    getVideoState: () -> StateFlow<UiState<StateFlow<PagingData<YoutubeVideoUiModel>>>>,
+    videosFlow: StateFlow<UiState<PagingData<YoutubeVideoUiModel>>>,
     innerPadding: PaddingValues = PaddingValues(0.dp),
     localWindowSizeClass: WindowWidthSizeClass = WindowWidthSizeClass.Compact,
     navigateToPlayerScreen: (YoutubeVideoUiModel) -> Unit,
 ) {
-    val videosFlow = getVideoState.invoke()
-
-    videosFlow.collectAsStateWithLifecycle().value.let { uiStatePagingData: UiState<StateFlow<PagingData<YoutubeVideoUiModel>>> ->
-        CommonScreen(uiStatePagingData) { pagingData: StateFlow<PagingData<YoutubeVideoUiModel>> ->
-            val videosPagingItem = pagingData.collectAsLazyPagingItems()
+    videosFlow.collectAsStateWithLifecycle().value.let { uiStateVideoList: UiState<PagingData<YoutubeVideoUiModel>> ->
+        CommonScreen(uiStateVideoList) { pagingData: PagingData<YoutubeVideoUiModel> ->
+            val lazyVideosPagingItem = flowOf(pagingData).collectAsLazyPagingItems()
 
             val keyboardController = LocalSoftwareKeyboardController.current
             val nestedScrollConnection = remember {
@@ -63,10 +63,10 @@ fun YouTubeVideoList(
             }
 
             PagerContentManager(
-                videoState = videosPagingItem,
+                videoState = lazyVideosPagingItem,
                 contentList = {
                     ItemsList(
-                        videosPagingItem,
+                        lazyVideosPagingItem,
                         modifier,
                         navigateToPlayerScreen,
                         localWindowSizeClass
@@ -155,17 +155,7 @@ fun ItemsList(
 private fun YouTubeVideoListCompactPreview() {
     YouTubeVideoList(
         modifier = Modifier,
-        getVideoState = {
-            MutableStateFlow(
-                UiState.Success(
-                    MutableStateFlow(
-                        PagingData.from(
-                            DEFAULT_VIDEO_LIST
-                        )
-                    )
-                )
-            )
-        },
+        videosFlow = MutableStateFlow(UiState.Success(PagingData.from(DEFAULT_VIDEO_LIST))),
         PaddingValues(8.dp),
         localWindowSizeClass = WindowWidthSizeClass.Compact
     ) {}
@@ -176,17 +166,7 @@ private fun YouTubeVideoListCompactPreview() {
 private fun YouTubeVideoListMediumPreview() {
     YouTubeVideoList(
         modifier = Modifier,
-        getVideoState = {
-            MutableStateFlow(
-                UiState.Success(
-                    MutableStateFlow(
-                        PagingData.from(
-                            DEFAULT_VIDEO_LIST
-                        )
-                    )
-                )
-            )
-        },
+        videosFlow = MutableStateFlow(UiState.Success(PagingData.from(DEFAULT_VIDEO_LIST))),
         PaddingValues(8.dp),
         localWindowSizeClass = WindowWidthSizeClass.Medium
     ) {}
@@ -197,17 +177,7 @@ private fun YouTubeVideoListMediumPreview() {
 private fun YouTubeVideoListExpandedPreview() {
     YouTubeVideoList(
         modifier = Modifier,
-        getVideoState = {
-            MutableStateFlow(
-                UiState.Success(
-                    MutableStateFlow(
-                        PagingData.from(
-                            DEFAULT_VIDEO_LIST
-                        )
-                    )
-                )
-            )
-        },
+        videosFlow = MutableStateFlow(UiState.Success(PagingData.from(DEFAULT_VIDEO_LIST))),
         PaddingValues(8.dp),
         localWindowSizeClass = WindowWidthSizeClass.Expanded
     ) {}

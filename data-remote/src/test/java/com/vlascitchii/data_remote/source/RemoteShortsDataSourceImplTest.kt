@@ -20,7 +20,10 @@ import com.vlascitchii.data_remote.util.SEARCH_RESPONSE_PATH
 import com.vlascitchii.data_repository.data_source.remote.RemoteShortsDataSource
 import com.vlascitchii.domain.custom_coroutine_scopes.AppCoroutineScope
 import com.vlascitchii.domain.custom_coroutine_scopes.VideoCoroutineScope
+import com.vlascitchii.domain.util.UseCaseException
 import junit.framework.TestCase.assertTrue
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -35,17 +38,15 @@ class RemoteShortsDataSourceImplTest {
 
     private lateinit var shortsApiService: ShortsApiService
     private lateinit var videoCoroutineScope: AppCoroutineScope
-    private lateinit var remoteSearchDatsSource: RemoteShortsDataSource
+    private lateinit var remoteShortsDatsSource: RemoteShortsDataSource
     private lateinit var mockWebServerScheduler: MockWebServerScheduler
 
     @Before
     fun initResponse() {
         shortsApiService = mockWebServerApiProvider.provideMockShortsApiService()
         videoCoroutineScope = VideoCoroutineScope(dispatcher = dispatcherTestRule.testDispatcher)
-        remoteSearchDatsSource = RemoteShortsDataSourceImpl(shortsApiService, videoCoroutineScope)
+        remoteShortsDatsSource = RemoteShortsDataSourceImpl(shortsApiService, videoCoroutineScope)
         mockWebServerScheduler = mockWebServerApiProvider.mockWebServerScheduler
-
-       initMockWebResponse()
     }
 
     private fun initMockWebResponse() {
@@ -70,7 +71,8 @@ class RemoteShortsDataSourceImplTest {
 
     @Test
     fun `fetchShorts() returns YoutubeVideo List with proper ID`() = runTest {
-        val shortsResponse = remoteSearchDatsSource.fetchShorts("").first()
+        initMockWebResponse()
+        val shortsResponse = remoteShortsDatsSource.fetchShorts("").first()
 
         val expectedVideoIdList = DEFAULT_SEARCH_VIDEO_RESPONSE.items.map { video -> video.id.videoId }
         val actualVideoIdList = shortsResponse.items.map { video -> video.id }
@@ -80,11 +82,21 @@ class RemoteShortsDataSourceImplTest {
 
     @Test
     fun `fetchShorts() returns YoutubeVideo List with proper UrlID`() = runTest {
-        val shortsResponse = remoteSearchDatsSource.fetchShorts("").first()
+        initMockWebResponse()
+        val shortsResponse = remoteShortsDatsSource.fetchShorts("").first()
 
         val expectedChannelURLList = DEFAULT_SEARCH_VIDEO_RESPONSE_WITH_CHANNEL_IMG_URL.items.map { video -> video.snippet.channelImgUrl }
         val actualChannelURLList = shortsResponse.items.map { video -> video.snippet.channelImgUrl }
 
         assertTrue(expectedChannelURLList.containsAll(actualChannelURLList))
+    }
+
+    @Test
+    fun `fun fetchShorts() returns UseCaseException`() = runTest {
+        mockWebServerScheduler.enqueueError()
+
+        remoteShortsDatsSource.fetchShorts("Test page token").catch { error: Throwable ->
+            assertTrue(error is UseCaseException.ShortsLoadException)
+        }.collect()
     }
 }
