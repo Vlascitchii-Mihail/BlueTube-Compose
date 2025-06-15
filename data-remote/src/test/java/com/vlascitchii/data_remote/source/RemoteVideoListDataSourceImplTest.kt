@@ -15,7 +15,10 @@ import com.vlascitchii.domain.custom_coroutine_scopes.AppCoroutineScope
 import com.vlascitchii.domain.custom_coroutine_scopes.VideoCoroutineScope
 import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse
 import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse.Companion.RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG
+import com.vlascitchii.domain.util.UseCaseException
 import junit.framework.TestCase.assertTrue
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -23,6 +26,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.kotlin.spy
 
 @RunWith(MockitoJUnitRunner::class)
 class RemoteVideoListDataSourceImplTest {
@@ -39,12 +43,10 @@ class RemoteVideoListDataSourceImplTest {
     @Before
     fun init() {
         mockWebServerApiProvider = MockWebServerApiProvider()
-        videoListApiServiceMock = mockWebServerApiProvider.provideMockVideoListApiService()
+        videoListApiServiceMock = spy(mockWebServerApiProvider.provideMockVideoListApiService())
         videoCoroutineScope = VideoCoroutineScope(dispatcher = dispatcherTestRule.testDispatcher)
-        remoteVideoListDataSource = RemoteVideoListDataSourceImpl(videoListApiServiceMock, videoCoroutineScope,)
+        remoteVideoListDataSource = RemoteVideoListDataSourceImpl(videoListApiServiceMock, videoCoroutineScope)
         mockWebServerScheduler = mockWebServerApiProvider.mockWebServerScheduler
-
-        initMockWebResponse()
     }
 
     private fun initMockWebResponse() {
@@ -64,6 +66,7 @@ class RemoteVideoListDataSourceImplTest {
 
     @Test
     fun `fetchVideos() returns YoutubeVideo List with proper ID`() = runTest {
+        initMockWebResponse()
         val response: YoutubeVideoResponse = remoteVideoListDataSource.fetchVideos("").first()
 
         val expectedVideoIdList = RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.items.map { video -> video.id }
@@ -74,6 +77,7 @@ class RemoteVideoListDataSourceImplTest {
 
     @Test
     fun `fetchVideos() returns YoutubeVideo List with proper UrlID`() = runTest {
+        initMockWebResponse()
         val response: YoutubeVideoResponse = remoteVideoListDataSource.fetchVideos("").first()
 
         val expectedChannelURLList = RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.items.map { video -> video.snippet.channelImgUrl }
@@ -81,5 +85,13 @@ class RemoteVideoListDataSourceImplTest {
 
         assertTrue(expectedChannelURLList.containsAll(actualChannelURLList))
     }
-}
 
+    @Test
+    fun `fun fetchVideos() returns UseCaseException`() = runTest {
+        mockWebServerScheduler.enqueueError()
+
+        remoteVideoListDataSource.fetchVideos("").catch { error: Throwable ->
+            assertTrue(error is UseCaseException.VideoListLoadException)
+        }.collect()
+    }
+}

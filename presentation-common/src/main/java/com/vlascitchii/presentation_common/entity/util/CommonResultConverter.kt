@@ -1,6 +1,5 @@
 package com.vlascitchii.presentation_common.entity.util
 
-import androidx.paging.Pager
 import androidx.paging.PagingData
 import androidx.paging.map
 import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideo
@@ -12,7 +11,6 @@ import com.vlascitchii.presentation_common.entity.videos.VideoSnippetUiModel
 import com.vlascitchii.presentation_common.entity.videos.VideoStatisticsUiModel
 import com.vlascitchii.presentation_common.entity.videos.YoutubeVideoUiModel
 import com.vlascitchii.presentation_common.ui.state.UiState
-import kotlinx.coroutines.flow.map
 
 abstract class CommonResultConverter<T: Any, R: Any> {
 
@@ -29,50 +27,52 @@ abstract class CommonResultConverter<T: Any, R: Any> {
             }
         }
     }
-    fun convertPager(pager: Pager<String, YoutubeVideo>) = pager.flow.map { pagingData: PagingData<YoutubeVideo> ->
-        pagingData.map { youTubeVideo: YoutubeVideo ->
+
+    fun convertPager(youTubeVideoPagingData: PagingData<YoutubeVideo>): PagingData<YoutubeVideoUiModel> {
+        return youTubeVideoPagingData.map { youTubeVideo: YoutubeVideo ->
             youTubeVideo.convertToYoutubeVideoUiMode()
         }
     }
+}
 
 
-    fun YoutubeVideo.convertToYoutubeVideoUiMode(): YoutubeVideoUiModel {
-        val youTubeVideo: YoutubeVideo = this
 
-        val thumbnailsAttributesUiModel = ThumbnailAttributesUiModel(
-            url = youTubeVideo.snippet.thumbnails.medium.url,
-            height = youTubeVideo.snippet.thumbnails.medium.height,
-            width = youTubeVideo.snippet.thumbnails.medium.width
-        )
+fun YoutubeVideo.convertToYoutubeVideoUiMode(): YoutubeVideoUiModel {
+    val youTubeVideo: YoutubeVideo = this
 
-        val thumbnailsUiModel = ThumbnailsUiModel(
-            medium = thumbnailsAttributesUiModel
-        )
+    val thumbnailsAttributesUiModel = ThumbnailAttributesUiModel(
+        url = youTubeVideo.snippet.thumbnails.medium.url,
+        height = youTubeVideo.snippet.thumbnails.medium.height,
+        width = youTubeVideo.snippet.thumbnails.medium.width
+    )
 
-        val snippetUiModel = VideoSnippetUiModel(
-            title = youTubeVideo.id,
-            description = youTubeVideo.snippet.description,
-            publishedAt = youTubeVideo.snippet.publishedAt,
-            channelTitle = youTubeVideo.snippet.channelTitle,
-            channelImgUrl = youTubeVideo.snippet.channelImgUrl,
-            channelId = youTubeVideo.snippet.channelId,
-            thumbnailsUiModel = thumbnailsUiModel
-        )
+    val thumbnailsUiModel = ThumbnailsUiModel(
+        medium = thumbnailsAttributesUiModel
+    )
 
-        val videoStaticsUiModel = VideoStatisticsUiModel(
-            viewCount = youTubeVideo.statistics.viewCount,
-            likeCount = youTubeVideo.statistics.likeCount
-        )
-        val contentDetailsUiModel = ContentDetailsUiModel(
-            duration = youTubeVideo.contentDetails.duration
-        )
+    val snippetUiModel = VideoSnippetUiModel(
+        title = youTubeVideo.id,
+        description = youTubeVideo.snippet.description,
+        publishedAt = youTubeVideo.snippet.publishedAt,
+        channelTitle = youTubeVideo.snippet.channelTitle,
+        channelImgUrl = youTubeVideo.snippet.channelImgUrl,
+        channelId = youTubeVideo.snippet.channelId,
+        thumbnailsUiModel = thumbnailsUiModel
+    )
 
-        return YoutubeVideoUiModel(
-            id = youTubeVideo.id,
-            pageToken = youTubeVideo.pageToken,
-            snippet = snippetUiModel,
-            statistics = videoStaticsUiModel,
-            contentDetails = contentDetailsUiModel
-        )
-    }
+    val videoStaticsUiModel = VideoStatisticsUiModel(
+        viewCount = youTubeVideo.statistics.viewCount,
+        likeCount = youTubeVideo.statistics.likeCount
+    )
+    val contentDetailsUiModel = ContentDetailsUiModel(
+        duration = youTubeVideo.contentDetails.duration
+    )
+
+    return YoutubeVideoUiModel(
+        id = youTubeVideo.id,
+        pageToken = youTubeVideo.pageToken,
+        snippet = snippetUiModel,
+        statistics = videoStaticsUiModel,
+        contentDetails = contentDetailsUiModel
+    )
 }

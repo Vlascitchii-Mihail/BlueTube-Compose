@@ -66,7 +66,7 @@ class RemoteConverterTest {
         val expectedVideoList = RESPONSE_VIDEO_LIST_NO_CHANNEL_IMG_URL.convertToYouTubeVideoResponseApiModel().items
 
         with(remoteConverter) {
-            val convertedVideos = DEFAULT_SEARCH_VIDEO_RESPONSE.items.convertToVideosList()
+            val convertedVideos = DEFAULT_SEARCH_VIDEO_RESPONSE.items.convertToApiVideosList()
 
             assertTrue(expectedVideoList.containsAll(convertedVideos))
         }

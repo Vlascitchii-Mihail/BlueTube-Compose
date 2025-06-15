@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.vlascitchii.domain.usecase.ShortsUseCase
+import com.vlascitchii.domain.util.VideoResult
 import com.vlascitchii.presentation_common.entity.videos.YoutubeVideoUiModel
 import com.vlascitchii.presentation_common.network_observer.ConnectivityStatus
 import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityObserver
@@ -30,17 +31,18 @@ class ShortsViewModel @Inject constructor(
     val videoQueue: MutableSharedFlow<YouTubePlayer?> = MutableSharedFlow(3)
     private val initPageToken = ""
 
-    private var _shortsStateFlow: MutableStateFlow<UiState<StateFlow<PagingData<YoutubeVideoUiModel>>>> =
-    MutableStateFlow<UiState<StateFlow<PagingData<YoutubeVideoUiModel>>>>(UiState.Loading)
-    val shortsStateFlow: StateFlow<UiState<StateFlow<PagingData<YoutubeVideoUiModel>>>> get() = _shortsStateFlow
+    private var _shortsStateFlow: MutableStateFlow<UiState<PagingData<YoutubeVideoUiModel>>> =
+        MutableStateFlow<UiState<PagingData<YoutubeVideoUiModel>>>(UiState.Loading)
+    val shortsStateFlow: StateFlow<UiState<PagingData<YoutubeVideoUiModel>>> get() = _shortsStateFlow
 
     private var _connectivityObserver: Flow<ConnectivityStatus> = networkConnectivityObserver.observe()
     val connectivityObserver: Flow<ConnectivityStatus> = _connectivityObserver
 
     private fun getShorts() {
         viewModelScope.launch {
-            shortsUseCase.execute(ShortsUseCase.Request(initPageToken)).map {
-                shortsConverter.convert(it)
+            shortsUseCase.execute(ShortsUseCase.Request)
+                .map { shortsVideoResult: VideoResult<ShortsUseCase.Response> ->
+                shortsConverter.convert(shortsVideoResult)
             }.collect {
                 _shortsStateFlow.value = it
             }

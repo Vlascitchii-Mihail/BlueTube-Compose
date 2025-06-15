@@ -4,11 +4,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import com.vlascitchii.presentation_common.ui.state.UiState
 
 @Composable
@@ -39,4 +41,16 @@ fun Error(errorMsg: String) {
     Column(modifier = Modifier.fillMaxSize()) {
         Snackbar{ Text(text = errorMsg) }
     }
+}
+
+@Preview
+@Composable
+fun PreviewLoading() {
+    Loading()
+}
+
+@Preview
+@Composable
+fun PreviewError() {
+    Error("Test error")
 }

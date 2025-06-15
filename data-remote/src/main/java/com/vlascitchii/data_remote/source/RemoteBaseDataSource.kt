@@ -5,10 +5,12 @@ import com.vlascitchii.data_remote.networking.service.BaseApiService
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import retrofit2.HttpException
+import retrofit2.Response
 
 private const val EMPTY_URL = ""
 
-abstract class RemoteBaseDataSource(private val baseApiService: BaseApiService) {
+abstract class RemoteBaseDataSource<T>(private val baseApiService: BaseApiService) {
 
     suspend fun List<YoutubeVideoApiModel>.fillChannelUrl() {
         val channelUrlList = getChannelImgUrlList(this)
@@ -36,6 +38,16 @@ abstract class RemoteBaseDataSource(private val baseApiService: BaseApiService) 
     fun List<YoutubeVideoApiModel>.addChannelUrl(channelUrlList: List<String>) {
         for (i in this.indices) {
             this[i].snippet.channelImgUrl = channelUrlList[i]
+        }
+    }
+
+    abstract fun checkResponseBodyItemsIsNoteEmpty(responseBody: T): Boolean
+
+    fun getDataOnSuccessOrThrowHttpExceptionOnError(response: Response<T>): T {
+        val responseBody = response.body()
+        return when (true) {
+            (response.isSuccessful && responseBody != null && checkResponseBodyItemsIsNoteEmpty(responseBody)) -> responseBody
+            else -> throw HttpException(response)
         }
     }
 }

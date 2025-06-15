@@ -24,11 +24,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "11"
     }
 }
 
@@ -48,6 +48,13 @@ dependencies {
     testImplementation(libs.mockito)
     testImplementation(libs.mockito.inline)
     testImplementation(libs.test.coroutines)
+    testImplementation(libs.paging.test)
+
+    androidTestImplementation(libs.junit)
+    androidTestImplementation(libs.mockito)
+    androidTestImplementation(libs.dexmaker)
+    androidTestImplementation(libs.test.coroutines)
+    androidTestImplementation(libs.paging.test)
 
     androidTestImplementation(libs.androidx.test.ext)
     androidTestImplementation(libs.androidx.test.espresso)

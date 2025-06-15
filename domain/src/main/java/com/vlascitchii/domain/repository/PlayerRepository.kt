@@ -1,9 +1,10 @@
 package com.vlascitchii.domain.repository
 
-import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse
+import androidx.paging.PagingData
+import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideo
 import kotlinx.coroutines.flow.Flow
 
 interface PlayerRepository {
 
-    fun getSearchRelayedVideos(query: String, nextPageToken: String): Flow<YoutubeVideoResponse>
+    fun getSearchRelayedVideos(query: String): Flow<PagingData<YoutubeVideo>>
 }

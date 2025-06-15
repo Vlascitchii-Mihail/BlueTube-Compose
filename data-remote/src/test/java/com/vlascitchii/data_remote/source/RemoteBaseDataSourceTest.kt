@@ -2,6 +2,9 @@ package com.vlascitchii.data_remote.source
 
 import com.vlascitchii.data_remote.enetity_api_model.util.convertToYouTubeVideoResponseApiModel
 import com.vlascitchii.data_remote.enetity_api_model.util.convertToYoutubeVideoApiModelList
+import com.vlascitchii.data_remote.enetity_api_model.video_channel_api_model.ChannelApiModel
+import com.vlascitchii.data_remote.enetity_api_model.video_channel_api_model.YoutubeChannelResponseApiModel
+import com.vlascitchii.data_remote.enetity_api_model.video_channel_api_model.YoutubeChannelResponseApiModel.Companion.DEFAULT_YOUTUBE_CHANNEL_RESPONSE_LIST
 import com.vlascitchii.data_remote.networking.service.BaseApiService
 import com.vlascitchii.data_remote.rule.DispatcherTestRule
 import com.vlascitchii.data_remote.util.CHANNEL_RESPONSE_1_PATH
@@ -22,6 +25,9 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
+import retrofit2.HttpException
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 @RunWith(MockitoJUnitRunner::class)
 class RemoteBaseDataSourceTest {
@@ -32,14 +38,19 @@ class RemoteBaseDataSourceTest {
     private lateinit var mockWebServerApiProvider: MockWebServerApiProvider
     private lateinit var baseApiService: BaseApiService
     private lateinit var mockWebServerScheduler: MockWebServerScheduler
-    private lateinit var remoteBaseDataSource: RemoteBaseDataSource
+    private lateinit var remoteBaseDataSource: RemoteBaseDataSource<YoutubeChannelResponseApiModel>
 
     @Before
     fun init() {
         mockWebServerApiProvider = MockWebServerApiProvider()
         baseApiService = mockWebServerApiProvider.provideMockBaseApiService()
         mockWebServerScheduler = mockWebServerApiProvider.mockWebServerScheduler
-        remoteBaseDataSource = object : RemoteBaseDataSource(baseApiService) {}
+        remoteBaseDataSource = object : RemoteBaseDataSource<YoutubeChannelResponseApiModel>(baseApiService) {
+
+            override fun checkResponseBodyItemsIsNoteEmpty(responseBody: YoutubeChannelResponseApiModel): Boolean {
+                return responseBody.items.isNotEmpty()
+            }
+        }
     }
 
     @After
@@ -101,5 +112,25 @@ class RemoteBaseDataSourceTest {
         }
 
         youTubeVideoList.items.assertListEqualsTo(expectedYouTubeVideoList)
+    }
+
+    @Test
+    fun `getVideoOnSuccessOrThrowHttpExceptionOnError throws error if Retrofit response is not success`() = runTest {
+        mockWebServerScheduler.enqueueError()
+        val retrofitResponse = baseApiService.fetchChannels("Test channel Id")
+
+        assertFailsWith<HttpException> {
+            remoteBaseDataSource.getDataOnSuccessOrThrowHttpExceptionOnError(retrofitResponse)
+        }
+    }
+
+    @Test
+    fun `getVideoOnSuccessOrThrowHttpExceptionOnError returns data if Retrofit response is success`() = runTest {
+        initialiseMockResponse()
+
+        val retrofitResponse = baseApiService.fetchChannels("Test channel Id")
+        val youTubeChannels: YoutubeChannelResponseApiModel = remoteBaseDataSource.getDataOnSuccessOrThrowHttpExceptionOnError(retrofitResponse)
+
+        assertEquals(youTubeChannels.items.first(), ChannelApiModel.channels.first())
     }
 }

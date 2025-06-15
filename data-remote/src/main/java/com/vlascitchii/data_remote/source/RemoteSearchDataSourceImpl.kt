@@ -20,7 +20,7 @@ class RemoteSearchDataSourceImpl @Inject constructor(
     private val searchApiService: SearchApiService,
     @Named("video")
     private val videoCoroutineScope: AppCoroutineScope,
-) : RemoteSearchDataSource, RemoteBaseDataSource(searchApiService),
+) : RemoteSearchDataSource, RemoteBaseDataSource<SearchVideoResponseApiModel>(searchApiService),
     RemoteConverter {
 
     override val particularVideoApi: ParticularVideoApiService = searchApiService
@@ -42,23 +42,21 @@ class RemoteSearchDataSourceImpl @Inject constructor(
 
     override fun search(query: String, nextPageToken: String): Flow<YoutubeVideoResponse> =
         flow<YoutubeVideoResponse> {
-            var searchVideoResponseApiModel: SearchVideoResponseApiModel? =
-                searchApiService.searchVideo(query = query, nextPageToken = nextPageToken).body()
+            val retrofitResponse = searchApiService.searchVideo(query = query, nextPageToken = nextPageToken)
+            var searchVideosPage: SearchVideoResponseApiModel = getDataOnSuccessOrThrowHttpExceptionOnError(retrofitResponse)
 
-            if (searchVideoResponseApiModel != null && searchVideoResponseApiModel.items.isNotEmpty()) {
-                if (isRelated) searchVideoResponseApiModel = searchVideoResponseApiModel.deleteFirstSameVideo()
-                val videoList = searchVideoResponseApiModel.items.convertToVideosList()
+            if (isRelated) searchVideosPage = searchVideosPage.deleteFirstSameVideo()
+            val videoList = searchVideosPage.items.convertToApiVideosList()
+            videoList.fillChannelUrl()
 
-                videoList.fillChannelUrl()
-
-                emit(
-                    YoutubeVideoResponse(
-                        nextPageToken = searchVideoResponseApiModel.nextPageToken,
-                        prevPageToken = searchVideoResponseApiModel.prevPageToken,
-                        items = videoList.convertToYoutubeVideoList()
-                    )
+            emit(
+                YoutubeVideoResponse(
+                    nextPageToken = searchVideosPage.nextPageToken,
+                    prevPageToken = searchVideosPage.prevPageToken,
+                    items = videoList.convertToYoutubeVideoList()
                 )
-            }
+            )
+
         }.catch {
             throw UseCaseException.SearchLoadException(it)
         }.flowOn(videoCoroutineScope.dispatcher)
@@ -67,5 +65,9 @@ class RemoteSearchDataSourceImpl @Inject constructor(
         val mutableVideoList = this.items.toMutableList()
         mutableVideoList.removeAt(0)
         return this.copy(items = mutableVideoList)
+    }
+
+    override fun checkResponseBodyItemsIsNoteEmpty(responseBody: SearchVideoResponseApiModel): Boolean {
+        return responseBody.items.isNotEmpty()
     }
 }

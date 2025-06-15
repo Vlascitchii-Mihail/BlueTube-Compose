@@ -1,6 +1,7 @@
 package com.appelier.bluetubecompose.navigation
 
 import com.vlascitchii.presentation_common.entity.videos.YoutubeVideoUiModel
+import com.vlascitchii.presentation_video_list.util.state.VideoType
 import kotlinx.serialization.Serializable
 
 const val HOME = "Home"
@@ -12,7 +13,7 @@ const val SETTINGS = "Settings"
 sealed class ScreenType(val name: String) {
 
     @Serializable
-    data object VideoList: ScreenType(HOME)
+    data class VideoList(val videoType: VideoType): ScreenType(HOME)
     @Serializable
     data class PlayerScreen(val video: YoutubeVideoUiModel) : ScreenType(PLAYER)
     @Serializable
