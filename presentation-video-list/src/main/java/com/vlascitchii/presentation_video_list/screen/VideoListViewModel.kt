@@ -34,10 +34,6 @@ class VideoListViewModel @Inject constructor(
     @Named("video") private val videoCoroutineScope: AppCoroutineScope,
 ) : ViewModel() {
 
-    //unknown if it will change the job in coroutine context variable in AppCoroutineScope class
-//    init { remoteScope.onStart() }
-
-    //    private val emptyPagingData = PagingData.Companion.empty<YoutubeVideoUiModel>()
     private var _videoStateFlow: MutableStateFlow<UiState<PagingData<YoutubeVideoUiModel>>> =
         MutableStateFlow<UiState<PagingData<YoutubeVideoUiModel>>>(UiState.Loading)
     val videoStateFlow: StateFlow<UiState<PagingData<YoutubeVideoUiModel>>> get() = _videoStateFlow
@@ -84,9 +80,6 @@ class VideoListViewModel @Inject constructor(
     fun updateSearchTextState(newSearchTextState: String) {
         _searchTextState.value = newSearchTextState
     }
-
-    //TODO: check is it possible to use only videoStateFlow without this function
-//    fun getVideos() = videoStateFlow
 
     override fun onCleared() {
         super.onCleared()
