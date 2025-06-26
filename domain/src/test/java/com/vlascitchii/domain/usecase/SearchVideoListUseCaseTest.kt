@@ -1,7 +1,7 @@
 package com.vlascitchii.domain.usecase
 
 import androidx.paging.PagingData
-import com.vlascitchii.data_remote.rule.DispatcherTestRule
+import com.vlascitchii.common_test.rule.DispatcherTestRule
 import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse.Companion.RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG
 import com.vlascitchii.domain.repository.VideoListRepository
 import com.vlascitchii.domain.usecase.util.Configuration
@@ -11,7 +11,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test

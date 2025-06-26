@@ -1,8 +1,8 @@
 package com.vlascitchii.data_local.source
 
+import com.vlascitchii.common_test.rule.DispatcherTestRule
 import com.vlascitchii.data_local.database.convertToLocalYoutubeVideoResponseEntity
 import com.vlascitchii.data_local.source.utils.DatabaseContentManager
-import com.vlascitchii.data_local.source.utils.rule.DispatcherTestRule
 import com.vlascitchii.data_repository.data_source.local.LocalVideoListDataSource
 import com.vlascitchii.domain.custom_coroutine_scopes.AppCoroutineScope
 import com.vlascitchii.domain.custom_coroutine_scopes.VideoCoroutineScope

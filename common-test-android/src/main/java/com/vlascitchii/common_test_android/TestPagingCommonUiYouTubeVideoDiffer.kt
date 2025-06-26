@@ -1,12 +1,12 @@
-package com.vlascitchii.data_repository.util
+package com.vlascitchii.common_test_android
 
 import androidx.paging.AsyncPagingDataDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListUpdateCallback
-import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideo
+import com.vlascitchii.presentation_common.entity.videos.YoutubeVideoUiModel
 import kotlinx.coroutines.CoroutineDispatcher
 
-class TestPagingDataDiffer(dispatcher: CoroutineDispatcher) {
+class TestPagingCommonUiYouTubeVideoDiffer(dispatcher: CoroutineDispatcher) {
 
     private object ListUpdateCallbackMock : ListUpdateCallback {
         override fun onInserted(position: Int, count: Int) {}
@@ -15,13 +15,13 @@ class TestPagingDataDiffer(dispatcher: CoroutineDispatcher) {
         override fun onChanged(position: Int, count: Int, payload: Any?) {}
     }
 
-    private val diffCallback = object : DiffUtil.ItemCallback<YoutubeVideo>() {
+    private val diffCallback = object : DiffUtil.ItemCallback<YoutubeVideoUiModel>() {
 
-        override fun areItemsTheSame(oldItem: YoutubeVideo, newItem: YoutubeVideo): Boolean {
+        override fun areItemsTheSame(oldItem: YoutubeVideoUiModel, newItem: YoutubeVideoUiModel): Boolean {
             return oldItem.id == newItem.id
         }
 
-        override fun areContentsTheSame(oldItem: YoutubeVideo, newItem: YoutubeVideo): Boolean {
+        override fun areContentsTheSame(oldItem: YoutubeVideoUiModel, newItem: YoutubeVideoUiModel): Boolean {
             return oldItem==newItem
         }
     }

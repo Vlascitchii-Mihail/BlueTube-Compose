@@ -1,7 +1,7 @@
 package com.vlascitchii.domain.usecase
 
 import androidx.paging.PagingData
-import com.vlascitchii.data_remote.rule.DispatcherTestRule
+import com.vlascitchii.common_test.rule.DispatcherTestRule
 import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse.Companion.RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG
 import com.vlascitchii.domain.repository.ShortsRepository
 import com.vlascitchii.domain.usecase.util.Configuration

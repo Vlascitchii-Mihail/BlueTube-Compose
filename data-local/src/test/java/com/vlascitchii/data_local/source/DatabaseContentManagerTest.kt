@@ -1,5 +1,7 @@
 package com.vlascitchii.data_local.source
 
+import com.vlascitchii.common_test.rule.DispatcherTestRule
+import com.vlascitchii.common_test.util.assertListEqualsTo
 import com.vlascitchii.data_local.database.YouTubeVideoDao
 import com.vlascitchii.data_local.database.convertToLocalYoutubeVideoResponseEntity
 import com.vlascitchii.data_local.enetity.INITIAL_PAGE_TOKEN
@@ -7,8 +9,6 @@ import com.vlascitchii.data_local.enetity.video_list.videos.YoutubeVideoEntity
 import com.vlascitchii.data_local.enetity.video_list.videos.YoutubeVideoResponseEntity
 import com.vlascitchii.data_local.enetity.video_list.videos.YoutubeVideoResponseEntity.Companion.TEST_DATABASE_VIDEO_RESPONSE
 import com.vlascitchii.data_local.source.utils.DatabaseContentManager
-import com.vlascitchii.data_local.source.utils.assertListEqualsTo
-import com.vlascitchii.data_local.source.utils.rule.DispatcherTestRule
 import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse.Companion.RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG
 import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse.Companion.testDateTime
 import kotlinx.coroutines.flow.flowOf

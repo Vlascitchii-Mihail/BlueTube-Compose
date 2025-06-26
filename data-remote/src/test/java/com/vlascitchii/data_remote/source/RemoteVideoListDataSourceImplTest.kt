@@ -1,7 +1,7 @@
 package com.vlascitchii.data_remote.source
 
+import com.vlascitchii.common_test.rule.DispatcherTestRule
 import com.vlascitchii.data_remote.networking.service.VideoListApiService
-import com.vlascitchii.data_remote.rule.DispatcherTestRule
 import com.vlascitchii.data_remote.util.CHANNEL_RESPONSE_1_PATH
 import com.vlascitchii.data_remote.util.CHANNEL_RESPONSE_2_PATH
 import com.vlascitchii.data_remote.util.CHANNEL_RESPONSE_3_PATH

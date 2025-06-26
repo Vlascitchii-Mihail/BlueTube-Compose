@@ -30,7 +30,6 @@ import androidx.navigation.toRoute
 import com.appelier.bluetubecompose.LocalWindowSizeClass
 import com.appelier.bluetubecompose.R
 import com.appelier.bluetubecompose.navigation.bottom_navigation.BlueTubeBottomNavigation
-import com.vlascitchii.data_local.enetity.video_list.videos.YoutubeVideoEntity
 import com.vlascitchii.presentation_common.entity.videos.YoutubeVideoUiModel
 import com.vlascitchii.presentation_common.network_observer.ObserveAsEvents
 import com.vlascitchii.presentation_common.ui.video_list.YouTubeVideoList
@@ -167,7 +166,7 @@ fun YouTubeNavigation(
                         },
                         isVideoPlaysFlow = playerScreenViewModel.isVideoPlaysFlow,
                         updateVideoIsPlayState = { isPlaying ->
-                            playerScreenViewModel.updateVideoIsPlayState(
+                            playerScreenViewModel.updateVideoPlayState(
                                 isPlaying
                             )
                         },
@@ -182,7 +181,7 @@ fun YouTubeNavigation(
                                 playbackPosition
                             )
                         },
-                        getPlaybackPosition = { playerScreenViewModel.getCurrentPlaybackPosition() },
+                        playbackPosition = playerScreenViewModel.videoPlaybackPosition,
                         playerOrientationState = playerScreenViewModel.playerOrientationState,
                         updatePlayerOrientationState = { newPlayerOrientationState ->
                             playerScreenViewModel.updatePlayerOrientationState(
@@ -195,11 +194,12 @@ fun YouTubeNavigation(
                                 isClicked
                             )
                         },
-                        connectivityStatus = playerScreenViewModel.getCurrentConnectivityState()
+                        connectivityStatus = playerScreenViewModel.connectivityObserver
                     )
                 }
                 composable<ScreenType.ShortsScreen> {
                     val shortsViewModel: ShortsViewModel = hiltViewModel()
+                    shortsViewModel.fetchShorts()
                     ShortsScreen(
                         shortsStateFlow = shortsViewModel.shortsStateFlow,
                         videoQueue = shortsViewModel.videoQueue,

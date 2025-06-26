@@ -1,7 +1,8 @@
-package com.vlascitchii.data_remote.util
+package com.vlascitchii.common_test.util
 
 import junit.framework.AssertionFailedError
 import junit.framework.TestCase.assertEquals
+
 
 fun <T> List<T>.assertListEqualsTo(actualList: List<T>?) {
     val expectedVideoList = this

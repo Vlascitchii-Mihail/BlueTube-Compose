@@ -39,7 +39,7 @@ fun YoutubeVideoPlayer(
     updateVideoIsPlayState: (Boolean) -> Unit,
     popBackStack: () -> Unit,
     updatePlaybackPosition: (Float) -> Unit,
-    getPlaybackPosition: () -> Float,
+    playbackPosition: Float,
     playerOrientationState: StateFlow<OrientationState>,
     updatePlayerOrientationState: (OrientationState) -> Unit,
     fullscreenWidgetIsClicked: StateFlow<Boolean>,
@@ -72,7 +72,7 @@ fun YoutubeVideoPlayer(
             isVideoPlays,
             updateVideoIsPlayState,
             updatePlaybackPosition,
-            getPlaybackPosition,
+            playbackPosition,
             orientationHandler
         )
     }

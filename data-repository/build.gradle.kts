@@ -35,6 +35,8 @@ android {
 dependencies {
 
     implementation(project(":domain"))
+    testImplementation(project(":common-test"))
+    testImplementation(project(":common-test-android"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
@@ -49,12 +51,6 @@ dependencies {
     testImplementation(libs.mockito.inline)
     testImplementation(libs.test.coroutines)
     testImplementation(libs.paging.test)
-
-    androidTestImplementation(libs.junit)
-    androidTestImplementation(libs.mockito)
-    androidTestImplementation(libs.dexmaker)
-    androidTestImplementation(libs.test.coroutines)
-    androidTestImplementation(libs.paging.test)
 
     androidTestImplementation(libs.androidx.test.ext)
     androidTestImplementation(libs.androidx.test.espresso)

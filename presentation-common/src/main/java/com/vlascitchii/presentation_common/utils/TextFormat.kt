@@ -75,14 +75,3 @@ fun formatVideoDuration(duration: String): String {
 
     return if (strHours == "") "$strMinutes:$strSeconds" else "$strHours:$strMinutes:$strSeconds"
 }
-
-//fun com.vlascitchii.data_local.database.relations.PageWithVideos.convertToYoutubeVideoResponse(): YoutubeVideoResponseApiModel {
-//    val pageEntity = this.pageEntity
-//    val videos = this.videos
-//    return YoutubeVideoResponseApiModel(
-//        nextPageToken = pageEntity.nextPageToken,
-//        currentPageToken = pageEntity.currentPageToken,
-//        prevPageToken = pageEntity.prevPageToken,
-//        videos
-//    )
-//}

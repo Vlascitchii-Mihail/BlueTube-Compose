@@ -1,6 +1,6 @@
 package com.vlascitchii.domain.custom_coroutine_scopes
 
-import com.vlascitchii.data_remote.rule.DispatcherTestRule
+import com.vlascitchii.common_test.rule.DispatcherTestRule
 import kotlinx.coroutines.CompletableJob
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.test.runTest
