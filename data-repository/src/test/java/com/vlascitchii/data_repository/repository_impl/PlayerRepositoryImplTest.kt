@@ -1,10 +1,10 @@
 package com.vlascitchii.data_repository.repository_impl
 
+import com.vlascitchii.common_test.rule.DispatcherTestRule
+import com.vlascitchii.common_test.util.assertListEqualsTo
+import com.vlascitchii.common_test_android.TestPagingDomainYouTubeVideoDiffer
 import com.vlascitchii.data_repository.data_source.local.LocalVideoListDataSource
 import com.vlascitchii.data_repository.data_source.remote.RemoteSearchDataSource
-import com.vlascitchii.data_repository.util.DispatcherTestRule
-import com.vlascitchii.data_repository.util.TestPagingDataDiffer
-import com.vlascitchii.data_repository.util.assertListEqualsTo
 import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse.Companion.RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
@@ -32,8 +32,7 @@ class PlayerRepositoryImplTest {
     private val initialPageToken = ""
     private val testQuery = "Test query"
     private val expectedResult = flowOf(RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG)
-    private val testPagingDataDiffer = TestPagingDataDiffer(dispatcherTestRule.testDispatcher).pagingDiffer
-
+    private val testPagingCommonUiYouTubeVideoDiffer = TestPagingDomainYouTubeVideoDiffer(dispatcherTestRule.testDispatcher).pagingDiffer
 
     @Before
     fun init() {
@@ -44,22 +43,22 @@ class PlayerRepositoryImplTest {
     @Test
     fun fun_getSearchRelayedVideos_returns_correct_Flow_with_YouTubeVideoResponse() = runTest {
         val actualValue = playerRepositoryImpl.getSearchRelayedVideos(testQuery).first()
-        val testJob = launch { testPagingDataDiffer.submitData(actualValue) }
+        val testJob = launch { testPagingCommonUiYouTubeVideoDiffer.submitData(actualValue) }
 
         advanceUntilIdle()
         testJob.cancel()
 
-        RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.items.assertListEqualsTo(testPagingDataDiffer.snapshot())
+        RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.items.assertListEqualsTo(testPagingCommonUiYouTubeVideoDiffer.snapshot())
     }
 
     @Test
     fun fun_getSearchRelayedVideos_inserts_each_received_videos_into_DB() = runTest {
         val actualValue = playerRepositoryImpl.getSearchRelayedVideos(testQuery).first()
-        val testJob = launch { testPagingDataDiffer.submitData(actualValue) }
+        val testJob = launch { testPagingCommonUiYouTubeVideoDiffer.submitData(actualValue) }
 
         advanceUntilIdle()
         testJob.cancel()
 
-        assertTrue(testPagingDataDiffer.snapshot().isNotEmpty())
+        assertTrue(testPagingCommonUiYouTubeVideoDiffer.snapshot().isNotEmpty())
     }
 }

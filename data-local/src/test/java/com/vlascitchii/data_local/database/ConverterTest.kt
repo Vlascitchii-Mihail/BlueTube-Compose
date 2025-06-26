@@ -1,7 +1,7 @@
 package com.vlascitchii.data_local.database
 
+import com.vlascitchii.common_test.util.assertListEqualsTo
 import com.vlascitchii.data_local.enetity.video_list.videos.YoutubeVideoResponseEntity.Companion.TEST_DATABASE_VIDEO_RESPONSE
-import com.vlascitchii.data_local.source.utils.assertListEqualsTo
 import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse.Companion.RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG
 import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse.Companion.testDateTime
 import org.junit.Assert.assertEquals

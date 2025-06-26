@@ -45,6 +45,8 @@ android {
 dependencies {
 
     implementation(project(":domain"))
+    testImplementation(project(":common-test"))
+    testImplementation(project(":common-test-android"))
     implementation(project(":presentation-common"))
 
     implementation(libs.androidx.core.ktx)
@@ -82,6 +84,10 @@ dependencies {
     implementation(libs.glide)
 
     testImplementation(libs.junit)
+    testImplementation(libs.mockito)
+    testImplementation(libs.mockito.inline)
+    testImplementation(libs.test.coroutines)
+
     androidTestImplementation(libs.androidx.test.ext)
     androidTestImplementation(libs.androidx.test.espresso)
     androidTestImplementation(libs.espresso.device)

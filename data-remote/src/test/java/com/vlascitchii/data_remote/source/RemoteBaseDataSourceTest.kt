@@ -1,12 +1,12 @@
 package com.vlascitchii.data_remote.source
 
+import com.vlascitchii.common_test.rule.DispatcherTestRule
+import com.vlascitchii.common_test.util.assertListEqualsTo
 import com.vlascitchii.data_remote.enetity_api_model.util.convertToYouTubeVideoResponseApiModel
 import com.vlascitchii.data_remote.enetity_api_model.util.convertToYoutubeVideoApiModelList
 import com.vlascitchii.data_remote.enetity_api_model.video_channel_api_model.ChannelApiModel
 import com.vlascitchii.data_remote.enetity_api_model.video_channel_api_model.YoutubeChannelResponseApiModel
-import com.vlascitchii.data_remote.enetity_api_model.video_channel_api_model.YoutubeChannelResponseApiModel.Companion.DEFAULT_YOUTUBE_CHANNEL_RESPONSE_LIST
 import com.vlascitchii.data_remote.networking.service.BaseApiService
-import com.vlascitchii.data_remote.rule.DispatcherTestRule
 import com.vlascitchii.data_remote.util.CHANNEL_RESPONSE_1_PATH
 import com.vlascitchii.data_remote.util.CHANNEL_RESPONSE_2_PATH
 import com.vlascitchii.data_remote.util.CHANNEL_RESPONSE_3_PATH
@@ -14,7 +14,6 @@ import com.vlascitchii.data_remote.util.CHANNEL_RESPONSE_4_PATH
 import com.vlascitchii.data_remote.util.CHANNEL_RESPONSE_5_PATH
 import com.vlascitchii.data_remote.util.MockWebServerApiProvider
 import com.vlascitchii.data_remote.util.MockWebServerScheduler
-import com.vlascitchii.data_remote.util.assertListEqualsTo
 import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse.Companion.RESPONSE_VIDEO_LIST_NO_CHANNEL_IMG_URL
 import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse.Companion.RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG
 import junit.framework.TestCase.assertTrue

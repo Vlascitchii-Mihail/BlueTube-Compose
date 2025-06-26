@@ -1,10 +1,8 @@
 package com.vlascitchii.presentation_player.screen_player.screen
 
 import android.content.pm.ActivityInfo
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -27,14 +25,14 @@ import kotlinx.coroutines.flow.StateFlow
 @Composable
 fun PlayerScreen(
     video: YoutubeVideoUiModel,
-    relatedVideos: StateFlow<UiState<StateFlow<PagingData<YoutubeVideoUiModel>>>>,
+    relatedVideos: StateFlow<UiState<PagingData<YoutubeVideoUiModel>>>,
     getRelatedVideos: (String) -> Unit,
     isVideoPlaysFlow: StateFlow<Boolean>,
     updateVideoIsPlayState: (Boolean) -> Unit,
     navigateToPlayerScreen: (YoutubeVideoUiModel) -> Unit,
     popBackStack: () -> Unit,
     updatePlaybackPosition: (Float) -> Unit,
-    getPlaybackPosition: () -> Float,
+    playbackPosition: Float,
     playerOrientationState: StateFlow<OrientationState>,
     updatePlayerOrientationState: (OrientationState) -> Unit,
     fullscreenWidgetIsClicked: StateFlow<Boolean>,
@@ -42,8 +40,8 @@ fun PlayerScreen(
     connectivityStatus: Flow<ConnectivityStatus>
 ) {
 
-    relatedVideos.collectAsStateWithLifecycle().value.let { uiStatePagingData: UiState<StateFlow<PagingData<YoutubeVideoUiModel>>> ->
-        CommonScreen(uiStatePagingData) { pagingData: StateFlow<PagingData<YoutubeVideoUiModel>> ->
+    relatedVideos.collectAsStateWithLifecycle().value.let { uiStatePagingData: UiState<PagingData<YoutubeVideoUiModel>> ->
+        CommonScreen(uiStatePagingData) { pagingData: PagingData<YoutubeVideoUiModel> ->
             val networkConnectivityStatus by connectivityStatus.collectAsStateWithLifecycle(
                 initialValue = ConnectivityStatus.Available
             )
@@ -69,7 +67,7 @@ fun PlayerScreen(
                     updateVideoIsPlayState,
                     popBackStack,
                     updatePlaybackPosition,
-                    getPlaybackPosition,
+                    playbackPosition,
                     playerOrientationState,
                     updatePlayerOrientationState,
                     fullscreenWidgetIsClicked,
@@ -81,10 +79,7 @@ fun PlayerScreen(
                     VideoDescription(video = video)
 
                     YouTubeVideoList(
-                        getVideoState = {
-                            getRelatedVideos.invoke(video.snippet.title)
-                            relatedVideos
-                        },
+                        videosFlow = relatedVideos,
                         modifier = Modifier,
                         navigateToPlayerScreen = navigateToPlayerScreen,
                     )

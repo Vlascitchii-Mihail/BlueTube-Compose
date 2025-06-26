@@ -1,11 +1,11 @@
 package com.vlascitchii.data_remote.networking.service
 
+import com.vlascitchii.common_test.rule.DispatcherTestRule
+import com.vlascitchii.common_test.util.assertListEqualsTo
 import com.vlascitchii.data_remote.enetity_api_model.util.convertToYouTubeVideoResponseApiModel
-import com.vlascitchii.data_remote.rule.DispatcherTestRule
 import com.vlascitchii.data_remote.util.MockWebServerApiProvider
 import com.vlascitchii.data_remote.util.MockWebServerScheduler
 import com.vlascitchii.data_remote.util.VIDEO_LIST_RESPONSE_PATH
-import com.vlascitchii.data_remote.util.assertListEqualsTo
 import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse.Companion.RESPONSE_VIDEO_LIST_NO_CHANNEL_IMG_URL
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.test.runTest

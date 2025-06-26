@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
+import com.vlascitchii.domain.custom_coroutine_scopes.AppCoroutineScope
 import com.vlascitchii.domain.usecase.ShortsUseCase
 import com.vlascitchii.domain.util.VideoResult
 import com.vlascitchii.presentation_common.entity.videos.YoutubeVideoUiModel
@@ -17,45 +18,54 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import javax.inject.Named
 
 @HiltViewModel
 class ShortsViewModel @Inject constructor(
     private val shortsUseCase: ShortsUseCase,
     private val shortsConverter: ShortsConverter,
-    private val networkConnectivityObserver: NetworkConnectivityObserver
-): ViewModel() {
+    private val networkConnectivityObserver: NetworkConnectivityObserver,
+    @Named("video") private val videoCoroutineScope: AppCoroutineScope,
+) : ViewModel() {
 
-    val videoQueue: MutableSharedFlow<YouTubePlayer?> = MutableSharedFlow(3)
-    private val initPageToken = ""
+    val videoQueueSize: Int = 3
+    val videoQueue: MutableSharedFlow<YouTubePlayer?> = MutableSharedFlow(videoQueueSize)
 
     private var _shortsStateFlow: MutableStateFlow<UiState<PagingData<YoutubeVideoUiModel>>> =
         MutableStateFlow<UiState<PagingData<YoutubeVideoUiModel>>>(UiState.Loading)
     val shortsStateFlow: StateFlow<UiState<PagingData<YoutubeVideoUiModel>>> get() = _shortsStateFlow
 
-    private var _connectivityObserver: Flow<ConnectivityStatus> = networkConnectivityObserver.observe()
+    private var _connectivityObserver: Flow<ConnectivityStatus> =
+        networkConnectivityObserver.observe()
     val connectivityObserver: Flow<ConnectivityStatus> = _connectivityObserver
 
-    private fun getShorts() {
+    fun fetchShorts() {
         viewModelScope.launch {
             shortsUseCase.execute(ShortsUseCase.Request)
                 .map { shortsVideoResult: VideoResult<ShortsUseCase.Response> ->
-                shortsConverter.convert(shortsVideoResult)
-            }.collect {
-                _shortsStateFlow.value = it
-            }
+                    shortsConverter.convert(shortsVideoResult)
+                }.collect { uiState: UiState<PagingData<YoutubeVideoUiModel>> ->
+                    _shortsStateFlow.value = uiState
+                }
         }
     }
 
     fun listenToVideoQueue() {
         viewModelScope.launch {
-            videoQueue.collect() {
+            videoQueue.collectLatest {
                 delay(1500)
                 if (videoQueue.replayCache.size == 1) videoQueue.replayCache.first()?.play()
                 else videoQueue.replayCache[1]?.play()
             }
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        videoCoroutineScope.onStop()
     }
 }
