@@ -1,10 +1,10 @@
 package com.vlascitchii.data_repository.repository_impl
 
+import com.vlascitchii.common_test.rule.DispatcherTestRule
+import com.vlascitchii.common_test.util.assertListEqualsTo
+import com.vlascitchii.common_test_android.TestPagingDomainYouTubeVideoDiffer
 import com.vlascitchii.data_repository.data_source.local.LocalVideoListDataSource
 import com.vlascitchii.data_repository.data_source.remote.RemoteShortsDataSource
-import com.vlascitchii.data_repository.util.DispatcherTestRule
-import com.vlascitchii.data_repository.util.TestPagingDataDiffer
-import com.vlascitchii.data_repository.util.assertListEqualsTo
 import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse.Companion.RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
@@ -32,7 +32,7 @@ class ShortsRepositoryImplTest {
 
     private val initialPageToken = ""
     private val expectedResult = flowOf(RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG)
-    private val testPagingDataDiffer = TestPagingDataDiffer(dispatcherTestRule.testDispatcher).pagingDiffer
+    private val testPagingDomainYouTubeVideoDiffer = TestPagingDomainYouTubeVideoDiffer(dispatcherTestRule.testDispatcher).pagingDiffer
 
 
     @Before
@@ -44,22 +44,22 @@ class ShortsRepositoryImplTest {
     @Test
     fun fun_getShorts_returns_correct_Flow_with_YoutubeVideoResponse() = runTest {
         val actualValue = shortsRepositoryImpl.getShorts().first()
-        val testJob = launch { testPagingDataDiffer.submitData(actualValue) }
+        val testJob = launch { testPagingDomainYouTubeVideoDiffer.submitData(actualValue) }
 
         advanceUntilIdle()
         testJob.cancel()
 
-        RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.items.assertListEqualsTo(testPagingDataDiffer.snapshot())
+        RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.items.assertListEqualsTo(testPagingDomainYouTubeVideoDiffer.snapshot())
     }
 
     @Test
     fun fun_getShorts_returns_Flow_which_is_not_empty() = runTest {
         val actualValue = shortsRepositoryImpl.getShorts().first()
-        val testJob = launch { testPagingDataDiffer.submitData(actualValue) }
+        val testJob = launch { testPagingDomainYouTubeVideoDiffer.submitData(actualValue) }
 
         advanceUntilIdle()
         testJob.cancel()
 
-        assertTrue(testPagingDataDiffer.snapshot().isNotEmpty())
+        assertTrue(testPagingDomainYouTubeVideoDiffer.snapshot().isNotEmpty())
     }
 }

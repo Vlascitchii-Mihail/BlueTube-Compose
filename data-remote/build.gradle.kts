@@ -47,6 +47,7 @@ dependencies {
 
     implementation(project(":data-repository"))
     implementation(project((":domain")))
+    testImplementation(project(":common-test"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

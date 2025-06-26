@@ -3,6 +3,7 @@ package com.vlascitchii.presentation_player.screen_player.screen
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
+import com.vlascitchii.domain.custom_coroutine_scopes.AppCoroutineScope
 import com.vlascitchii.domain.usecase.VideoPlayerUseCase
 import com.vlascitchii.domain.util.VideoResult
 import com.vlascitchii.presentation_common.entity.videos.YoutubeVideoUiModel
@@ -18,6 +19,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import javax.inject.Named
 
 private const val INITIAL_VIDEO_PLAYBACK_POSITION = 0F
 
@@ -25,14 +27,16 @@ private const val INITIAL_VIDEO_PLAYBACK_POSITION = 0F
 class VideoPlayerViewModel @Inject constructor(
     private val videoPlayerUseCase: VideoPlayerUseCase,
     private val videoPlayerConverter: VideoPlayerConverter,
-    private val networkConnectivityObserver: NetworkConnectivityObserver
-) : ViewModel() {
+    private val networkConnectivityObserver: NetworkConnectivityObserver,
+    @Named("video") private val videoCoroutineScope: AppCoroutineScope,
+    ) : ViewModel() {
 
     private var _relatedVideoStateFlow: MutableStateFlow<UiState<PagingData<YoutubeVideoUiModel>>> =
         MutableStateFlow<UiState<PagingData<YoutubeVideoUiModel>>>(UiState.Loading)
     val relatedVideoStateFlow: StateFlow<UiState<PagingData<YoutubeVideoUiModel>>> get() = _relatedVideoStateFlow
 
-    private var videoPlaybackPosition: Float = INITIAL_VIDEO_PLAYBACK_POSITION
+    var videoPlaybackPosition: Float = INITIAL_VIDEO_PLAYBACK_POSITION
+        private set
 
     private val _isVideoPlaysFlow = MutableStateFlow(true)
     val isVideoPlaysFlow: StateFlow<Boolean> = _isVideoPlaysFlow
@@ -43,13 +47,12 @@ class VideoPlayerViewModel @Inject constructor(
     private var _fullscreenWidgetIsClicked = MutableStateFlow(false)
     val fullscreenWidgetIsClicked: StateFlow<Boolean> = _fullscreenWidgetIsClicked
 
-    fun updatePlaybackPosition(newPlaybackTime: Float = INITIAL_VIDEO_PLAYBACK_POSITION) {
-        videoPlaybackPosition = newPlaybackTime
-    }
+    private var _connectivityObserver:
+            Flow<ConnectivityStatus> = networkConnectivityObserver.observe()
+    val connectivityObserver: Flow<ConnectivityStatus> = _connectivityObserver
 
-    fun getCurrentPlaybackPosition(): Float {
-        return if (videoPlaybackPosition > INITIAL_VIDEO_PLAYBACK_POSITION) videoPlaybackPosition
-        else INITIAL_VIDEO_PLAYBACK_POSITION
+    fun updatePlaybackPosition(newPlaybackTime: Float) {
+        videoPlaybackPosition = newPlaybackTime
     }
 
     fun getSearchedRelatedVideos(query: String) {
@@ -57,21 +60,13 @@ class VideoPlayerViewModel @Inject constructor(
             videoPlayerUseCase.execute(VideoPlayerUseCase.Request(query))
                 .map { playerSearchVideoResult: VideoResult<VideoPlayerUseCase.Response> ->
                     videoPlayerConverter.convert(playerSearchVideoResult)
-                }.collect { uiState->
+                }.collect { uiState ->
                     _relatedVideoStateFlow.value = uiState
                 }
-
-//            if (_relatedVideoStateFlow.value == emptyPagingData) {
-//                videoPlayerUseCase.execute(VideoPlayerUseCase.Request(query)).map {
-//                    videoPlayerConverter.convert(it)
-//                }.collect {
-//                    _relatedVideoStateFlow.value = it
-//                }
-//            }
         }
     }
 
-    fun updateVideoIsPlayState(isPlaying: Boolean) {
+    fun updateVideoPlayState(isPlaying: Boolean) {
         _isVideoPlaysFlow.value = isPlaying
     }
 
@@ -83,7 +78,8 @@ class VideoPlayerViewModel @Inject constructor(
         _fullscreenWidgetIsClicked.value = isClicked
     }
 
-    fun getCurrentConnectivityState(): Flow<ConnectivityStatus> {
-        return networkConnectivityObserver.observe()
+    override fun onCleared() {
+        super.onCleared()
+        videoCoroutineScope.onStop()
     }
 }

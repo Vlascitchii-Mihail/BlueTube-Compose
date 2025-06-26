@@ -1,8 +1,8 @@
 package com.vlascitchii.data_remote.networking.service
 
+import com.vlascitchii.common_test.rule.DispatcherTestRule
 import com.vlascitchii.data_remote.enetity_api_model.video_list_api_model.videos_api_model.ParticularVideoApiModel
 import com.vlascitchii.data_remote.enetity_api_model.video_search_api_model.DEFAULT_SEARCH_VIDEO_RESPONSE
-import com.vlascitchii.data_remote.rule.DispatcherTestRule
 import com.vlascitchii.data_remote.util.MockWebServerApiProvider
 import com.vlascitchii.data_remote.util.MockWebServerScheduler
 import com.vlascitchii.data_remote.util.PARTICULAR_VIDEO_RESPONSE_1_PATH

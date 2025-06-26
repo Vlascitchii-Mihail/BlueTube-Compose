@@ -2,9 +2,9 @@ package com.vlascitchii.data_repository.paging
 
 import android.net.http.HttpException
 import androidx.paging.PagingSource
+import com.vlascitchii.common_test.rule.DispatcherTestRule
 import com.vlascitchii.data_repository.data_source.local.LocalVideoListDataSource
 import com.vlascitchii.data_repository.data_source.remote.RemoteVideoListDataSource
-import com.vlascitchii.data_repository.util.DispatcherTestRule
 import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideo
 import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse
 import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse.Companion.RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG

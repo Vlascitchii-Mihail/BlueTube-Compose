@@ -33,6 +33,7 @@ android {
 }
 
 dependencies {
+    testImplementation(project(":common-test"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

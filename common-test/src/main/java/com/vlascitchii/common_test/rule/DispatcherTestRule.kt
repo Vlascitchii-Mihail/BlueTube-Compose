@@ -1,4 +1,4 @@
-package com.vlascitchii.data_local.source.utils.rule
+package com.vlascitchii.common_test.rule
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -12,7 +12,7 @@ import org.junit.runner.Description
 @OptIn(ExperimentalCoroutinesApi::class)
 class DispatcherTestRule(
     val testDispatcher: TestDispatcher = StandardTestDispatcher()
-) : TestWatcher() {
+): TestWatcher() {
 
     override fun starting(description: Description?) {
         super.starting(description)

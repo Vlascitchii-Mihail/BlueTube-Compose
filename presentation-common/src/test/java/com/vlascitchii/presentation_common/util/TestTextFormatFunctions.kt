@@ -17,19 +17,19 @@ class TestTextFormatFunctions {
     @Test
     fun testFormatDate() {
         assertEquals("2 minutes ago",
-            com.vlascitchii.presentation_common.utils.formatDate(currentMinutes)
+            formatDate(currentMinutes)
         )
         assertEquals("2 hours ago",
-            com.vlascitchii.presentation_common.utils.formatDate(currentHours)
+            formatDate(currentHours)
         )
         assertEquals("2 days ago",
-            com.vlascitchii.presentation_common.utils.formatDate(currentDays)
+            formatDate(currentDays)
         )
         assertEquals("3 months ago",
-            com.vlascitchii.presentation_common.utils.formatDate(currentMonths)
+            formatDate(currentMonths)
         )
         assertEquals("7 years ago",
-            com.vlascitchii.presentation_common.utils.formatDate("2017-01-22T21:08:03Z")
+            formatDate("2017-01-22T21:08:03Z")
         )
     }
 

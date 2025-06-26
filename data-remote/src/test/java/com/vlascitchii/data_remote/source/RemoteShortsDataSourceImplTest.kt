@@ -1,9 +1,9 @@
 package com.vlascitchii.data_remote.source
 
+import com.vlascitchii.common_test.rule.DispatcherTestRule
 import com.vlascitchii.data_remote.enetity_api_model.video_search_api_model.DEFAULT_SEARCH_VIDEO_RESPONSE
 import com.vlascitchii.data_remote.enetity_api_model.video_search_api_model.DEFAULT_SEARCH_VIDEO_RESPONSE_WITH_CHANNEL_IMG_URL
 import com.vlascitchii.data_remote.networking.service.ShortsApiService
-import com.vlascitchii.data_remote.rule.DispatcherTestRule
 import com.vlascitchii.data_remote.util.CHANNEL_RESPONSE_1_PATH
 import com.vlascitchii.data_remote.util.CHANNEL_RESPONSE_2_PATH
 import com.vlascitchii.data_remote.util.CHANNEL_RESPONSE_3_PATH

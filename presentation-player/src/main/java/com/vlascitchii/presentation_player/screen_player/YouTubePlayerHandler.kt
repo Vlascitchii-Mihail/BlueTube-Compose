@@ -14,7 +14,7 @@ class YouTubePlayerHandler(
     private val isVideoPlays: Boolean,
     private val updateVideoIsPlayState: (Boolean) -> Unit,
     private val updatePlaybackPosition: (Float) -> Unit,
-    private val getCurrentPlaybackPosition: () -> Float,
+    private val currentPlaybackPosition: Float,
     private val orientationHandler: OrientationHandler,
 ) {
 
@@ -44,8 +44,8 @@ class YouTubePlayerHandler(
                 orientationHandler.setOnFullscreenClickListener(player)
 
                 when (isVideoPlays) {
-                    true -> youTubePlayer.loadVideo(videoId, getCurrentPlaybackPosition.invoke())
-                    false -> youTubePlayer.cueVideo(videoId, getCurrentPlaybackPosition.invoke())
+                    true -> youTubePlayer.loadVideo(videoId, currentPlaybackPosition)
+                    false -> youTubePlayer.cueVideo(videoId, currentPlaybackPosition)
                 }
             }
 
