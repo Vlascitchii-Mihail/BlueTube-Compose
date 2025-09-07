@@ -3,13 +3,13 @@ package com.vlascitchii.presentation_player.player
 import androidx.paging.PagingData
 import com.vlascitchii.common_test.rule.DispatcherTestRule
 import com.vlascitchii.domain.custom_coroutine_scopes.AppCoroutineScope
-import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideo
-import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse.Companion.RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG
+import com.vlascitchii.domain.model.videos.YoutubeVideoDomain
+import com.vlascitchii.domain.model.videos.YoutubeVideoResponseDomain.Companion.DOMAIN_RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG
 import com.vlascitchii.domain.usecase.VideoPlayerUseCase
 import com.vlascitchii.domain.util.UseCaseException
 import com.vlascitchii.domain.util.VideoResult
-import com.vlascitchii.presentation_common.entity.util.convertToYoutubeVideoUiMode
-import com.vlascitchii.presentation_common.entity.videos.YoutubeVideoUiModel
+import com.vlascitchii.presentation_common.model.util.convertToYoutubeVideoUiModel
+import com.vlascitchii.presentation_common.model.videos.YoutubeVideoUiModel
 import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityObserver
 import com.vlascitchii.presentation_common.ui.state.UiState
 import com.vlascitchii.presentation_player.screen_player.OrientationState
@@ -58,20 +58,20 @@ class VideoPlayerViewModelTest {
     private val orientationStatePortrait = OrientationState.PORTRAIT
     private val orientationStateLandscape = OrientationState.FULL_SCREEN
 
-    private val pagingData: PagingData<YoutubeVideo> = PagingData.from(RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.items)
+    private val pagingData: PagingData<YoutubeVideoDomain> = PagingData.from(DOMAIN_RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.items)
     private val pagingUiData: PagingData<YoutubeVideoUiModel> = PagingData.from(
-        RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.items.map { video: YoutubeVideo ->
-            video.convertToYoutubeVideoUiMode()
+        DOMAIN_RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.items.map { video: YoutubeVideoDomain ->
+            video.convertToYoutubeVideoUiModel()
         }
     )
 
-    private val expectedRelatedVideosUseCaseResponse: VideoResult<VideoPlayerUseCase.Response> =
-        VideoResult.Success(VideoPlayerUseCase.Response(pagingData))
+    private val expectedRelatedVideosUseCaseResponse: VideoResult<VideoPlayerUseCase.PlayerResponse> =
+        VideoResult.Success(VideoPlayerUseCase.PlayerResponse(pagingData))
     private val positiveConvertResult: UiState<PagingData<YoutubeVideoUiModel>> =
         UiState.Success(pagingUiData)
 
     private fun positiveCase() {
-        whenever(videoPlayerUseCase.execute(VideoPlayerUseCase.Request(testQuery)))
+        whenever(videoPlayerUseCase.execute(VideoPlayerUseCase.PlayerRequest(testQuery)))
             .thenReturn(flowOf(expectedRelatedVideosUseCaseResponse))
         whenever(videoPlayerConverter.convert(expectedRelatedVideosUseCaseResponse))
             .thenReturn(positiveConvertResult)
@@ -79,13 +79,13 @@ class VideoPlayerViewModelTest {
 
 
     private val runtimeRelatedVideosException = RuntimeException("VideoList Exception")
-    private val expectedNegativeRelatedVideosUseCaseResponse: VideoResult<VideoPlayerUseCase.Response> = VideoResult
+    private val expectedNegativeRelatedVideosUseCaseResponse: VideoResult<VideoPlayerUseCase.PlayerResponse> = VideoResult
         .Error(UseCaseException.VideoListLoadException(runtimeRelatedVideosException))
     private val negativeConvertResultPlayer: UiState<PagingData<YoutubeVideoUiModel>> =
         UiState.Error(testErrorMessage)
 
     private fun negativeCase() {
-        whenever(videoPlayerUseCase.execute(VideoPlayerUseCase.Request(testQuery)))
+        whenever(videoPlayerUseCase.execute(VideoPlayerUseCase.PlayerRequest(testQuery)))
             .thenReturn(flowOf(expectedNegativeRelatedVideosUseCaseResponse))
         whenever(videoPlayerConverter.convert(expectedNegativeRelatedVideosUseCaseResponse))
             .thenReturn(negativeConvertResultPlayer)
@@ -107,7 +107,7 @@ class VideoPlayerViewModelTest {
 
         val actualResult = relatedVideosViewModel.relatedVideoStateFlow.first()
 
-        verify(videoPlayerUseCase).execute(VideoPlayerUseCase.Request(testQuery))
+        verify(videoPlayerUseCase).execute(VideoPlayerUseCase.PlayerRequest(testQuery))
         verify(videoPlayerConverter).convert(expectedRelatedVideosUseCaseResponse)
         assertEquals(positiveConvertResult, actualResult)
     }
@@ -121,7 +121,7 @@ class VideoPlayerViewModelTest {
 
         val actualResult = relatedVideosViewModel.relatedVideoStateFlow.first()
 
-        verify(videoPlayerUseCase).execute(VideoPlayerUseCase.Request(testQuery))
+        verify(videoPlayerUseCase).execute(VideoPlayerUseCase.PlayerRequest(testQuery))
         verify(videoPlayerConverter).convert(expectedNegativeRelatedVideosUseCaseResponse)
         assertEquals(negativeConvertResultPlayer, actualResult)
     }

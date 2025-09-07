@@ -7,10 +7,10 @@ plugins {
 
 android {
     namespace = "com.vlascitchii.data_local"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
-        minSdk = 26
+        minSdk = 31
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
@@ -26,11 +26,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "17"
     }
 }
 
@@ -67,9 +67,5 @@ dependencies {
     //android tests
     androidTestImplementation(libs.test.arch.core)
     androidTestImplementation(libs.androidx.test.ext)
-    //add opportunity to spy ony object
-    androidTestImplementation(libs.dexmaker)
-    androidTestImplementation(libs.mockito)
     androidTestImplementation(libs.androidx.test.espresso)
-    androidTestImplementation(libs.test.coroutines)
 }

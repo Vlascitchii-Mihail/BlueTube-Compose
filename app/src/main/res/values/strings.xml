@@ -1,8 +1,4 @@
 <resources>
     <string name="app_name">BlueTubeCompose</string>
 
-    <string name="video_list_screen">Video List</string>
-    <string name="shorts_screen">Shorts Screen</string>
-    <string name="settings_screen">Setting\'s screen</string>
-    <string name="snackbar_description">Connectivity snackbar</string>
 </resources>

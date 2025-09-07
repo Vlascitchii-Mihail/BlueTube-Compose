@@ -1,6 +1,6 @@
 package com.vlascitchii.data_remote.di
 
-import com.vlascitchii.data_remote.source.RemoteSearchDataSourceImpl
+import com.vlascitchii.data_remote.source.RemoteSearchVideoDataSourceImpl
 import com.vlascitchii.data_remote.source.RemoteShortsDataSourceImpl
 import com.vlascitchii.data_remote.source.RemoteVideoListDataSourceImpl
 import com.vlascitchii.data_repository.data_source.remote.RemoteSearchDataSource
@@ -19,7 +19,7 @@ abstract class RemoteVideoDataSourceModule {
     abstract fun bindRemoteVideoListDataSource(remoteVideoListDataSourceImpl: RemoteVideoListDataSourceImpl): RemoteVideoListDataSource
 
     @Binds
-    abstract fun bindRemoteSearchListDataSource(remoteSearchDataSourceImpl: RemoteSearchDataSourceImpl): RemoteSearchDataSource
+    abstract fun bindRemoteSearchListDataSource(remoteSearchVideoDataSourceImpl: RemoteSearchVideoDataSourceImpl): RemoteSearchDataSource
 
     @Binds
     abstract fun bindRemoteShortsDataSource(remoteShortsDataSourceImpl: RemoteShortsDataSourceImpl): RemoteShortsDataSource

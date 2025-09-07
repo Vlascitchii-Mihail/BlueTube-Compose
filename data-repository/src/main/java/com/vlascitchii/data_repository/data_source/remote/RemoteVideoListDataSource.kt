@@ -1,9 +1,8 @@
 package com.vlascitchii.data_repository.data_source.remote
 
-import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse
-import kotlinx.coroutines.flow.Flow
+import com.vlascitchii.domain.model.videos.YoutubeVideoResponseDomain
 
 interface RemoteVideoListDataSource {
 
-    fun fetchVideos(nextPageToken: String): Flow<YoutubeVideoResponse>
+    suspend fun fetchVideos(nextPageToken: String): YoutubeVideoResponseDomain
 }

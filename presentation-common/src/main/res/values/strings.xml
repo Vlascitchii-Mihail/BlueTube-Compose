@@ -1,20 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!--    Core-->
-    <string name="channel_name">Channel name is </string>
-    <string name="paging_error_retry_btn">Try Again</string>
+    <!--    core-->
+    <string name="snackbar_description">Connectivity snackbar</string>
+    <string name="circular_progress_indicator">Circular progress indicator</string>
+    <string name="wrong_internet_connection">Wrong internet connection</string>
+
+    <!--    Pagination-->
     <string name="paging_error_retry_item">Try loading items again</string>
+    <string name="paging_error_retry_btn">Try Again</string>
     <string name="paging_error_msg_txt">Videos not found</string>
     <string name="error_msg_empty_list">The video list is empty</string>
-    <string name="snackbar_description">Connectivity snackbar</string>
+
+    <!--    Video item-->
+    <string name="channel_description">Channel name</string>
+    <string name="video_compact_preview_description">Video compact preview</string>
+    <string name="video_medium_preview_description">Video medium preview</string>
+    <string name="video_preview_description">Video preview</string>
     <string name="views">\u0020views</string>
+    <string name="video_item_title">video title</string>
+    <string name="video_statistics">video statistics</string>
 
+<!--    Video List-->
+    <string name="video_list_description">video list</string>
 
-    <!--    Video appearance-->
-    <string name="video_preview">Video preview</string>
+<!--    Common screen-->
+    <string name="common_error_compos_desc">Common error composable desc</string>
+    <string name="common_loading_compose_desc">Common load composable desc</string>
+    <string name="common_success_compos_desc">Common success composable desc</string>
+    <string name="video_thumbnail_description">Video thumbnail description</string>
 
-    <!--    VideoPreviewItemConfiguration-->
-    <string name="video_compact_preview">Video compact preview</string>
-    <string name="video_medium_preview">Video medium preview</string>
-
+<!--    Bottom navigation-->
+    <string name="video_list_screen">Video</string>
+    <string name="shorts_screen">Shorts</string>
+    <string name="settings_screen">Settings</string>
 </resources>

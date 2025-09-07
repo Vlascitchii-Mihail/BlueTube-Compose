@@ -2,8 +2,8 @@ package com.vlascitchii.data_local.database
 
 import com.vlascitchii.common_test.util.assertListEqualsTo
 import com.vlascitchii.data_local.enetity.video_list.videos.YoutubeVideoResponseEntity.Companion.TEST_DATABASE_VIDEO_RESPONSE
-import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse.Companion.RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG
-import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse.Companion.testDateTime
+import com.vlascitchii.domain.model.videos.YoutubeVideoResponseDomain.Companion.DOMAIN_RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG
+import com.vlascitchii.domain.model.videos.YoutubeVideoResponseDomain.Companion.testDateTime
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -31,16 +31,16 @@ class ConverterTest {
     fun `convertToDomainYoutubeVideoResponse() converts YoutubeVideoResponseEntity to YoutubeVideoResponse`() {
         val result = TEST_DATABASE_VIDEO_RESPONSE.convertToDomainYoutubeVideoResponse()
 
-        assertEquals(RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.nextPageToken, result.nextPageToken)
-        assertEquals(RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.currentPageToken, result.currentPageToken)
-        assertEquals(RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.prevPageToken, result.prevPageToken)
+        assertEquals(DOMAIN_RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.nextPageToken, result.nextPageToken)
+        assertEquals(DOMAIN_RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.currentPageToken, result.currentPageToken)
+        assertEquals(DOMAIN_RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.prevPageToken, result.prevPageToken)
 
-        RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.items.assertListEqualsTo(result.items)
+        DOMAIN_RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.items.assertListEqualsTo(result.items)
     }
 
     @Test
     fun `convertToLocalYoutubeVideoResponseEntity() converts YoutubeVideoResponse to YoutubeVideoResponseEntity`() {
-        val result = RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.convertToLocalYoutubeVideoResponseEntity()
+        val result = DOMAIN_RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.convertToLocalYoutubeVideoResponseEntity()
 
         assertEquals(TEST_DATABASE_VIDEO_RESPONSE.pageEntity, result.pageEntity)
     }

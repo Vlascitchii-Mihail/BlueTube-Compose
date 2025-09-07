@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!--Settings Screen-->
-    <string name="settings_screen">Setting\'s screen</string>
+    <string name="settings_screen_description">Settings screen</string>
 </resources>

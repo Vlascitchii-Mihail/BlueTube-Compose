@@ -9,8 +9,8 @@ import com.vlascitchii.data_local.enetity.video_list.videos.YoutubeVideoEntity
 import com.vlascitchii.data_local.enetity.video_list.videos.YoutubeVideoResponseEntity
 import com.vlascitchii.data_local.enetity.video_list.videos.YoutubeVideoResponseEntity.Companion.TEST_DATABASE_VIDEO_RESPONSE
 import com.vlascitchii.data_local.source.utils.DatabaseContentManager
-import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse.Companion.RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG
-import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse.Companion.testDateTime
+import com.vlascitchii.domain.model.videos.YoutubeVideoResponseDomain.Companion.DOMAIN_RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG
+import com.vlascitchii.domain.model.videos.YoutubeVideoResponseDomain.Companion.testDateTime
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -39,7 +39,7 @@ class DatabaseContentManagerTest {
     @Before
     fun init() {
         databaseContentManager = DatabaseContentManager(youTubeDao)
-        testVideoResponseEntity = RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.convertToLocalYoutubeVideoResponseEntity()
+        testVideoResponseEntity = DOMAIN_RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.convertToLocalYoutubeVideoResponseEntity()
     }
 
     @Test

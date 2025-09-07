@@ -28,9 +28,9 @@ class YouTubePlayerHandler(
         binding.ytPlayer.apply {
             currentComposeLifecycle.addObserver(this)
             enableAutomaticInitialization = false
-            val fullScreenControl = IFramePlayerOptions.Builder().controls(1).fullscreen(1).build()
+//            val fullScreenControl = IFramePlayerOptions.Builder().controls(1).fullscreen(1).build()
             val youTubePlayerListener = getYouTubePlayerListener()
-            initialize(youTubePlayerListener, fullScreenControl)
+//            initialize(youTubePlayerListener, fullScreenControl)
         }
     }
 
