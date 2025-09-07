@@ -1,17 +1,22 @@
 package com.vlascitchii.domain.usecase
 
+import androidx.paging.AsyncPagingDataDiffer
 import androidx.paging.PagingData
+import androidx.recyclerview.widget.DiffUtil
+import com.vlascitchii.common_test.paging.CommonTestPagingDiffer
 import com.vlascitchii.common_test.rule.DispatcherTestRule
-import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse.Companion.RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG
+import com.vlascitchii.common_test.util.assertListEqualsTo
+import com.vlascitchii.domain.mock_model.DOMAIN_RESPONSE_VIDEO_WITH_CHANNEL_IMG
+import com.vlascitchii.domain.model.videos.YoutubeVideoDomain
 import com.vlascitchii.domain.repository.VideoListRepository
-import com.vlascitchii.domain.usecase.util.Configuration
-import com.vlascitchii.domain.util.UseCaseException.VideoListLoadException
+import com.vlascitchii.domain.usecase.util.DispatcherConfiguration
 import com.vlascitchii.domain.util.VideoResult
-import junit.framework.TestCase.assertEquals
-import junit.framework.TestCase.assertTrue
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -24,36 +29,83 @@ class VideoListUseCaseTest {
     @get:Rule
     val dispatcherTestRule = DispatcherTestRule()
 
-    private val configuration: Configuration = mock()
+    private val configuration: DispatcherConfiguration = mock()
     private val videoListRepository: VideoListRepository = mock()
-    private val videoListUseCase: VideoListUseCase = VideoListUseCase(configuration, videoListRepository)
+    private lateinit var videoListUseCase: VideoListUseCase
 
-    private val repositoryExpectedResultFlow = PagingData.from((RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.items))
-    private val negativeRepositoryExpectedResultFlow = VideoListLoadException(RuntimeException())
+    private val repositoryExpectedResultFlow: Flow<PagingData<YoutubeVideoDomain>> =
+        flowOf(PagingData.from((DOMAIN_RESPONSE_VIDEO_WITH_CHANNEL_IMG.items)))
 
-    private val positiveExpectedResult = flowOf(VideoResult.Success(VideoListUseCase.Response(repositoryExpectedResultFlow)))
+    private val positiveExpectedResult: VideoResult.Success<VideoListUseCase.VideoListResponse> =
+        VideoResult.Success(VideoListUseCase.VideoListResponse(repositoryExpectedResultFlow))
+
+    private val differCallback = object : DiffUtil.ItemCallback<YoutubeVideoDomain>() {
+
+        override fun areItemsTheSame(oldItem: YoutubeVideoDomain, newItem: YoutubeVideoDomain): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+        override fun areContentsTheSame(oldItem: YoutubeVideoDomain, newItem: YoutubeVideoDomain): Boolean {
+            return oldItem == newItem
+        }
+    }
+
+    private lateinit var expectedTestPagingDomainYouTubeVideoDiffer: AsyncPagingDataDiffer<YoutubeVideoDomain>
+    private lateinit var actualTestPagingDomainYouTubeVideoDiffer : AsyncPagingDataDiffer<YoutubeVideoDomain>
 
     @Before
     fun init() {
         whenever(configuration.dispatcher).thenReturn(dispatcherTestRule.testDispatcher)
+        videoListUseCase = VideoListUseCase(configuration, videoListRepository)
+        expectedTestPagingDomainYouTubeVideoDiffer =
+            CommonTestPagingDiffer(dispatcherTestRule.testDispatcher, differCallback).pagingDiffer
+        actualTestPagingDomainYouTubeVideoDiffer =
+            CommonTestPagingDiffer(dispatcherTestRule.testDispatcher, differCallback).pagingDiffer
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `fun execute() returns Success PopularVideoResult with pager inside`() = runTest {
-        whenever(videoListRepository.getPopularVideos()).thenReturn(flowOf(repositoryExpectedResultFlow))
+        whenever(videoListRepository.getPopularVideos()).thenReturn(repositoryExpectedResultFlow)
 
-        val actualResult = videoListUseCase.execute(VideoListUseCase.Request)
+        val actualResult = videoListUseCase.execute(
+            VideoListUseCase.VideoListRequest.VideoRequest(coroutineScope = this)
+        )
 
-        assertEquals(positiveExpectedResult.first(), actualResult.first())
+        val expectedPagingData = positiveExpectedResult.data.youTubePopularVideoPagingData.first()
+        val actualPagingData = (actualResult.first() as VideoResult.Success).data.youTubePopularVideoPagingData.first()
+
+        val testJob1 = launch { expectedTestPagingDomainYouTubeVideoDiffer.submitData(expectedPagingData) }
+        val testJob2 = launch { actualTestPagingDomainYouTubeVideoDiffer.submitData(actualPagingData) }
+
+        advanceUntilIdle()
+        testJob1.cancel()
+        testJob2.cancel()
+
+        expectedTestPagingDomainYouTubeVideoDiffer.snapshot().assertListEqualsTo(actualTestPagingDomainYouTubeVideoDiffer.snapshot())
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `fun execute() returns PopularVideoResult Error`() = runTest {
-        whenever(videoListRepository.getPopularVideos())
-            .thenReturn(flow { throw negativeRepositoryExpectedResultFlow })
+    fun `fun execute() returns Success SearchVideoResult with pager inside`() = runTest {
+        val testQuery = "Test query"
+        whenever(videoListRepository.getSearchVideos(testQuery))
+            .thenReturn(repositoryExpectedResultFlow)
 
-        val actualResult = videoListUseCase.execute(VideoListUseCase.Request).first()
+        val actualResult = videoListUseCase.execute(
+            VideoListUseCase.VideoListRequest.SearchRequest(query = testQuery, coroutineScope = this)
+        )
 
-        assertTrue((actualResult as VideoResult.Error).exception is VideoListLoadException)
+        val expectedPagingData = positiveExpectedResult.data.youTubePopularVideoPagingData.first()
+        val actualPagingData = (actualResult.first() as VideoResult.Success).data.youTubePopularVideoPagingData.first()
+
+        val testJob1 = launch { expectedTestPagingDomainYouTubeVideoDiffer.submitData(expectedPagingData) }
+        val testJob2 = launch { actualTestPagingDomainYouTubeVideoDiffer.submitData(actualPagingData) }
+
+        advanceUntilIdle()
+        testJob1.cancel()
+        testJob2.cancel()
+
+        expectedTestPagingDomainYouTubeVideoDiffer.snapshot().assertListEqualsTo(actualTestPagingDomainYouTubeVideoDiffer.snapshot())
     }
 }

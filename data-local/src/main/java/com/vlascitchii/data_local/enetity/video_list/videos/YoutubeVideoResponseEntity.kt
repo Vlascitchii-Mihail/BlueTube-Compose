@@ -6,7 +6,8 @@ import com.vlascitchii.data_local.enetity.INITIAL_PAGE_TOKEN
 import com.vlascitchii.data_local.enetity.PageEntity
 import com.vlascitchii.data_local.enetity.video_list.ThumbnailAttributesEntity
 import com.vlascitchii.data_local.enetity.video_list.ThumbnailsEntity
-import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse.Companion.testDateTime
+import java.time.OffsetDateTime
+import java.time.format.DateTimeFormatter
 
 data class YoutubeVideoResponseEntity(
     @Embedded val pageEntity: PageEntity,
@@ -18,6 +19,9 @@ data class YoutubeVideoResponseEntity(
 ) {
 
     companion object {
+
+        private val offsetFormatter: DateTimeFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
+        val testDateTime: OffsetDateTime = offsetFormatter.parse("2007-12-03T10:15:30+01:00", OffsetDateTime::from)
 
         val TEST_DATABASE_VIDEO_LIST = listOf(
             YoutubeVideoEntity(

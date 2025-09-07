@@ -63,7 +63,7 @@ interface YouTubeVideoDao {
     fun getVideosFromPage(currentPageToken: String): Flow<YoutubeVideoResponseEntity> {
         val videoResponseEntity = getPageByToken(currentPageToken)
         return videoResponseEntity.map { videoResponse: YoutubeVideoResponseEntity ->
-            videoResponse.items.initializeVideos()
+            initializeVideos(videoResponse.items)
             videoResponse
         }
     }
@@ -80,7 +80,7 @@ interface YouTubeVideoDao {
     fun getFirstPageFromDb(): Flow<YoutubeVideoResponseEntity> {
         val firstPage = getFirstPage()
         return firstPage.map { responseEntity: YoutubeVideoResponseEntity ->
-            responseEntity.items.initializeVideos()
+            initializeVideos(responseEntity.items)
             responseEntity
         }
     }
@@ -96,8 +96,8 @@ interface YouTubeVideoDao {
 
     //TODO: check if it possible to get videos from DB at once with annotations, without initializing fields of the result
     @Transaction
-    suspend fun List<YoutubeVideoEntity>.initializeVideos() {
-        this.forEach { video ->
+    suspend fun initializeVideos(videoEntryList: List<YoutubeVideoEntity>) {
+        videoEntryList.forEach { video ->
             val videoId = video.id
             video.statistics = getVideoStatistics(videoId).first()
             video.contentDetailsEntity = getVideoDetails(videoId).first()

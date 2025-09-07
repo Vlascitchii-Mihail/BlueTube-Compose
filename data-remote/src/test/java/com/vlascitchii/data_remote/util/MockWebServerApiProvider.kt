@@ -1,10 +1,10 @@
 package com.vlascitchii.data_remote.util
 
+import com.squareup.moshi.Moshi
 import com.vlascitchii.data_remote.networking.service.BaseApiService
-import com.vlascitchii.data_remote.networking.service.ParticularVideoApiService
-import com.vlascitchii.data_remote.networking.service.SearchApiService
 import com.vlascitchii.data_remote.networking.service.ShortsApiService
 import com.vlascitchii.data_remote.networking.service.VideoListApiService
+import com.vlascitchii.data_remote.source.util.MoshiParser
 import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockWebServer
 import retrofit2.Retrofit
@@ -15,20 +15,16 @@ private const val MOCK_BASE_URL = "/"
 class MockWebServerApiProvider {
 
     private var mockWebServer: MockWebServer = MockWebServer()
-    private val client = OkHttpClient.Builder().build()
-    private val moshiConverterFactory = MoshiConverterFactory.create()
     private val retrofit = Retrofit.Builder()
         .baseUrl(mockWebServer.url(MOCK_BASE_URL))
-        .addConverterFactory(moshiConverterFactory)
-        .client(client)
+        .addConverterFactory(staticMoshiConverterFactory)
+        .client(staticClient)
         .build()
-    val mockWebServerScheduler = MockWebServerScheduler(mockWebServer)
+
+    val mockWebServerScheduler = MockWebServerScheduler(mockWebServer, staticJsonHandler)
 
     fun provideMockBaseApiService(): BaseApiService {
         return retrofit.create(BaseApiService::class.java)
-    }
-    fun provideMockSearchApiService(): SearchApiService {
-        return retrofit.create(SearchApiService::class.java)
     }
 
     fun provideMockShortsApiService(): ShortsApiService {
@@ -39,7 +35,11 @@ class MockWebServerApiProvider {
         return retrofit.create(VideoListApiService::class.java)
     }
 
-    fun provideParticularVideoApiService(): ParticularVideoApiService {
-        return retrofit.create(ParticularVideoApiService::class.java)
+    companion object {
+        private val staticClient = OkHttpClient.Builder().build()
+        private val staticMoshi: Moshi = Moshi.Builder().build()
+        private val staticMoshiConverterFactory = MoshiConverterFactory.create(staticMoshi)
+        val staticMoshiParser: MoshiParser = MoshiParser(staticMoshi)
+        val staticJsonHandler: JsonHandler = JsonHandler()
     }
 }

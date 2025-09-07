@@ -64,13 +64,13 @@ class OrientationHandler(
     }
 
     fun initFullScreenWidgetState(player: YouTubePlayer?) {
-        if (playerOrientationState == OrientationState.FULL_SCREEN) player?.toggleFullscreen()
+//        if (playerOrientationState == OrientationState.FULL_SCREEN) player?.toggleFullscreen()
     }
 
     fun setOnFullscreenClickListener(player: YouTubePlayer?) {
         binding.fullScreenButton.setOnClickListener {
             setFullscreenWidgetIsClicked.invoke(true)
-            player?.toggleFullscreen()
+//            player?.toggleFullscreen()
         }
     }
 

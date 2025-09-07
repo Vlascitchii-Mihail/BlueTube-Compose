@@ -2,23 +2,20 @@ package com.vlascitchii.presentation_video_list.video_list
 
 import androidx.paging.PagingData
 import com.vlascitchii.common_test.rule.DispatcherTestRule
-import com.vlascitchii.domain.custom_coroutine_scopes.AppCoroutineScope
-import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideo
-import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse.Companion.RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG
-import com.vlascitchii.domain.usecase.SearchVideoListUseCase
+import com.vlascitchii.domain.custom_scope.CustomCoroutineScope
+import com.vlascitchii.domain.model.videos.YoutubeVideoDomain
 import com.vlascitchii.domain.usecase.VideoListUseCase
 import com.vlascitchii.domain.util.UseCaseException
 import com.vlascitchii.domain.util.VideoResult
-import com.vlascitchii.presentation_common.entity.util.convertToYoutubeVideoUiMode
-import com.vlascitchii.presentation_common.entity.videos.YoutubeVideoUiModel
+import com.vlascitchii.presentation_common.model.videos.YoutubeVideoUiModel
 import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityObserver
 import com.vlascitchii.presentation_common.ui.state.UiState
 import com.vlascitchii.presentation_video_list.screen.VideoListViewModel
-import com.vlascitchii.presentation_video_list.util.SearchVideoListConverter
+import com.vlascitchii.presentation_video_list.screen.state.SearchState
+import com.vlascitchii.presentation_video_list.screen.state.UiVideoListAction
 import com.vlascitchii.presentation_video_list.util.VideoListConverter
-import com.vlascitchii.presentation_video_list.util.state.SearchState
-import com.vlascitchii.presentation_video_list.util.state.VideoType
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -29,6 +26,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -40,69 +38,50 @@ class VideoListViewModelTest {
     @get:Rule
     val dispatcherTestRule = DispatcherTestRule()
 
+    private val customCoroutineScope: CustomCoroutineScope = CustomCoroutineScope(dispatcherTestRule.testDispatcher)
+
     private val videoListUseCase: VideoListUseCase = mock()
-    private val searchVideoListUseCase: SearchVideoListUseCase = mock()
     private val videoListConverter: VideoListConverter = mock()
-    private val searchVideoListConverter: SearchVideoListConverter = mock()
     private val networkConnectivityObserver: NetworkConnectivityObserver = mock()
-    private val videoCoroutineScope: AppCoroutineScope = mock()
     private val videoListViewModel = VideoListViewModel(
         videoListUseCase,
-        searchVideoListUseCase,
         videoListConverter,
-        searchVideoListConverter,
         networkConnectivityObserver,
-        videoCoroutineScope
+        customCoroutineScope
     )
 
     private val testQuery = "TestQuery"
     private val testErrorMessage = "Test Error Message"
 
-    private val pagingData: PagingData<YoutubeVideo> = PagingData.from(RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.items)
-    private val pagingUiData: PagingData<YoutubeVideoUiModel> = PagingData.from(
-        RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.items.map { video: YoutubeVideo ->
-            video.convertToYoutubeVideoUiMode()
-        }
-    )
+    private val pagingData: Flow<PagingData<YoutubeVideoDomain>> = flowOf(PagingData.from(emptyList()))
+    private val pagingUiData: Flow<PagingData<YoutubeVideoUiModel>> = flowOf(PagingData.from(emptyList()))
 
-    private val expectedVideoListUseCaseResponse: VideoResult<VideoListUseCase.Response> =
-        VideoResult.Success(VideoListUseCase.Response(pagingData))
-    private val expectedSearchVideoUseCaseResponse: VideoResult<SearchVideoListUseCase.Response> =
-        VideoResult.Success(SearchVideoListUseCase.Response(pagingData))
-    private val positiveConvertResult: UiState<PagingData<YoutubeVideoUiModel>> =
+    private val expectedVideoListUseCaseResponse: VideoResult<VideoListUseCase.VideoListResponse> =
+        VideoResult.Success(VideoListUseCase.VideoListResponse(pagingData))
+
+    private val positiveConvertResult: UiState<Flow<PagingData<YoutubeVideoUiModel>>> =
         UiState.Success(pagingUiData)
+
     private fun positiveCase() {
-        whenever(videoListUseCase.execute(VideoListUseCase.Request))
+        whenever(videoListUseCase.execute(any()))
             .thenReturn(flowOf(expectedVideoListUseCaseResponse))
-        whenever(searchVideoListUseCase.execute(SearchVideoListUseCase.Request(testQuery)))
-            .thenReturn(flowOf(expectedSearchVideoUseCaseResponse))
 
         whenever(videoListConverter.convert(expectedVideoListUseCaseResponse))
             .thenReturn(positiveConvertResult)
-        whenever(searchVideoListConverter.convert(expectedSearchVideoUseCaseResponse))
-            .thenReturn(positiveConvertResult)
     }
 
-
-
     private val runtimeVideoListException = RuntimeException("VideoList Exception")
-    private val expectedNegativeVideoListUseCaseResponse: VideoResult<VideoListUseCase.Response> = VideoResult
+    private val expectedNegativeVideoListUseCaseResponse: VideoResult<VideoListUseCase.VideoListResponse> = VideoResult
         .Error(UseCaseException.VideoListLoadException(runtimeVideoListException))
-    private val runtimeSearchException = RuntimeException("Search Exception")
-    private val expectedNegativeSearchVideoUseCaseResponse: VideoResult<SearchVideoListUseCase.Response> = VideoResult
-        .Error(UseCaseException.SearchLoadException(runtimeSearchException))
-    private val negativeConvertResult: UiState<PagingData<YoutubeVideoUiModel>> =
+
+    private val negativeConvertResult: UiState<Flow<PagingData<YoutubeVideoUiModel>>> =
         UiState.Error(testErrorMessage)
 
     private fun negativeCase() {
-        whenever(videoListUseCase.execute(VideoListUseCase.Request))
+        whenever(videoListUseCase.execute(any()))
              .thenReturn(flowOf(expectedNegativeVideoListUseCaseResponse))
-        whenever(searchVideoListUseCase.execute(SearchVideoListUseCase.Request(testQuery)))
-            .thenReturn(flowOf(expectedNegativeSearchVideoUseCaseResponse))
 
         whenever(videoListConverter.convert(expectedNegativeVideoListUseCaseResponse))
-            .thenReturn(negativeConvertResult)
-        whenever(searchVideoListConverter.convert(expectedNegativeSearchVideoUseCaseResponse))
             .thenReturn(negativeConvertResult)
     }
 
@@ -110,34 +89,31 @@ class VideoListViewModelTest {
     fun `fun updateSearchTextState() updates text in SearchAppBar`() {
         positiveCase()
 
-        val testText = "TestText"
-        videoListViewModel.updateSearchTextState(testText)
-        assertEquals(testText, videoListViewModel.searchTextState.value)
+        videoListViewModel.updateSearchTextState(testQuery)
+        assertEquals(testQuery, videoListViewModel.searchTextState.value.text)
     }
 
     @Test
     fun `fun updateSearchState() changes the state of the SearchAppBar `() {
         positiveCase()
 
-        assertTrue(videoListViewModel.searchState.value == SearchState.CLOSED)
+        assertTrue(videoListViewModel.searchBarState.value == SearchState.CLOSED)
 
         videoListViewModel.updateSearchState(SearchState.OPENED)
-        assertTrue(videoListViewModel.searchState.value == SearchState.OPENED)
+        assertTrue(videoListViewModel.searchBarState.value == SearchState.OPENED)
 
         videoListViewModel.updateSearchState(SearchState.CLOSED)
-        assertTrue(videoListViewModel.searchState.value == SearchState.CLOSED)
+        assertTrue(videoListViewModel.searchBarState.value == SearchState.CLOSED)
     }
 
     @Test
-    fun `fetchVideoPagingData() gets UiState Error when VideoType is PopularVideo and assigns it to the ViewModel state`() = runTest {
+    fun `fetchVideoPagingData() gets UiState Error and assigns it to the ViewModel state`() = runTest {
         negativeCase()
 
-        videoListViewModel.fetchVideoPagingData(VideoType.PopularVideo)
+        videoListViewModel.submitAction(UiVideoListAction.GetVideo(""))
         advanceUntilIdle()
+        val actualErrorResult = videoListViewModel.uiStateFlow.first()
 
-        val actualErrorResult = videoListViewModel.videoStateFlow.first() as UiState.Error
-
-        verify(videoListUseCase).execute(VideoListUseCase.Request)
         verify(videoListConverter).convert(expectedNegativeVideoListUseCaseResponse)
         assertEquals(negativeConvertResult, actualErrorResult)
     }
@@ -146,41 +122,38 @@ class VideoListViewModelTest {
     fun `fetchVideoPagingData() gets UiState Error when VideoType is SearchVideo and assigns it to the ViewModel state`() = runTest {
         negativeCase()
 
-        videoListViewModel.fetchVideoPagingData(VideoType.SearchVideo(testQuery))
+        videoListViewModel.submitAction(UiVideoListAction.GetVideo(testQuery))
         advanceUntilIdle()
 
-        val actualErrorResult = videoListViewModel.videoStateFlow.first() as UiState.Error
+        val actualErrorResult = videoListViewModel.uiStateFlow.first()
 
-        verify(searchVideoListUseCase).execute(SearchVideoListUseCase.Request(testQuery))
-        verify(searchVideoListConverter).convert(expectedNegativeSearchVideoUseCaseResponse)
+        verify(videoListConverter).convert(expectedNegativeVideoListUseCaseResponse)
         assertEquals(negativeConvertResult, actualErrorResult)
     }
 
     @Test
-    fun `fetchVideoPagingData() gets UiState Success when VideoType is PopularVideo and assigns it to the ViewModel state`() = runTest {
+    fun `fetchVideoPagingData() gets UiState Success and assigns it to the ViewModel state`() = runTest {
         positiveCase()
 
-        videoListViewModel.fetchVideoPagingData(VideoType.PopularVideo)
+        videoListViewModel.submitAction(UiVideoListAction.GetVideo(""))
         advanceUntilIdle()
 
-        val actualResult = videoListViewModel.videoStateFlow.first()
+        val actualResult = videoListViewModel.uiStateFlow.first()
 
-        verify(videoListUseCase).execute(VideoListUseCase.Request)
         verify(videoListConverter).convert(expectedVideoListUseCaseResponse)
         assertEquals(positiveConvertResult, actualResult)
     }
 
     @Test
-    fun `fetchVideoPagingData() gets UiState Success when VideoType is SearchVideo and assigns it to the ViewModel state`() = runTest {
+    fun `fetchVideoPagingData() search gets UiState Success and assigns it to the ViewModel state`() = runTest {
         positiveCase()
 
-        videoListViewModel.fetchVideoPagingData(VideoType.SearchVideo(testQuery))
+        videoListViewModel.submitAction(UiVideoListAction.GetVideo(testQuery))
         advanceUntilIdle()
 
-        val actualResult = videoListViewModel.videoStateFlow.first()
+        val actualResult = videoListViewModel.uiStateFlow.first()
 
-        verify(searchVideoListUseCase).execute(SearchVideoListUseCase.Request(testQuery))
-        verify(searchVideoListConverter).convert(expectedSearchVideoUseCaseResponse)
+        verify(videoListConverter).convert(expectedVideoListUseCaseResponse)
         assertEquals(positiveConvertResult, actualResult)
     }
 }

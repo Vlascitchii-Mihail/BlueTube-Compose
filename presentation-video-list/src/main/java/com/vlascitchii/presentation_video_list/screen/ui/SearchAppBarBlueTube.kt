@@ -1,21 +1,25 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.vlascitchii.presentation_video_list.screen.ui
 
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.AppBarDefaults
-import androidx.compose.material.ContentAlpha
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -27,30 +31,34 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.vlascitchii.presentation_video_list.R
-import com.vlascitchii.presentation_video_list.util.state.SearchState
+import com.vlascitchii.presentation_common.ui.theme.BlueTubeComposeTheme
+import com.vlascitchii.presentation_video_list.screen.state.SearchState
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import com.vlascitchii.presentation_common.R as RCommon
+import com.vlascitchii.presentation_video_list.R as RPresentationList
 
-private val DEFAULT_APP_BAR_HEIGHT = 56.dp
-private const val SEARCH_INPUT_DELAY = 1500L
+private const val SEARCH_INPUT_DELAY = 2000L
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchAppBarBlueTube(
-    searchText: StateFlow<String>,
+    searchText: StateFlow<TextFieldValue>,
     onTextChange: (String) -> Unit,
-    updateSearchState: (newSearchState: SearchState) -> Unit,
+    updateSearchState: (SearchState) -> Unit,
     onSearchClicked: () -> Unit,
+    scrollAppBarBehaviour: TopAppBarScrollBehavior,
+    modifier: Modifier,
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusRequester = remember { FocusRequester() }
@@ -75,85 +83,108 @@ fun SearchAppBarBlueTube(
     }
 
     Surface(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
-            .height(DEFAULT_APP_BAR_HEIGHT),
-        shadowElevation = AppBarDefaults.TopAppBarElevation,
+            .statusBarsPadding(),
+        shadowElevation = dimensionResource(RCommon.dimen.elevation_medium_16),
+        tonalElevation = dimensionResource(RCommon.dimen.elevation_medium_16)
+
     ) {
-        TextField(
-            modifier = Modifier
-                .fillMaxWidth()
-                .focusRequester(focusRequester),
-            value = searchQuery,
-            onValueChange = { input ->
-                onTextChange.invoke(input)
-                performSearch(input)
-            },
-            placeholder = {
-                Text(
-                    modifier = Modifier.alpha(ContentAlpha.medium),
-                    text = stringResource(id = R.string.search_placeholder),
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = ContentAlpha.medium)
-                )
-            },
-            textStyle = MaterialTheme.typography.bodyMedium,
-            singleLine = true,
-            leadingIcon = {
+        TopAppBar(
+            navigationIcon = {
                 IconButton(
-                    modifier = Modifier.alpha(ContentAlpha.medium),
-                    onClick = {  }
+                    modifier = modifier.alpha(0.5f),
+                    onClick = { }
                 ) {
                     Icon(
                         imageVector = Icons.Default.Search,
-                        contentDescription = stringResource(id = R.string.appbar_search_icon_descr),
-                        tint = MaterialTheme.colorScheme.onBackground
+                        contentDescription = stringResource(id = RPresentationList.string.appbar_search_icon_descr),
                     )
                 }
             },
-            trailingIcon = {
-                IconButton(
-                    onClick = {
-                        if(searchQuery.isNotEmpty()) onTextChange("")
-                        else updateSearchState.invoke(SearchState.CLOSED)
-                    }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = stringResource(id = R.string.appbar_close_icon_descr),
-                        tint = MaterialTheme.colorScheme.onBackground
+            title = {
+                OutlinedTextField(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .focusRequester(focusRequester),
+                    value = searchQuery,
+                    onValueChange = { input ->
+                        onTextChange.invoke(input.text)
+                        performSearch(input.text)
+                    },
+                    placeholder = {
+                        Text(
+                            modifier = modifier.alpha(0.5f),
+                            text = stringResource(id = RPresentationList.string.search_placeholder),
+                        )
+                    },
+                    textStyle = MaterialTheme.typography.bodyMedium,
+                    singleLine = true,
+                    trailingIcon = {
+                        IconButton(
+                            onClick = {
+                                if (searchQuery.text.isNotEmpty()) onTextChange("")
+                                else updateSearchState.invoke(SearchState.CLOSED)
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = stringResource(id = RPresentationList.string.appbar_close_icon_descr),
+                            )
+                        }
+                    },
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Search
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onSearch = {
+                            performSearch(searchQuery.text)
+                            keyboardController?.hide()
+                        }
                     )
-                }
+                )
             },
-            keyboardOptions = KeyboardOptions(
-                imeAction = ImeAction.Search
-            ),
-            keyboardActions = KeyboardActions(
-                onSearch = {
-                    performSearch(searchQuery)
-                    keyboardController?.hide()
-                }
-            ),
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = MaterialTheme.colorScheme.onPrimary,
-                unfocusedContainerColor = MaterialTheme.colorScheme.onPrimary,
-                focusedTextColor = MaterialTheme.colorScheme.onBackground,
-                unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
-                cursorColor = Color.Gray
-            )
+            scrollBehavior = scrollAppBarBehaviour
         )
     }
-
-
 }
 
-@Preview
+@PreviewLightDark
 @Composable
 fun PreviewSearchAppBarBlueTube() {
-    val searchText = remember { MutableStateFlow("Test text") }
-    SearchAppBarBlueTube(
-        searchText = searchText,
-        onTextChange = {},
-        updateSearchState = {},
-        onSearchClicked = {},
-    )
+    val searchText = remember { MutableStateFlow(TextFieldValue("")) }
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+
+    BlueTubeComposeTheme {
+        Surface {
+            SearchAppBarBlueTube(
+                searchText = searchText,
+                onTextChange = {},
+                updateSearchState = {},
+                onSearchClicked = {},
+                scrollAppBarBehaviour = scrollBehavior,
+                modifier = Modifier,
+            )
+        }
+    }
+}
+
+@PreviewLightDark
+@Composable
+fun PreviewSearchAppBarBlueTubeWithText() {
+    val searchText = remember { MutableStateFlow(TextFieldValue("Test text")) }
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+
+    BlueTubeComposeTheme {
+        Surface {
+            SearchAppBarBlueTube(
+                searchText = searchText,
+                onTextChange = {},
+                updateSearchState = {},
+                onSearchClicked = {},
+                scrollAppBarBehaviour = scrollBehavior,
+                modifier = Modifier,
+            )
+        }
+    }
 }

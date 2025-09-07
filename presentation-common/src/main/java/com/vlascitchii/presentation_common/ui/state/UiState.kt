@@ -1,8 +1,8 @@
 package com.vlascitchii.presentation_common.ui.state
 
-sealed class UiState<out T: Any> {
+sealed class UiState<out RESULT: Any> {
 
     object Loading : UiState<Nothing>()
-    data class Error<T: Any>(val errorMessage: String) : UiState<T>()
-    data class Success<T: Any>(val data: T) : UiState<T>()
+    data class Error<RESULT: Any>(val errorMessage: String) : UiState<RESULT>()
+    data class Success<RESULT: Any>(val data: RESULT) : UiState<RESULT>()
 }

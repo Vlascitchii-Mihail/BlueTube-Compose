@@ -9,13 +9,13 @@ import com.vlascitchii.data_local.enetity.video_list.videos.VideoSnippetEntity
 import com.vlascitchii.data_local.enetity.video_list.videos.VideoStatisticsEntity
 import com.vlascitchii.data_local.enetity.video_list.videos.YoutubeVideoEntity
 import com.vlascitchii.data_local.enetity.video_list.videos.YoutubeVideoResponseEntity
-import com.vlascitchii.domain.enetity.video_list.ThumbnailAttributes
-import com.vlascitchii.domain.enetity.video_list.Thumbnails
-import com.vlascitchii.domain.enetity.video_list.videos.ContentDetails
-import com.vlascitchii.domain.enetity.video_list.videos.VideoSnippet
-import com.vlascitchii.domain.enetity.video_list.videos.VideoStatistics
-import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideo
-import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse
+import com.vlascitchii.domain.model.ThumbnailAttributesDomain
+import com.vlascitchii.domain.model.ThumbnailsDomain
+import com.vlascitchii.domain.model.videos.ContentDetailsDomain
+import com.vlascitchii.domain.model.videos.VideoSnippetDomain
+import com.vlascitchii.domain.model.videos.VideoStatisticsDomain
+import com.vlascitchii.domain.model.videos.YoutubeVideoDomain
+import com.vlascitchii.domain.model.videos.YoutubeVideoResponseDomain
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 
@@ -32,8 +32,8 @@ class Converter {
     }
 }
 
-internal fun YoutubeVideoResponseEntity.convertToDomainYoutubeVideoResponse(): YoutubeVideoResponse {
-    return YoutubeVideoResponse(
+internal fun YoutubeVideoResponseEntity.convertToDomainYoutubeVideoResponse(): YoutubeVideoResponseDomain {
+    return YoutubeVideoResponseDomain(
         nextPageToken = this.pageEntity.nextPageToken,
         currentPageToken = this.pageEntity.currentPageToken,
         prevPageToken = this.pageEntity.prevPageToken,
@@ -41,9 +41,9 @@ internal fun YoutubeVideoResponseEntity.convertToDomainYoutubeVideoResponse(): Y
     )
 }
 
-internal fun List<YoutubeVideoEntity>.convertToDomainYoutubeVideo(): List<YoutubeVideo> {
+internal fun List<YoutubeVideoEntity>.convertToDomainYoutubeVideo(): List<YoutubeVideoDomain> {
     return this.map { videoEntity: YoutubeVideoEntity ->
-        YoutubeVideo(
+        YoutubeVideoDomain(
             id = videoEntity.id,
             pageToken = videoEntity.pageToken,
             snippet = videoEntity.snippet.convertToDomainVideoSnippet(),
@@ -53,8 +53,8 @@ internal fun List<YoutubeVideoEntity>.convertToDomainYoutubeVideo(): List<Youtub
     }
 }
 
-internal fun VideoSnippetEntity.convertToDomainVideoSnippet(): VideoSnippet {
-    return VideoSnippet(
+internal fun VideoSnippetEntity.convertToDomainVideoSnippet(): VideoSnippetDomain {
+    return VideoSnippetDomain(
         title = this.title,
         description = this.description,
         publishedAt = this.publishedAt,
@@ -65,36 +65,36 @@ internal fun VideoSnippetEntity.convertToDomainVideoSnippet(): VideoSnippet {
     )
 }
 
-internal fun ThumbnailsEntity.convertToDomainThumbnails(): Thumbnails {
-    return Thumbnails(
+internal fun ThumbnailsEntity.convertToDomainThumbnails(): ThumbnailsDomain {
+    return ThumbnailsDomain(
         medium = this.medium.convertToDomainThumbnailAttributes()
 
     )
 }
 
-internal fun ThumbnailAttributesEntity.convertToDomainThumbnailAttributes(): ThumbnailAttributes {
-    return ThumbnailAttributes(
+internal fun ThumbnailAttributesEntity.convertToDomainThumbnailAttributes(): ThumbnailAttributesDomain {
+    return ThumbnailAttributesDomain(
         url = this.url,
         height = this.height,
         width = this.width
     )
 }
 
-internal fun VideoStatisticsEntity.convertToDomainVideoStatistics(): VideoStatistics {
-    return VideoStatistics(
+internal fun VideoStatisticsEntity.convertToDomainVideoStatistics(): VideoStatisticsDomain {
+    return VideoStatisticsDomain(
         viewCount = this.viewCount,
         likeCount = this.likeCount
     )
 }
 
-internal fun ContentDetailsEntity.convertToDomainContentDetails(): ContentDetails {
-    return ContentDetails(duration = this.duration)
+internal fun ContentDetailsEntity.convertToDomainContentDetails(): ContentDetailsDomain {
+    return ContentDetailsDomain(duration = this.duration)
 }
 
 
 
 
-internal fun YoutubeVideoResponse.convertToLocalYoutubeVideoResponseEntity(): YoutubeVideoResponseEntity {
+internal fun YoutubeVideoResponseDomain.convertToLocalYoutubeVideoResponseEntity(): YoutubeVideoResponseEntity {
     return YoutubeVideoResponseEntity(
         pageEntity = PageEntity(
             nextPageToken = this.nextPageToken,
@@ -106,8 +106,8 @@ internal fun YoutubeVideoResponse.convertToLocalYoutubeVideoResponseEntity(): Yo
     )
 }
 
-internal fun List<YoutubeVideo>.convertToLocalYoutubeVideoEntity(): List<YoutubeVideoEntity> {
-    return this.map { youTubeVide: YoutubeVideo ->
+internal fun List<YoutubeVideoDomain>.convertToLocalYoutubeVideoEntity(): List<YoutubeVideoEntity> {
+    return this.map { youTubeVide: YoutubeVideoDomain ->
         YoutubeVideoEntity(
             id = youTubeVide.id,
             pageToken = youTubeVide.pageToken,
@@ -118,7 +118,7 @@ internal fun List<YoutubeVideo>.convertToLocalYoutubeVideoEntity(): List<Youtube
     }
 }
 
-internal fun VideoSnippet.convertToLocalVideoSnippetEntity(): VideoSnippetEntity {
+internal fun VideoSnippetDomain.convertToLocalVideoSnippetEntity(): VideoSnippetEntity {
     return VideoSnippetEntity(
         title = this.title,
         description = this.description,
@@ -130,13 +130,13 @@ internal fun VideoSnippet.convertToLocalVideoSnippetEntity(): VideoSnippetEntity
     )
 }
 
-internal fun Thumbnails.convertToLocalVEntity(): ThumbnailsEntity {
+internal fun ThumbnailsDomain.convertToLocalVEntity(): ThumbnailsEntity {
     return ThumbnailsEntity(
         medium = this.medium.convertToLocalThumbnailAttributesEntity()
     )
 }
 
-internal fun ThumbnailAttributes.convertToLocalThumbnailAttributesEntity(): ThumbnailAttributesEntity {
+internal fun ThumbnailAttributesDomain.convertToLocalThumbnailAttributesEntity(): ThumbnailAttributesEntity {
     return ThumbnailAttributesEntity(
         url = this.url,
         height = this.height,
@@ -144,14 +144,14 @@ internal fun ThumbnailAttributes.convertToLocalThumbnailAttributesEntity(): Thum
     )
 }
 
-internal fun VideoStatistics.convertToLocalVideoStatisticsEntity(): VideoStatisticsEntity {
+internal fun VideoStatisticsDomain.convertToLocalVideoStatisticsEntity(): VideoStatisticsEntity {
     return VideoStatisticsEntity(
         viewCount = this.viewCount,
         likeCount = this.likeCount
     )
 }
 
-internal fun ContentDetails.convertToLocalContentDetailsEntity(): ContentDetailsEntity {
+internal fun ContentDetailsDomain.convertToLocalContentDetailsEntity(): ContentDetailsEntity {
     return ContentDetailsEntity(
         duration = this.duration
     )

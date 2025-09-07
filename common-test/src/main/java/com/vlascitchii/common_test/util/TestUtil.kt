@@ -6,7 +6,7 @@ import junit.framework.TestCase.assertEquals
 
 fun <T> List<T>.assertListEqualsTo(actualList: List<T>?) {
     val expectedVideoList = this
-    if (actualList.isNullOrEmpty()) throw AssertionFailedError()
+    if (actualList.isNullOrEmpty()) throw AssertionFailedError("Actual list is empty")
 
     for (index in actualList.indices) {
         assertEquals(expectedVideoList[index], actualList[index])

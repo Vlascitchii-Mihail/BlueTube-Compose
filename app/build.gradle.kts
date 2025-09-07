@@ -1,25 +1,27 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin)
+    alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt.plugin)
 }
 
 android {
-    namespace = "com.appelier.bluetubecompose"
-    compileSdk = 34
+    namespace = "com.vlascitchii.bluetubecompose"
+    compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.appelier.bluetubecompose"
-        minSdk = 26
-        targetSdk = 34
+        applicationId = "com.vlascitchii.bluetubecompose"
+        minSdk = 31
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "com.appelier.bluetubecompose.BlueTubeTestRunner"
+        testInstrumentationRunner = "com.vlascitchii.bluetubecompose.util.BlueTubeTestRunner"
 
         vectorDrawables {
             useSupportLibrary = true
@@ -40,11 +42,13 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "11"
+    kotlin {
+        compilerOptions {
+            jvmTarget = JvmTarget.JVM_17
+        }
     }
     buildFeatures {
         compose = true
@@ -94,7 +98,6 @@ dependencies {
     implementation(libs.ui.graphics)
     implementation(libs.ui.tooling.preview)
     implementation(libs.material3)
-    implementation(libs.androidx.material)
     implementation(libs.constraint.layout.compose)
     implementation(libs.constraint.layout.xml)
     implementation(libs.window.configuration)
@@ -113,13 +116,30 @@ dependencies {
     implementation(libs.room.ktx)
     ksp(libs.room.compiler)
 
+    //viewmodel
+    implementation(libs.viewmodel.compose)
+    implementation(libs.lifecycle.runtime.compose)
+
     //navigation
-    implementation(libs.navigation)
+    implementation(libs.nav3.runtime)
+    implementation(libs.nav3.ui)
+    implementation(libs.androidx.lifecycle.viewmodel.nav3)
+    implementation(libs.androidx.material3.adaptive)
+    implementation(libs.kotlinx.serialization.core)
     implementation(libs.kotlinx.serialization.json)
+
+    //Paging
+    implementation(libs.paging)
+    implementation(libs.paging.compose)
+
+    implementation(libs.coil)
+
+    //Youtube player
+    implementation(libs.youtube.player)
 
     //unit test
     testImplementation(libs.junit)
-    testImplementation(libs.mockito)
+//    testImplementation(libs.mockito)
     testImplementation(libs.mockito.inline)
     testImplementation(libs.test.coroutines)
 

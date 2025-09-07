@@ -1,24 +1,28 @@
 package com.vlascitchii.domain.usecase
 
 import androidx.paging.PagingData
-import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideo
+import androidx.paging.cachedIn
+import com.vlascitchii.domain.model.videos.YoutubeVideoDomain
 import com.vlascitchii.domain.repository.ShortsRepository
-import com.vlascitchii.domain.usecase.util.Configuration
+import com.vlascitchii.domain.usecase.util.DispatcherConfiguration
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.flowOf
 
 class ShortsUseCase(
-    configuration: Configuration,
+    configuration: DispatcherConfiguration,
     private val shortsRepository: ShortsRepository
-) : UseCase<ShortsUseCase.Request, ShortsUseCase.Response>(configuration) {
+) : UseCase<ShortsUseCase.ShortsRequest, ShortsUseCase.ShortsResponse>(configuration) {
 
-    object Request: UseCase.Request
-    data class Response(val shortsPopularVideoPagingData: PagingData<YoutubeVideo>) : UseCase.Response
+    data class ShortsRequest(val coroutineScope: CoroutineScope): UseCase.CommonRequest
+    data class ShortsResponse(val shortsPopularVideoPagingData: Flow<PagingData<YoutubeVideoDomain>>) : UseCase.CommonResponse
 
-    override fun process(request: Request): Flow<Response>{
-
-        return shortsRepository.getShorts().map { youTubeVideoResponse: PagingData<YoutubeVideo> ->
-            Response(youTubeVideoResponse)
-        }
+    override fun process(request: ShortsRequest): Flow<ShortsResponse>{
+        return flowOf(
+            ShortsResponse(
+                shortsRepository.getShorts()
+                    .cachedIn(request.coroutineScope)
+            )
+        )
     }
 }

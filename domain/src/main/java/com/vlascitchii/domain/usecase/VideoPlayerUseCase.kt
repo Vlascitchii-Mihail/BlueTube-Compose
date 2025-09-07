@@ -1,25 +1,29 @@
 package com.vlascitchii.domain.usecase
 
 import androidx.paging.PagingData
-import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideo
+import androidx.paging.cachedIn
+import com.vlascitchii.domain.model.videos.YoutubeVideoDomain
 import com.vlascitchii.domain.repository.PlayerRepository
-import com.vlascitchii.domain.usecase.util.Configuration
+import com.vlascitchii.domain.usecase.util.DispatcherConfiguration
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.flowOf
 
 class VideoPlayerUseCase(
-    configuration: Configuration,
+    configuration: DispatcherConfiguration,
     private val playerRepository: PlayerRepository
-) : UseCase<VideoPlayerUseCase.Request, VideoPlayerUseCase.Response>(configuration){
+) : UseCase<VideoPlayerUseCase.PlayerRequest, VideoPlayerUseCase.PlayerResponse>(configuration){
 
-    data class Request(val query: String) : UseCase.Request
-    data class Response(val relatedVideoPagingData: PagingData<YoutubeVideo>) : UseCase.Response
+    data class PlayerRequest(val query: String, val coroutineScope: CoroutineScope) : UseCase.CommonRequest
+    data class PlayerResponse(val relatedVideoPagingData: Flow<PagingData<YoutubeVideoDomain>>) : UseCase.CommonResponse
 
-    override fun process(request: Request): Flow<Response> {
+    override fun process(request: PlayerRequest): Flow<PlayerResponse> {
 
-        return playerRepository.getSearchRelayedVideos(request.query)
-            .map { youTubeVideoResponse: PagingData<YoutubeVideo> ->
-                Response(youTubeVideoResponse)
-            }
+        return flowOf(
+            PlayerResponse(
+                playerRepository.getSearchRelayedVideos(request.query)
+                    .cachedIn(request.coroutineScope)
+            )
+        )
     }
 }

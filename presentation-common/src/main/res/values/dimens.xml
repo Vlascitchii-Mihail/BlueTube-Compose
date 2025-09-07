@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<!--    Padding    -->
+    <dimen name="padding_tiny_2">2dp</dimen>
+    <dimen name="padding_small_extra_4">4dp</dimen>
+    <dimen name="padding_small_8">8dp</dimen>
+    <dimen name="padding_medium_16">16dp</dimen>
+    <dimen name="padding_large_24">24dp</dimen>
+    <dimen name="padding_large_extra_32">32dp</dimen>
+
+<!--    Shape-->
+    <dimen name="shape_small_8">8dp</dimen>
+    <dimen name="shape_large_24">24dp</dimen>
+    <dimen name="shape_large_extra_48">48dp</dimen>
+
+<!--    Elevation-->
+    <dimen name="elevation_medium_16">16dp</dimen>
+
+<!--    Height-->
+    <dimen name="height_small_extra_35">35dp</dimen>
+    <dimen name="height_small_40">40dp</dimen>
+    <dimen name="height_medium_48">48dp</dimen>
+    <dimen name="height_medium_extra_50">50dp</dimen>
+    <dimen name="height_large_56">56dp</dimen>
+    <dimen name="height_large_extra_72">72dp</dimen>
+
+<!--    Width-->
+    <dimen name="width_small_extra_35">35dp</dimen>
+    <dimen name="width_medium_extra_50">50dp</dimen>
+</resources>

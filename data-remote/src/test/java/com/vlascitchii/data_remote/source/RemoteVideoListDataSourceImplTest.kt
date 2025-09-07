@@ -1,32 +1,33 @@
 package com.vlascitchii.data_remote.source
 
 import com.vlascitchii.common_test.rule.DispatcherTestRule
+import com.vlascitchii.common_test.util.assertListEqualsTo
+import com.vlascitchii.data_remote.model_api.DOMAIN_RESPONSE_VIDEO_WITH_CHANNEL_IMG
+import com.vlascitchii.data_remote.networking.service.CONTENT_DETAILS
+import com.vlascitchii.data_remote.networking.service.MOST_POPULAR
+import com.vlascitchii.data_remote.networking.service.SNIPPET
+import com.vlascitchii.data_remote.networking.service.STATISTICS
+import com.vlascitchii.data_remote.networking.service.US_REGION_CODE
 import com.vlascitchii.data_remote.networking.service.VideoListApiService
-import com.vlascitchii.data_remote.util.CHANNEL_RESPONSE_1_PATH
-import com.vlascitchii.data_remote.util.CHANNEL_RESPONSE_2_PATH
-import com.vlascitchii.data_remote.util.CHANNEL_RESPONSE_3_PATH
-import com.vlascitchii.data_remote.util.CHANNEL_RESPONSE_4_PATH
-import com.vlascitchii.data_remote.util.CHANNEL_RESPONSE_5_PATH
+import com.vlascitchii.data_remote.util.CHANNEL_RESPONSE_PATH
+import com.vlascitchii.data_remote.util.ERROR_CODE
 import com.vlascitchii.data_remote.util.MockWebServerApiProvider
 import com.vlascitchii.data_remote.util.MockWebServerScheduler
 import com.vlascitchii.data_remote.util.VIDEO_LIST_RESPONSE_PATH
 import com.vlascitchii.data_repository.data_source.remote.RemoteVideoListDataSource
-import com.vlascitchii.domain.custom_coroutine_scopes.AppCoroutineScope
-import com.vlascitchii.domain.custom_coroutine_scopes.VideoCoroutineScope
-import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse
-import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse.Companion.RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG
+import com.vlascitchii.domain.model.videos.YoutubeVideoResponseDomain
 import com.vlascitchii.domain.util.UseCaseException
-import junit.framework.TestCase.assertTrue
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
+import org.junit.After
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.spy
+import org.mockito.kotlin.verify
+import kotlin.test.Test
 
 @RunWith(MockitoJUnitRunner::class)
 class RemoteVideoListDataSourceImplTest {
@@ -36,62 +37,60 @@ class RemoteVideoListDataSourceImplTest {
 
     private lateinit var mockWebServerApiProvider: MockWebServerApiProvider
     private lateinit var videoListApiServiceMock: VideoListApiService
-    private lateinit var videoCoroutineScope: AppCoroutineScope
-    private lateinit var remoteVideoListDataSource: RemoteVideoListDataSource
     private lateinit var mockWebServerScheduler: MockWebServerScheduler
+    private lateinit var remoteVideoListDataSource: RemoteVideoListDataSource
+    val testPageToken = ""
 
     @Before
     fun init() {
         mockWebServerApiProvider = MockWebServerApiProvider()
         videoListApiServiceMock = spy(mockWebServerApiProvider.provideMockVideoListApiService())
-        videoCoroutineScope = VideoCoroutineScope(dispatcher = dispatcherTestRule.testDispatcher)
-        remoteVideoListDataSource = RemoteVideoListDataSourceImpl(videoListApiServiceMock, videoCoroutineScope)
         mockWebServerScheduler = mockWebServerApiProvider.mockWebServerScheduler
-    }
-
-    private fun initMockWebResponse() {
-        val mockResponseList = listOf(
-            VIDEO_LIST_RESPONSE_PATH,
-            CHANNEL_RESPONSE_1_PATH,
-            CHANNEL_RESPONSE_2_PATH,
-            CHANNEL_RESPONSE_3_PATH,
-            CHANNEL_RESPONSE_4_PATH,
-            CHANNEL_RESPONSE_5_PATH
+        remoteVideoListDataSource = RemoteVideoListDataSourceImpl(
+            videoListApiServiceMock,
+            MockWebServerApiProvider.staticMoshiParser
         )
+    }
 
-        mockResponseList.forEach { path: String ->
-            mockWebServerScheduler.generateMockResponseFrom(path)
-        }
+    @After
+    fun tearDown() {
+        mockWebServerScheduler.shutDownMockWebServer()
+    }
+
+    private fun initMockApiResponse() {
+        mockWebServerScheduler.generateMockResponseFrom(VIDEO_LIST_RESPONSE_PATH)
+        mockWebServerScheduler.generateMockResponseFrom(CHANNEL_RESPONSE_PATH)
     }
 
     @Test
-    fun `fetchVideos() returns YoutubeVideo List with proper ID`() = runTest {
-        initMockWebResponse()
-        val response: YoutubeVideoResponse = remoteVideoListDataSource.fetchVideos("").first()
+    fun `fetchVideos() returns YoutubeVideoResponseDomain`() = runTest {
+        initMockApiResponse()
 
-        val expectedVideoIdList = RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.items.map { video -> video.id }
-        val actualVideoIdList = response.items.map { video -> video.id }
+        val actualResult: YoutubeVideoResponseDomain = remoteVideoListDataSource.fetchVideos(testPageToken)
 
-        assertTrue(expectedVideoIdList.containsAll(actualVideoIdList))
+        DOMAIN_RESPONSE_VIDEO_WITH_CHANNEL_IMG.items.assertListEqualsTo(actualResult.items)
+        assertEquals(DOMAIN_RESPONSE_VIDEO_WITH_CHANNEL_IMG.nextPageToken, actualResult.nextPageToken)
+        assertEquals(DOMAIN_RESPONSE_VIDEO_WITH_CHANNEL_IMG.prevPageToken, actualResult.prevPageToken)
+    }
+
+    @Test(expected = UseCaseException.VideoListLoadException::class)
+    fun `fetchVideos() throws UseCaseException VideoListLoadException`() = runTest {
+        mockWebServerScheduler.generateMockResponseFrom("", ERROR_CODE)
+
+        remoteVideoListDataSource.fetchVideos(testPageToken)
     }
 
     @Test
-    fun `fetchVideos() returns YoutubeVideo List with proper UrlID`() = runTest {
-        initMockWebResponse()
-        val response: YoutubeVideoResponse = remoteVideoListDataSource.fetchVideos("").first()
+    fun `verify VideoListApiService fetchVideos() was called with correct arguments`() = runTest {
+        initMockApiResponse()
 
-        val expectedChannelURLList = RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.items.map { video -> video.snippet.channelImgUrl }
-        val actualChannelURLList = response.items.map { video -> video.snippet.channelImgUrl }
+        remoteVideoListDataSource.fetchVideos(testPageToken)
 
-        assertTrue(expectedChannelURLList.containsAll(actualChannelURLList))
-    }
-
-    @Test
-    fun `fun fetchVideos() returns UseCaseException`() = runTest {
-        mockWebServerScheduler.enqueueError()
-
-        remoteVideoListDataSource.fetchVideos("").catch { error: Throwable ->
-            assertTrue(error is UseCaseException.VideoListLoadException)
-        }.collect()
+        verify(videoListApiServiceMock).fetchVideos(
+            part = eq("$SNIPPET, $CONTENT_DETAILS, $STATISTICS"),
+            chart = eq(MOST_POPULAR),
+            regionCode = eq(US_REGION_CODE),
+            nextPageToken = eq(testPageToken)
+        )
     }
 }

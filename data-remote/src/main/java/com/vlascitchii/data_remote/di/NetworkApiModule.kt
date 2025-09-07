@@ -2,9 +2,7 @@ package com.vlascitchii.data_remote.di
 
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import com.vlascitchii.data_remote.networking.Constants
 import com.vlascitchii.data_remote.networking.InterceptorApiRequest
-import com.vlascitchii.data_remote.networking.service.SearchApiService
 import com.vlascitchii.data_remote.networking.service.ShortsApiService
 import com.vlascitchii.data_remote.networking.service.VideoListApiService
 import dagger.Module
@@ -17,19 +15,27 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import javax.inject.Singleton
 
+private const val BASE_URL = "https://www.googleapis.com/youtube/v3/"
+
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkApiModule {
 
-    private val interceptor = HttpLoggingInterceptor().apply {
-        level = okhttp3.logging.HttpLoggingInterceptor.Level.BODY
+    @Provides
+    @Singleton
+    fun provideLoggingInterceptor(): HttpLoggingInterceptor =
+        HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY }
 
-    }
-
-    private val client = OkHttpClient.Builder()
-        .addInterceptor(InterceptorApiRequest())
-        .addInterceptor(interceptor)
-        .build()
+    @Provides
+    @Singleton
+    fun provideOkHttpClient(
+        loggingInterceptor: HttpLoggingInterceptor,
+        interceptorApiRequest: InterceptorApiRequest
+    ): OkHttpClient =
+        OkHttpClient.Builder()
+            .addInterceptor(loggingInterceptor)
+            .addInterceptor(interceptorApiRequest)
+            .build()
 
     @Provides
     @Singleton
@@ -39,10 +45,10 @@ object NetworkApiModule {
 
     @Singleton
     @Provides
-    fun provideRetrofit(moshi: Moshi): Retrofit = Retrofit.Builder()
-        .baseUrl(Constants.BASE_URL)
+    fun provideRetrofit(moshi: Moshi, okHttpClient: OkHttpClient): Retrofit = Retrofit.Builder()
+        .baseUrl(BASE_URL)
         .addConverterFactory(MoshiConverterFactory.create(moshi))
-        .client(client)
+        .client(okHttpClient)
         .build()
 
     @Singleton
@@ -54,9 +60,4 @@ object NetworkApiModule {
     @Provides
     fun provideShortsApiService(retrofit: Retrofit): ShortsApiService =
         retrofit.create(ShortsApiService::class.java)
-
-    @Singleton
-    @Provides
-    fun provideSearchApiService(retrofit: Retrofit): SearchApiService =
-        retrofit.create(SearchApiService::class.java)
 }

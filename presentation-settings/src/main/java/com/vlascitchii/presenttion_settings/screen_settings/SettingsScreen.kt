@@ -8,27 +8,37 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import com.vlascitchii.presentation_common.ui.TextBodyLargeCentered
-import com.vlascitchii.presentation_common.utils.NavigationTags.SETTINGS_SCREEN
 import com.vlascitchii.presenttion_settings.R
 
 @Composable
-fun SettingsScreen() {
+fun SettingsScreen(
+    modifier: Modifier = Modifier,
+    bottomNavigation: @Composable () -> Unit
+) {
+    val settingsScreenDescription = stringResource(id = R.string.settings_screen_description)
 
     Scaffold(
-        modifier = Modifier
-            .background(MaterialTheme.colorScheme.background)
-            .testTag(SETTINGS_SCREEN),
+        modifier = modifier
+            .background(MaterialTheme.colorScheme.background).semantics { contentDescription = settingsScreenDescription },
         content = { paddingValue ->
-            Column(modifier = Modifier.fillMaxSize().padding(paddingValue)) {
+            Column(
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(paddingValue)
+                    .semantics { contentDescription = settingsScreenDescription }
+            ) {
                 TextBodyLargeCentered(
-                    text = stringResource(id = R.string.settings_screen),
-                    modifier = Modifier,
-                    color = MaterialTheme.colorScheme.primary
+                    text = settingsScreenDescription,
+                    modifier = modifier.semantics { contentDescription = settingsScreenDescription }
                 )
             }
+        },
+        bottomBar = {
+            bottomNavigation.invoke()
         }
     )
 }

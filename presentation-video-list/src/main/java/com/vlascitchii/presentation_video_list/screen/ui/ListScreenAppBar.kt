@@ -6,24 +6,27 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vlascitchii.presentation_video_list.R
-import com.vlascitchii.presentation_video_list.util.state.SearchState
+import com.vlascitchii.presentation_video_list.screen.state.SearchState
 import kotlinx.coroutines.flow.StateFlow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListScreenAppBar(
     searchViewState: StateFlow<SearchState>,
-    searchTextState: StateFlow<String>,
+    searchTextState: StateFlow<TextFieldValue>,
     scrollAppBarBehaviour: TopAppBarScrollBehavior,
     onTextChange: (String) -> Unit,
     onSearchClicked: () -> Unit,
-    updateSearchState: (newSearchState: SearchState) -> Unit,
+    modifier: Modifier = Modifier,
+    updateSearchState: (SearchState) -> Unit,
     searchIcon: ImageVector = Icons.Filled.Search,
-    appBarTitle: String = stringResource(id = R.string.appbar_title)
+    appBarTitle: String = stringResource(id = R.string.appbar_title),
 ) {
     val searchViewToolbarState by searchViewState.collectAsStateWithLifecycle()
 
@@ -32,8 +35,9 @@ fun ListScreenAppBar(
             BlueTubeTopAppBar(
                 title = appBarTitle,
                 icon = searchIcon,
-                scrollAppBarBehaviour,
-                updateSearchState = updateSearchState
+                scrollBehavior = scrollAppBarBehaviour,
+                updateSearchState = updateSearchState,
+                modifier
             )
         }
 
@@ -42,7 +46,9 @@ fun ListScreenAppBar(
                 searchText = searchTextState,
                 onTextChange = onTextChange,
                 updateSearchState = updateSearchState,
-                onSearchClicked = onSearchClicked
+                onSearchClicked = onSearchClicked,
+                scrollAppBarBehaviour = scrollAppBarBehaviour,
+                modifier
             )
         }
     }
