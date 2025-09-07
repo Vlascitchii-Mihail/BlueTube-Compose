@@ -1,14 +1,15 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin)
+    alias(libs.plugins.kotlin.compose)
 }
 
 android {
     namespace = "com.vlascitchii.presenttion_settings"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
-        minSdk = 26
+        minSdk = 31
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
@@ -27,8 +28,8 @@ android {
         kotlinCompilerExtensionVersion = "1.5.12"
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     buildFeatures {
         compose =  true
@@ -37,7 +38,7 @@ android {
         kotlinCompilerExtensionVersion = "1.5.14"
     }
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "17"
     }
 }
 
@@ -53,7 +54,6 @@ dependencies {
     debugImplementation(libs.compose.ui.tooling)
     implementation(libs.ui.tooling.preview)
     implementation(libs.material3)
-    implementation(libs.androidx.material)
     implementation(libs.constraint.layout.compose)
     implementation(libs.constraint.layout.xml)
     implementation(libs.window.configuration)

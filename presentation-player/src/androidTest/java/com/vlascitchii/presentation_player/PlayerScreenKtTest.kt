@@ -1,5 +1,5 @@
-package com.vlascitchii.presentation_player
-
+//package com.vlascitchii.presentation_player
+//
 //import dagger.hilt.android.testing.HiltAndroidRule
 //import dagger.hilt.android.testing.HiltAndroidTest
 //import androidx.test.espresso.device.DeviceInteraction.Companion.setScreenOrientation

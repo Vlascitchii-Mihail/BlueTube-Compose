@@ -4,13 +4,13 @@ import androidx.paging.PagingData
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.vlascitchii.common_test.rule.DispatcherTestRule
 import com.vlascitchii.domain.custom_coroutine_scopes.AppCoroutineScope
-import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideo
-import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse.Companion.RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG
+import com.vlascitchii.domain.model.videos.YoutubeVideoDomain
+import com.vlascitchii.domain.model.videos.YoutubeVideoResponseDomain.Companion.DOMAIN_RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG
 import com.vlascitchii.domain.usecase.ShortsUseCase
 import com.vlascitchii.domain.util.UseCaseException
 import com.vlascitchii.domain.util.VideoResult
-import com.vlascitchii.presentation_common.entity.util.convertToYoutubeVideoUiMode
-import com.vlascitchii.presentation_common.entity.videos.YoutubeVideoUiModel
+import com.vlascitchii.presentation_common.model.util.convertToYoutubeVideoUiModel
+import com.vlascitchii.presentation_common.model.videos.YoutubeVideoUiModel
 import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityObserver
 import com.vlascitchii.presentation_common.ui.state.UiState
 import com.vlascitchii.presentation_shorts.screen_shorts.utils.ShortsConverter
@@ -48,20 +48,20 @@ class ShortsViewModelTest {
 
     private val testErrorMessage = "Test Error Message"
 
-    private val pagingData: PagingData<YoutubeVideo> = PagingData.from(RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.items)
+    private val pagingData: PagingData<YoutubeVideoDomain> = PagingData.from(DOMAIN_RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.items)
     private val pagingUiData: PagingData<YoutubeVideoUiModel> = PagingData.from(
-        RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.items.map { video: YoutubeVideo ->
-            video.convertToYoutubeVideoUiMode()
+        DOMAIN_RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.items.map { video: YoutubeVideoDomain ->
+            video.convertToYoutubeVideoUiModel()
         }
     )
 
-    private val expectedShortsUseCaseResponse: VideoResult<ShortsUseCase.Response> =
-        VideoResult.Success(ShortsUseCase.Response(pagingData))
+    private val expectedShortsUseCaseResponse: VideoResult<ShortsUseCase.ShortsResponse> =
+        VideoResult.Success(ShortsUseCase.ShortsResponse(pagingData))
     private val positiveConvertResult: UiState<PagingData<YoutubeVideoUiModel>> =
         UiState.Success(pagingUiData)
 
     private fun positiveCase() {
-        whenever(shortsUseCase.execute(ShortsUseCase.Request))
+        whenever(shortsUseCase.execute(ShortsUseCase.ShortsRequest))
             .thenReturn(flowOf(expectedShortsUseCaseResponse))
         whenever(shortsConverter.convert(expectedShortsUseCaseResponse))
             .thenReturn(positiveConvertResult)
@@ -69,13 +69,13 @@ class ShortsViewModelTest {
 
 
     private val runtimeShortsException = RuntimeException("VideoList Exception")
-    private val expectedNegativeShortsUseCaseResponse: VideoResult<ShortsUseCase.Response> = VideoResult
+    private val expectedNegativeShortsUseCaseResponse: VideoResult<ShortsUseCase.ShortsResponse> = VideoResult
         .Error(UseCaseException.ShortsLoadException(runtimeShortsException))
     private val negativeConvertResultShorts: UiState<PagingData<YoutubeVideoUiModel>> =
         UiState.Error(testErrorMessage)
 
     private fun negativeCase() {
-        whenever(shortsUseCase.execute(ShortsUseCase.Request))
+        whenever(shortsUseCase.execute(ShortsUseCase.ShortsRequest))
             .thenReturn(flowOf(expectedNegativeShortsUseCaseResponse))
         whenever(shortsConverter.convert(expectedNegativeShortsUseCaseResponse))
             .thenReturn(negativeConvertResultShorts)
@@ -90,7 +90,7 @@ class ShortsViewModelTest {
 
         val actualResult = shortsViewModel.shortsStateFlow.first()
 
-        verify(shortsUseCase).execute(ShortsUseCase.Request)
+        verify(shortsUseCase).execute(ShortsUseCase.ShortsRequest)
         verify(shortsConverter).convert(expectedShortsUseCaseResponse)
         assertEquals(positiveConvertResult, actualResult)
     }
@@ -104,7 +104,7 @@ class ShortsViewModelTest {
 
         val actualErrorResult = shortsViewModel.shortsStateFlow.first()
 
-        verify(shortsUseCase).execute(ShortsUseCase.Request)
+        verify(shortsUseCase).execute(ShortsUseCase.ShortsRequest)
         verify(shortsConverter).convert(expectedNegativeShortsUseCaseResponse)
         assertEquals(negativeConvertResultShorts, actualErrorResult)
     }

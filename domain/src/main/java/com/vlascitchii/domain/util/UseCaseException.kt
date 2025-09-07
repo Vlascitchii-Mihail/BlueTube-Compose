@@ -1,17 +1,19 @@
 package com.vlascitchii.domain.util
 
-sealed class UseCaseException(cause: Throwable): Throwable(cause) {
+import com.vlascitchii.domain.model.ErrorDomain
 
-    class VideoListLoadException(cause: Throwable): UseCaseException(cause)
-    class ShortsLoadException(cause: Throwable): UseCaseException(cause)
-    class SearchLoadException(cause: Throwable): UseCaseException(cause)
-    class LocalStorageException(cause: Throwable): UseCaseException(cause)
-    class UnknownException(cause: Throwable): UseCaseException(cause)
+sealed class UseCaseException(cause: Throwable, val errorDomain: ErrorDomain?): Throwable(cause) {
+
+    class VideoListLoadException(cause: Throwable, errorDomain: ErrorDomain? = ErrorDomain()): UseCaseException(cause, errorDomain)
+    class ShortsLoadException(cause: Throwable, errorDomain: ErrorDomain? = ErrorDomain()): UseCaseException(cause, errorDomain)
+    class SearchLoadException(cause: Throwable, errorDomain: ErrorDomain? = ErrorDomain()): UseCaseException(cause, errorDomain)
+    class LocalStorageException(cause: Throwable, errorDomain: ErrorDomain? = ErrorDomain()): UseCaseException(cause, errorDomain)
+    class UnknownException(cause: Throwable, errorDomain: ErrorDomain? = ErrorDomain()): UseCaseException(cause, errorDomain)
 
     companion object {
         fun createFromThrowable(throwable: Throwable): UseCaseException {
             return if (throwable is UseCaseException) throwable
-            else UnknownException(throwable)
+            else UnknownException(throwable, null)
         }
     }
 }

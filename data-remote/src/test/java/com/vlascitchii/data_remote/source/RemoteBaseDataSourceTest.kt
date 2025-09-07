@@ -2,31 +2,41 @@ package com.vlascitchii.data_remote.source
 
 import com.vlascitchii.common_test.rule.DispatcherTestRule
 import com.vlascitchii.common_test.util.assertListEqualsTo
-import com.vlascitchii.data_remote.enetity_api_model.util.convertToYouTubeVideoResponseApiModel
-import com.vlascitchii.data_remote.enetity_api_model.util.convertToYoutubeVideoApiModelList
-import com.vlascitchii.data_remote.enetity_api_model.video_channel_api_model.ChannelApiModel
-import com.vlascitchii.data_remote.enetity_api_model.video_channel_api_model.YoutubeChannelResponseApiModel
+import com.vlascitchii.data_remote.model_api.API_ERROR_YOUTUBE_RESPONSE_INSTANCE
+import com.vlascitchii.data_remote.model_api.API_RESPONSE_SEARCH_VIDEO_NO_CHANNEL_URL
+import com.vlascitchii.data_remote.model_api.API_RESPONSE_VIDEO_WITH_CHANNEL_IMG
+import com.vlascitchii.data_remote.model_api.API_VIDEO_RESPONSE_NO_CHANNEL_IMG_URL
+import com.vlascitchii.data_remote.model_api.DOMAIN_RESPONSE_VIDEO_WITH_CHANNEL_IMG
+import com.vlascitchii.data_remote.model_api.error.convertErrorApiYouTubeResponseToErrorDomainYouTubeResponse
+import com.vlascitchii.data_remote.model_api.video_api_model.YoutubeVideoApiModel
+import com.vlascitchii.data_remote.model_api.video_api_model.YoutubeVideoResponseApiModel
+import com.vlascitchii.data_remote.model_api.video_api_model.convertToDomainYouTubeVideoResponse
 import com.vlascitchii.data_remote.networking.service.BaseApiService
-import com.vlascitchii.data_remote.util.CHANNEL_RESPONSE_1_PATH
-import com.vlascitchii.data_remote.util.CHANNEL_RESPONSE_2_PATH
-import com.vlascitchii.data_remote.util.CHANNEL_RESPONSE_3_PATH
-import com.vlascitchii.data_remote.util.CHANNEL_RESPONSE_4_PATH
-import com.vlascitchii.data_remote.util.CHANNEL_RESPONSE_5_PATH
+import com.vlascitchii.data_remote.util.CHANNEL_RESPONSE_PATH
+import com.vlascitchii.data_remote.util.ERROR_CODE
+import com.vlascitchii.data_remote.util.ERROR_YOUTUBE_RESPONSE
 import com.vlascitchii.data_remote.util.MockWebServerApiProvider
 import com.vlascitchii.data_remote.util.MockWebServerScheduler
-import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse.Companion.RESPONSE_VIDEO_LIST_NO_CHANNEL_IMG_URL
-import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse.Companion.RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG
-import junit.framework.TestCase.assertTrue
+import com.vlascitchii.data_remote.util.VIDEO_LIST_RESPONSE_PATH
+import com.vlascitchii.domain.model.ErrorDomain
+import com.vlascitchii.domain.model.videos.YoutubeVideoResponseDomain
+import com.vlascitchii.domain.util.UseCaseException
+import junit.framework.TestCase.assertNull
 import kotlinx.coroutines.test.runTest
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.ResponseBody
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.After
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import retrofit2.HttpException
-import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
+import retrofit2.Response
 
 @RunWith(MockitoJUnitRunner::class)
 class RemoteBaseDataSourceTest {
@@ -37,19 +47,33 @@ class RemoteBaseDataSourceTest {
     private lateinit var mockWebServerApiProvider: MockWebServerApiProvider
     private lateinit var baseApiService: BaseApiService
     private lateinit var mockWebServerScheduler: MockWebServerScheduler
-    private lateinit var remoteBaseDataSource: RemoteBaseDataSource<YoutubeChannelResponseApiModel>
+    private lateinit var remoteBaseVideoDataSource: RemoteBaseVideoDataSource<YoutubeVideoResponseApiModel>
+
+    private val mockRetrofitResponse: Response<YoutubeVideoResponseApiModel> = mock()
+    private val errorJsonAsString: String = MockWebServerApiProvider.staticJsonHandler
+        .readJsonAsStringFromPath(ERROR_YOUTUBE_RESPONSE)
+    private val mockErrorResponseBody: ResponseBody = errorJsonAsString.toResponseBody(
+        "application/json".toMediaType()
+    )
 
     @Before
     fun init() {
         mockWebServerApiProvider = MockWebServerApiProvider()
         baseApiService = mockWebServerApiProvider.provideMockBaseApiService()
         mockWebServerScheduler = mockWebServerApiProvider.mockWebServerScheduler
-        remoteBaseDataSource = object : RemoteBaseDataSource<YoutubeChannelResponseApiModel>(baseApiService) {
 
-            override fun checkResponseBodyItemsIsNoteEmpty(responseBody: YoutubeChannelResponseApiModel): Boolean {
-                return responseBody.items.isNotEmpty()
+        remoteBaseVideoDataSource =
+            object : RemoteBaseVideoDataSource<YoutubeVideoResponseApiModel>(
+                baseApiService, MockWebServerApiProvider.staticMoshiParser
+            ) {
+                override fun checkResponseBodyItemsIsNoteEmpty(responseBody: YoutubeVideoResponseApiModel): Boolean {
+                    return responseBody.items.isNotEmpty()
+                }
+
+                override suspend fun returnHandledVideoResult(successResponse: YoutubeVideoResponseApiModel): YoutubeVideoResponseDomain {
+                    return fillChannelUrlFields(successResponse).convertToDomainYouTubeVideoResponse()
+                }
             }
-        }
     }
 
     @After
@@ -57,79 +81,133 @@ class RemoteBaseDataSourceTest {
         mockWebServerScheduler.shutDownMockWebServer()
     }
 
-    private fun initialiseMockResponse() {
-        val channelImageURLPathList = listOf(
-            CHANNEL_RESPONSE_1_PATH,
-            CHANNEL_RESPONSE_2_PATH,
-            CHANNEL_RESPONSE_3_PATH,
-            CHANNEL_RESPONSE_4_PATH,
-            CHANNEL_RESPONSE_5_PATH
+    private fun setNegativeResponseResult() {
+        whenever(mockRetrofitResponse.body()).thenReturn(null)
+        whenever(mockRetrofitResponse.isSuccessful).thenReturn(false)
+        whenever(mockRetrofitResponse.errorBody()).thenReturn(mockErrorResponseBody)
+    }
+
+    @Test
+    fun `fillChannelUrl() returns  YoutubeVideoResponseApiModel with channel image URL`() =
+        runTest {
+            mockWebServerScheduler.generateMockResponseFrom(CHANNEL_RESPONSE_PATH)
+
+            val actualYouTubeVideo: YoutubeVideoResponseApiModel = remoteBaseVideoDataSource
+                .fillChannelUrlFields(API_VIDEO_RESPONSE_NO_CHANNEL_IMG_URL)
+
+            API_RESPONSE_VIDEO_WITH_CHANNEL_IMG.items.assertListEqualsTo(actualYouTubeVideo.items)
+        }
+
+    @Test
+    fun `getChannelImgUrlList() returns a list with channels image URL`() = runTest {
+        mockWebServerScheduler.generateMockResponseFrom(CHANNEL_RESPONSE_PATH)
+
+        val actualChannelListURL: List<String> = remoteBaseVideoDataSource.getChannelImgUrlList(
+            API_VIDEO_RESPONSE_NO_CHANNEL_IMG_URL.items
         )
-        channelImageURLPathList.forEach { path: String ->
-            mockWebServerScheduler.generateMockResponseFrom(path)
+        val expectedChannelListURL: List<String> =
+            API_RESPONSE_VIDEO_WITH_CHANNEL_IMG.items.map { video -> video.snippet.channelImgUrl }
+
+        expectedChannelListURL.assertListEqualsTo(actualChannelListURL)
+    }
+
+    @Test
+    fun `addChannelUrl() gets new YouTubeVideoList with channel URL`() {
+        val youTubeVideoList: YoutubeVideoResponseApiModel = API_VIDEO_RESPONSE_NO_CHANNEL_IMG_URL
+        val channelUrlList: List<String> =
+            API_RESPONSE_VIDEO_WITH_CHANNEL_IMG.items.map { video -> video.snippet.channelImgUrl }
+        val expectedYouTubeVideoList: List<YoutubeVideoApiModel> =
+            API_RESPONSE_VIDEO_WITH_CHANNEL_IMG.items
+
+        with(remoteBaseVideoDataSource) {
+            val actualVideoListResult = youTubeVideoList.addChannelUrl(channelUrlList).items
+
+            actualVideoListResult.assertListEqualsTo(expectedYouTubeVideoList)
         }
     }
 
     @Test
-    fun `fillChannelUrl() fills with URL the videoList without URL`() = runTest {
-        initialiseMockResponse()
-        val actualYouTubeVideoList =
-            RESPONSE_VIDEO_LIST_NO_CHANNEL_IMG_URL.convertToYouTubeVideoResponseApiModel().items
-        val expectedYouTubeVideoList =
-            RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.convertToYouTubeVideoResponseApiModel().items.map { video -> video.snippet.channelImgUrl }
+    fun `convertToVideoResponseApiModel() SearchVideoList to YouTubeVideoList`() = runTest {
+        mockWebServerScheduler.generateMockResponseFrom(VIDEO_LIST_RESPONSE_PATH)
 
-        with(remoteBaseDataSource) {
-            actualYouTubeVideoList.fillChannelUrl()
-        }
+        val expectedVideoList: List<YoutubeVideoApiModel> =
+            API_VIDEO_RESPONSE_NO_CHANNEL_IMG_URL.items
 
-        assertTrue(expectedYouTubeVideoList.containsAll(actualYouTubeVideoList.map { video -> video.snippet.channelImgUrl }))
-    }
+        with(remoteBaseVideoDataSource) {
+            val convertedVideoResponse: YoutubeVideoResponseApiModel =
+                API_RESPONSE_SEARCH_VIDEO_NO_CHANNEL_URL.convertToVideoResponseApiModel()
 
-    @Test
-    fun `getChannelImgUrlList() returns a list with channels URL`() = runTest {
-        initialiseMockResponse()
-        val actualChannelListURL = remoteBaseDataSource.getChannelImgUrlList(
-                RESPONSE_VIDEO_LIST_NO_CHANNEL_IMG_URL.items.convertToYoutubeVideoApiModelList()
-        )
-        val expectedChannelListURL =
-            RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.items.map { video -> video.snippet.channelImgUrl }
-
-        assertTrue(expectedChannelListURL.containsAll(actualChannelListURL))
-    }
-
-    @Test
-    fun `addChannelUrl() adds URLs to YouTubeVideoList`() {
-        val youTubeVideoList =
-            RESPONSE_VIDEO_LIST_NO_CHANNEL_IMG_URL.convertToYouTubeVideoResponseApiModel()
-        val channelUrlList =
-            RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.items.map { video -> video.snippet.channelImgUrl }
-        val expectedYouTubeVideoList =
-            RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.convertToYouTubeVideoResponseApiModel().items
-
-        with(remoteBaseDataSource) {
-            youTubeVideoList.items.addChannelUrl(channelUrlList)
-        }
-
-        youTubeVideoList.items.assertListEqualsTo(expectedYouTubeVideoList)
-    }
-
-    @Test
-    fun `getVideoOnSuccessOrThrowHttpExceptionOnError throws error if Retrofit response is not success`() = runTest {
-        mockWebServerScheduler.enqueueError()
-        val retrofitResponse = baseApiService.fetchChannels("Test channel Id")
-
-        assertFailsWith<HttpException> {
-            remoteBaseDataSource.getDataOnSuccessOrThrowHttpExceptionOnError(retrofitResponse)
+            expectedVideoList.assertListEqualsTo(convertedVideoResponse.items)
         }
     }
 
+    @Test(expected = HttpException::class)
+    fun `negative getVideoOnSuccessOrThrowHttpExceptionOnError() throws error if Retrofit response is not success`() =
+        runTest {
+            mockWebServerScheduler.generateMockResponseFrom(VIDEO_LIST_RESPONSE_PATH, ERROR_CODE)
+
+            val retrofitResponse = baseApiService.fetchParticularVideoList(emptyList())
+
+            remoteBaseVideoDataSource.getDataOnSuccessOrThrowHttpExceptionOnError(retrofitResponse)
+        }
+
     @Test
-    fun `getVideoOnSuccessOrThrowHttpExceptionOnError returns data if Retrofit response is success`() = runTest {
-        initialiseMockResponse()
+    fun `positive getVideoOnSuccessOrThrowHttpExceptionOnError returns data if Retrofit response is success`() =
+        runTest {
+            mockWebServerScheduler.generateMockResponseFrom(VIDEO_LIST_RESPONSE_PATH)
 
-        val retrofitResponse = baseApiService.fetchChannels("Test channel Id")
-        val youTubeChannels: YoutubeChannelResponseApiModel = remoteBaseDataSource.getDataOnSuccessOrThrowHttpExceptionOnError(retrofitResponse)
+            val retrofitResponse: Response<YoutubeVideoResponseApiModel> =
+                baseApiService.fetchParticularVideoList(emptyList())
+            val youTubeResponse: YoutubeVideoResponseApiModel = remoteBaseVideoDataSource
+                .getDataOnSuccessOrThrowHttpExceptionOnError(retrofitResponse)
 
-        assertEquals(youTubeChannels.items.first(), ChannelApiModel.channels.first())
+            API_VIDEO_RESPONSE_NO_CHANNEL_IMG_URL.items.assertListEqualsTo(youTubeResponse.items)
+        }
+
+    @Test
+    fun `positive getYouTubeDomainErrorFromErrorBody() converts errorBody to ErrorApiYouTubeResponse instance`() {
+        setNegativeResponseResult()
+
+        try {
+            remoteBaseVideoDataSource
+                .getDataOnSuccessOrThrowHttpExceptionOnError(mockRetrofitResponse)
+            throw AssertionError("getDataOnSuccessOrThrowHttpExceptionOnError() should throw HttpException")
+        } catch (exception: HttpException) {
+
+            val expectedErrorResult: ErrorDomain = API_ERROR_YOUTUBE_RESPONSE_INSTANCE
+                .convertErrorApiYouTubeResponseToErrorDomainYouTubeResponse()
+            val actualErrorResult: ErrorDomain? = remoteBaseVideoDataSource
+                .getYouTubeDomainErrorFromErrorBody()
+
+            assertEquals(expectedErrorResult, actualErrorResult)
+        }
+    }
+
+    @Test
+    fun `getYouTubeDomainErrorFromErrorBody() returns null on Retrofit success`() {
+        val actualErrorResult: ErrorDomain? = remoteBaseVideoDataSource
+            .getYouTubeDomainErrorFromErrorBody()
+
+        assertNull(actualErrorResult)
+    }
+
+    @Test
+    fun `positive fetch() returns YoutubeVideoResponseDomain`() = runTest {
+        mockWebServerScheduler.generateMockResponseFrom(VIDEO_LIST_RESPONSE_PATH)
+        mockWebServerScheduler.generateMockResponseFrom(CHANNEL_RESPONSE_PATH)
+
+        val expectedResult: YoutubeVideoResponseDomain = DOMAIN_RESPONSE_VIDEO_WITH_CHANNEL_IMG
+
+        val actualResult: YoutubeVideoResponseDomain =
+            remoteBaseVideoDataSource.fetch { baseApiService.fetchParticularVideoList(emptyList()) }
+
+        expectedResult.items.assertListEqualsTo(actualResult.items)
+    }
+
+    @Test(expected = UseCaseException::class)
+    fun `negative fetch() throws UseCaseException`() = runTest {
+        mockWebServerScheduler.generateMockResponseFrom(VIDEO_LIST_RESPONSE_PATH, ERROR_CODE)
+
+        remoteBaseVideoDataSource.fetch { baseApiService.fetchParticularVideoList(emptyList()) }
     }
 }

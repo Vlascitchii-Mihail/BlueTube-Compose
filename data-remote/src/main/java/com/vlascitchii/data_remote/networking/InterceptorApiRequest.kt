@@ -1,21 +1,20 @@
 package com.vlascitchii.data_remote.networking
 
-import com.vlascitchii.data_remote.networking.Constants.Companion.API_KEY
-import okhttp3.HttpUrl
+import com.vlascitchii.data_remote.BuildConfig
 import okhttp3.Interceptor
-import okhttp3.Request
 import okhttp3.Response
+import javax.inject.Inject
 
-class InterceptorApiRequest: Interceptor {
+private const val API_KEY = BuildConfig.API_KEY
+
+class InterceptorApiRequest @Inject constructor(): Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
 
         val originalRequest = chain.request()
-        val newUrl: HttpUrl = originalRequest.url.newBuilder()
-            .addQueryParameter("key", API_KEY)
+        val newRequest = originalRequest.newBuilder()
+            .addHeader("X-Goog-Api-Key", API_KEY)
             .build()
-
-        val newRequest: Request = originalRequest.newBuilder().url(newUrl).build()
 
         return chain.proceed(newRequest)
     }

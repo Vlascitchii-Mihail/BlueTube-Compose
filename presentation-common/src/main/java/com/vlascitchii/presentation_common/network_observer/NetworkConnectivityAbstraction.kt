@@ -4,5 +4,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface NetworkConnectivityAbstraction {
 
-    fun observe(): Flow<ConnectivityStatus>
+    fun observe(): Flow<NetworkConnectivityStatus>
 }

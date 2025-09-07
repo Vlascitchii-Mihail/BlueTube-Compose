@@ -13,7 +13,7 @@ const val TRILLION = 1_000_000_000
 const val SECONDS_PER_MINUTE = 60
 const val SECONDS_PER_HOUR = 3600
 const val HOURS_PER_DAY = 24
-const val DAYS_PER_MONTH = 31
+const val DAYS_PER_MONTH = 30
 const val DAYS_PER_YEAR = 365
 
 const val MINUTES_PER_HOUR = 60
@@ -28,8 +28,8 @@ fun formatViews(views: Long): String {
 }
 
 //date = 2017-01-22T21:08:03Z
-fun formatDate(date: String?): String {
-    val postedDate: LocalDateTime = if (date != null) {
+fun formatDate(date: String): String {
+    val postedDate: LocalDateTime = if (date.isNotEmpty()) {
         LocalDateTime.parse(
             date.substring(0, 19),
             DateTimeFormatter.ISO_LOCAL_DATE_TIME
@@ -43,12 +43,13 @@ fun formatDate(date: String?): String {
     val days = abs(postedAgo.toDays())
 
     return when(true) {
+        (date.isEmpty()) -> "null"
         (seconds < SECONDS_PER_HOUR) -> "${seconds / SECONDS_PER_MINUTE} minutes ago"
         (hours < HOURS_PER_DAY) -> "$hours hours ago"
         (days < DAYS_PER_MONTH) -> "$days days ago"
         (days < DAYS_PER_YEAR) -> "${days / DAYS_PER_MONTH} months ago"
-        (date == null) -> "null"
-        else -> "${days / DAYS_PER_YEAR} years ago"
+        (days > DAYS_PER_YEAR) -> "${days / DAYS_PER_YEAR} years ago"
+        else -> "null"
     }
 }
 
@@ -73,5 +74,5 @@ fun formatVideoDuration(duration: String): String {
         else -> ""
     }
 
-    return if (strHours == "") "$strMinutes:$strSeconds" else "$strHours:$strMinutes:$strSeconds"
+    return if (strHours.isEmpty()) "$strMinutes:$strSeconds" else "$strHours:$strMinutes:$strSeconds"
 }

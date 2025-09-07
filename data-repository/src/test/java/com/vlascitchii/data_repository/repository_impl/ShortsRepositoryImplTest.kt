@@ -1,14 +1,16 @@
 package com.vlascitchii.data_repository.repository_impl
 
+import androidx.recyclerview.widget.DiffUtil
+import com.vlascitchii.common_test.paging.CommonTestPagingDiffer
 import com.vlascitchii.common_test.rule.DispatcherTestRule
 import com.vlascitchii.common_test.util.assertListEqualsTo
-import com.vlascitchii.common_test_android.TestPagingDomainYouTubeVideoDiffer
 import com.vlascitchii.data_repository.data_source.local.LocalVideoListDataSource
 import com.vlascitchii.data_repository.data_source.remote.RemoteShortsDataSource
-import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse.Companion.RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG
+import com.vlascitchii.data_repository.mock_model.DOMAIN_RESPONSE_VIDEO_WITH_CHANNEL_IMG
+import com.vlascitchii.domain.custom_scope.CustomCoroutineScope
+import com.vlascitchii.domain.model.videos.YoutubeVideoDomain
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -16,8 +18,10 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.wheneverBlocking
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ShortsRepositoryImplTest {
@@ -27,33 +31,44 @@ class ShortsRepositoryImplTest {
 
     private val remoteShortsDataSource: RemoteShortsDataSource = mock()
     private val localVideoListDataSource: LocalVideoListDataSource = mock()
+    private val customCoroutineScope: CustomCoroutineScope = CustomCoroutineScope(dispatcherTestRule.testDispatcher)
     private val shortsRepositoryImpl =
-        ShortsRepositoryImpl(remoteShortsDataSource, localVideoListDataSource)
+        ShortsRepositoryImpl(remoteShortsDataSource, localVideoListDataSource, customCoroutineScope)
 
     private val initialPageToken = ""
-    private val expectedResult = flowOf(RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG)
-    private val testPagingDomainYouTubeVideoDiffer = TestPagingDomainYouTubeVideoDiffer(dispatcherTestRule.testDispatcher).pagingDiffer
+    private val expectedResult = DOMAIN_RESPONSE_VIDEO_WITH_CHANNEL_IMG
+    private val differCallback = object : DiffUtil.ItemCallback<YoutubeVideoDomain>() {
 
+        override fun areItemsTheSame(oldItem: YoutubeVideoDomain, newItem: YoutubeVideoDomain): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+        override fun areContentsTheSame(oldItem: YoutubeVideoDomain, newItem: YoutubeVideoDomain): Boolean {
+            return oldItem == newItem
+        }
+    }
+    private val testPagingDomainYouTubeVideoDiffer =
+        CommonTestPagingDiffer(dispatcherTestRule.testDispatcher, differCallback).pagingDiffer
 
     @Before
     fun init() {
-        whenever(remoteShortsDataSource.fetchShorts(initialPageToken))
+        wheneverBlocking { remoteShortsDataSource.fetchShorts(initialPageToken) }
             .thenReturn(expectedResult)
     }
 
     @Test
-    fun fun_getShorts_returns_correct_Flow_with_YoutubeVideoResponse() = runTest {
+    fun `fun getShorts returns correct Flow with YoutubeVideoResponse`() = runTest {
         val actualValue = shortsRepositoryImpl.getShorts().first()
         val testJob = launch { testPagingDomainYouTubeVideoDiffer.submitData(actualValue) }
 
         advanceUntilIdle()
         testJob.cancel()
 
-        RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.items.assertListEqualsTo(testPagingDomainYouTubeVideoDiffer.snapshot())
+        DOMAIN_RESPONSE_VIDEO_WITH_CHANNEL_IMG.items.assertListEqualsTo(testPagingDomainYouTubeVideoDiffer.snapshot())
     }
 
     @Test
-    fun fun_getShorts_returns_Flow_which_is_not_empty() = runTest {
+    fun `fun getShorts inserts each video into the DB`() = runTest {
         val actualValue = shortsRepositoryImpl.getShorts().first()
         val testJob = launch { testPagingDomainYouTubeVideoDiffer.submitData(actualValue) }
 
@@ -61,5 +76,6 @@ class ShortsRepositoryImplTest {
         testJob.cancel()
 
         assertTrue(testPagingDomainYouTubeVideoDiffer.snapshot().isNotEmpty())
+        verify(localVideoListDataSource).insertVideosToDatabaseWithTimeStamp(any(), any())
     }
 }

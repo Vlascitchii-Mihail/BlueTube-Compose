@@ -10,12 +10,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.PagingData
-import com.vlascitchii.presentation_common.entity.videos.YoutubeVideoUiModel
-import com.vlascitchii.presentation_common.network_observer.ConnectivityStatus
+import androidx.paging.compose.collectAsLazyPagingItems
+import com.vlascitchii.presentation_common.model.videos.YoutubeVideoUiModel
+import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityStatus
+import com.vlascitchii.presentation_common.ui.global_snackbar.SnackBarController.sendEvent
+import com.vlascitchii.presentation_common.ui.global_snackbar.SnackBarEvent
 import com.vlascitchii.presentation_common.ui.screen.CommonScreen
+import com.vlascitchii.presentation_common.ui.screen.PagerContentManager
 import com.vlascitchii.presentation_common.ui.state.UiState
-import com.vlascitchii.presentation_common.ui.video_list.YouTubeVideoList
-import com.vlascitchii.presentation_common.utils.SnackbarController.sendEvent
+import com.vlascitchii.presentation_common.ui.video_list.ItemsList
 import com.vlascitchii.presentation_player.screen_player.OrientationState
 import com.vlascitchii.presentation_player.screen_player.VideoDescription
 import com.vlascitchii.presentation_player.screen_player.YoutubeVideoPlayer
@@ -25,7 +28,7 @@ import kotlinx.coroutines.flow.StateFlow
 @Composable
 fun PlayerScreen(
     video: YoutubeVideoUiModel,
-    relatedVideos: StateFlow<UiState<PagingData<YoutubeVideoUiModel>>>,
+    relatedVideos: StateFlow<UiState<Flow<PagingData<YoutubeVideoUiModel>>>>,
     getRelatedVideos: (String) -> Unit,
     isVideoPlaysFlow: StateFlow<Boolean>,
     updateVideoIsPlayState: (Boolean) -> Unit,
@@ -37,18 +40,21 @@ fun PlayerScreen(
     updatePlayerOrientationState: (OrientationState) -> Unit,
     fullscreenWidgetIsClicked: StateFlow<Boolean>,
     setFullscreenWidgetIsClicked: (Boolean) -> Unit,
-    connectivityStatus: Flow<ConnectivityStatus>
+    connectivityStatus: Flow<NetworkConnectivityStatus>,
+    modifier: Modifier = Modifier
 ) {
 
-    relatedVideos.collectAsStateWithLifecycle().value.let { uiStatePagingData: UiState<PagingData<YoutubeVideoUiModel>> ->
-        CommonScreen(uiStatePagingData) { pagingData: PagingData<YoutubeVideoUiModel> ->
+    relatedVideos.collectAsStateWithLifecycle().value.let { uiStatePagingData: UiState<Flow<PagingData<YoutubeVideoUiModel>>> ->
+        CommonScreen(uiStatePagingData) { pagingData: Flow<PagingData<YoutubeVideoUiModel>> ->
             val networkConnectivityStatus by connectivityStatus.collectAsStateWithLifecycle(
-                initialValue = ConnectivityStatus.Available
+                initialValue = NetworkConnectivityStatus.Available
             )
+            val lazyPagingData = pagingData.collectAsLazyPagingItems()
+
             LaunchedEffect(networkConnectivityStatus) {
-                if (networkConnectivityStatus == ConnectivityStatus.Lost) {
+                if (networkConnectivityStatus == NetworkConnectivityStatus.Lost) {
                     sendEvent(
-                        event = com.vlascitchii.presentation_common.utils.SnackbarEvent(
+                        event = SnackBarEvent(
                             message = "Wrong internet connection"
                         )
                     )
@@ -56,32 +62,38 @@ fun PlayerScreen(
             }
 
             Column(
-                modifier = Modifier
+                modifier = modifier
                     .fillMaxSize()
-//                    .background(MaterialTheme.colorScheme.background)
             ) {
-                YoutubeVideoPlayer(
-                    videoId = video.id,
-                    Modifier,
-                    isVideoPlaysFlow,
-                    updateVideoIsPlayState,
-                    popBackStack,
-                    updatePlaybackPosition,
-                    playbackPosition,
-                    playerOrientationState,
-                    updatePlayerOrientationState,
-                    fullscreenWidgetIsClicked,
-                    setFullscreenWidgetIsClicked,
-                    networkConnectivityStatus
-                )
+//                YoutubeVideoPlayer(
+//                    videoId = video.id,
+//                    modifier,
+//                    isVideoPlaysFlow,
+//                    updateVideoIsPlayState,
+//                    popBackStack,
+//                    updatePlaybackPosition,
+//                    playbackPosition,
+//                    playerOrientationState,
+//                    updatePlayerOrientationState,
+//                    fullscreenWidgetIsClicked,
+//                    setFullscreenWidgetIsClicked,
+//                    networkConnectivityStatus
+//                )
 
                 if (LocalConfiguration.current.orientation != ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE) {
                     VideoDescription(video = video)
 
-                    YouTubeVideoList(
-                        videosFlow = relatedVideos,
-                        modifier = Modifier,
-                        navigateToPlayerScreen = navigateToPlayerScreen,
+                    PagerContentManager(
+                        videoState = lazyPagingData,
+                        contentList = {
+                            ItemsList(
+                                lazyPagingData,
+                                modifier,
+                                navigateToPlayerScreen,
+                            )
+                        },
+                        modifier = modifier
+                            .fillMaxSize()
                     )
                 }
             }

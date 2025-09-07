@@ -5,9 +5,10 @@ import com.vlascitchii.data_local.database.convertToLocalYoutubeVideoResponseEnt
 import com.vlascitchii.data_local.enetity.video_list.videos.YoutubeVideoResponseEntity
 import com.vlascitchii.data_local.source.utils.DatabaseContentManager
 import com.vlascitchii.data_repository.data_source.local.LocalVideoListDataSource
-import com.vlascitchii.domain.custom_coroutine_scopes.AppCoroutineScope
-import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse
+import com.vlascitchii.domain.custom_scope.CustomCoroutineScope
+import com.vlascitchii.domain.model.videos.YoutubeVideoResponseDomain
 import com.vlascitchii.domain.util.UseCaseException
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
@@ -16,16 +17,15 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import java.time.OffsetDateTime
 import javax.inject.Inject
-import javax.inject.Named
+import kotlin.coroutines.coroutineContext
 
 class LocalVideoListDataSourceImpl @Inject constructor(
-    @Named("video")
-    private val videoCoroutineScope: AppCoroutineScope,
-    private val databaseContentManager: DatabaseContentManager
+    private val databaseContentManager: DatabaseContentManager,
+    private val customCoroutineScope: CustomCoroutineScope
 ) : LocalVideoListDataSource {
 
-    override fun insertVideosToDatabaseWithTimeStamp(
-        youTubeVideoResponse: YoutubeVideoResponse,
+    override suspend fun insertVideosToDatabaseWithTimeStamp(
+        youTubeVideoResponse: YoutubeVideoResponseDomain,
         loadDate: OffsetDateTime,
     ) {
         try {
@@ -34,9 +34,10 @@ class LocalVideoListDataSourceImpl @Inject constructor(
                     youTubeVideoResponse.convertToLocalYoutubeVideoResponseEntity()
                         .setCurrentPageTokenToVideos(sourceCurrentPageToken)
 
-                println("videoResponseEntity = $videoResponseEntity")
+                customCoroutineScope.linkWithParentContextAndGetContext(coroutineContext)
+                customCoroutineScope.launch {
+                    delay(10000L)
 
-                videoCoroutineScope.launch {
                     insertPageFrom(videoResponseEntity)
                     videoResponseEntity.bindAndInsertVideoWith(loadDate)
                     deleteExtraVideos()
@@ -49,7 +50,7 @@ class LocalVideoListDataSourceImpl @Inject constructor(
         }
     }
 
-    override fun getVideosFromDatabase(pageToken: String): Flow<YoutubeVideoResponse> = flow {
+    override fun getVideosFromDatabase(pageToken: String): Flow<YoutubeVideoResponseDomain> = flow {
 
         with(databaseContentManager) {
             val videoResponse: Flow<YoutubeVideoResponseEntity> =
@@ -60,6 +61,6 @@ class LocalVideoListDataSourceImpl @Inject constructor(
             emit(videoResponse.first().convertToDomainYoutubeVideoResponse())
         }
     }
-        .flowOn(videoCoroutineScope.dispatcher)
+        .flowOn(customCoroutineScope.coroutineContext)
         .catch { throw UseCaseException.LocalStorageException(it) }
 }

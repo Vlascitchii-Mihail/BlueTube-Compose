@@ -1,65 +1,69 @@
 [versions]
 #core
-activity-compose = "1.9.0"
-core-ktx = "1.13.1"
-lifecycle-runtime-ktx = "2.8.0"
+activity-compose = "1.11.0"
+core-ktx = "1.17.0"
+lifecycle-runtime-ktx = "2.9.4"
 
 #ui
-material = "1.6.7"
-compose-bom = "2024.10.01"
-navigation = "2.8.3"
-constraint-layout = "1.1.0-alpha13"
-constraint-layout-xml = "2.1.4"
-window-size = "1.3.0"
+compose-bom = "2025.10.00"
+#navigation
+nav3Core = "1.0.0-alpha11"
+nav3Lifecycle = "1.0.0-alpha04"
+material3Adaptive = "1.2.0-rc01"
+
+constraint-layout = "1.1.1"
+constraint-layout-xml = "2.2.1"
+window-size = "1.4.0"
 
 #dagger hilt
-hilt = "2.49"
-hilt-navigation = "1.2.0"
+hilt = "2.57.2"
+hilt-navigation = "1.3.0"
 
 #retrofit
-retrofit = "2.9.0"
-okhttp3 = "4.12.0"
-moshi = "1.14.0"
-moshi-converter = "2.9.0"
+retrofit = "3.0.0"
+okhttp3 = "5.2.1"
+moshi = "1.15.2"
+moshi-converter = "3.0.0"
 
 #room
-room = "2.6.1"
+room = "2.8.2"
 
 #paging
 paging = "3.3.6"
-recyclerview = "1.3.1"
+recyclerview = "1.4.0"
 
 
-glide = "1.0.0-beta01"
-youtube-player = "12.1.0"
-coroutines = "1.7.3"
-lifecycle = "2.8.0"
+glide = "1.0.0-beta08"
+coil = "2.7.0"
+youtube-player = "13.0.0"
+coroutines = "1.10.2"
+lifecycle = "2.9.4"
 
 #test
 junit = "4.13.2"
-androidx-test-ext = "1.1.5"
-androidx-test-espresso = "3.5.1"
-mockito = "5.2.0"
+androidx-test-ext = "1.3.0"
+androidx-test-espresso = "3.7.0"
+mockito = "6.1.0"
 mockito-inline = "5.2.0"
-mockito-kotlin-android = "3.2.0"
-dexmaker = "2.28.1"
-mockwebserver = "4.9.2"
-coroutine-test = "1.8.1"
+mockito-core = "5.20.0"
+dexmaker = "2.28.6"
+mockwebserver = "5.2.1"
+coroutine-test = "1.10.2"
 test-arch-core = "2.2.0"
-espresso_device = "1.0.1"
+espresso_device = "1.1.0"
+androidTestRunner = "1.7.0"
 
 #plugins
-android-application = "8.2.2"
-jetbrains-kotlin = "1.9.24"
-serialization = "1.6.3"
-ksp-compiler = "1.9.20-1.0.14"
+android-application = "8.13.0"
+jetbrains-kotlin = "2.2.20"
+serialization = "1.9.0"
+ksp-compiler = "2.2.20-2.0.3"
 
-navigation-testing = "2.7.7"
-parcelize = "1.8.10"
-appcompat = "1.7.0"
-material-version = "1.12.0"
-ui-tooling = "1.8.2"
-jetbrains-kotlin-jvm = "1.9.24"
+navigation-testing = "2.9.5"
+parcelize = "2.2.20"
+appcompat = "1.7.1"
+material-version = "1.13.0"
+junitVersion = "4.12"
 
 
 [libraries]
@@ -69,6 +73,8 @@ androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtim
 
 #ui
 androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose-bom" }
+icons-core = { module = "androidx.compose.material:material-icons-core" }
+icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 compose-ui = { module = "androidx.compose.ui:ui" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity-compose" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test" }
@@ -76,22 +82,33 @@ ui-graphics = { module = "androidx.compose.ui:ui-graphics" }
 compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
 material3 = { module = "androidx.compose.material3:material3" }
-androidx-material = { module = "androidx.compose.material:material", version.ref = "material" }
 constraint-layout-compose = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraint-layout"}
 constraint-layout-xml = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraint-layout-xml"}
 window-configuration = { group = "androidx.compose.material3", name = "material3-window-size-class", version.ref = "window-size" }
 
 #view model
-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose"}
+# adds collectAsStateWithLifecycle
+viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
+# obtain and use ViewModels inside composables, provides viewModel() function, hiltViewModel()
+lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
 
 #coroutines
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 
-#navigation
-navigation = { module = "androidx.navigation:navigation-compose", version.ref = "navigation" }
-kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization"}
+# navigation 3 core
+nav3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "nav3Core" }
+nav3-ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "nav3Core" }
+
+#restoring states and navigation destinations
+androidx-lifecycle-viewmodel-nav3 = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "nav3Lifecycle" }
+
+#for type save destinations
+kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "serialization" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
+
+# build adaptive UIs that automatically adjust to different screen sizes, window sizes, postures, and device types, multi-pane UIs
+androidx-material3-adaptive = { module = "androidx.compose.material3.adaptive:adaptive", version.ref = "material3Adaptive" }
 
 #dagger hilt
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt"}
@@ -115,9 +132,11 @@ room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "room"}
 
 glide = { module = "com.github.bumptech.glide:compose", version.ref = "glide" }
+coil = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 
 #paging
 paging = { module = "androidx.paging:paging-runtime-ktx", version.ref = "paging"}
+androidx-paging-common = { module = "androidx.paging:paging-common", version.ref = "paging" }
 paging-compose = {module = "androidx.paging:paging-compose", version.ref = "paging"}
 
 #YouTubePlayer
@@ -127,6 +146,7 @@ youtube-player = { module = "com.pierfrancescosoffritti.androidyoutubeplayer:cor
 junit = { module = "junit:junit", version.ref = "junit"}
 mockito = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockito" }
 mockito-inline = { module = "org.mockito:mockito-inline", version.ref = "mockito-inline" }
+mockito-core = { group = "org.mockito", name = "mockito-core", version.ref = "mockito-core" }
 test-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutine-test" }
 paging-test = { module = "androidx.paging:paging-testing", version.ref = "paging"}
 #android tests
@@ -135,6 +155,7 @@ test-arch-core = { module = "androidx.arch.core:core-testing", version.ref = "te
 dexmaker = { module = "com.linkedin.dexmaker:dexmaker-mockito-inline", version.ref = "dexmaker"}
 androidx-test-ext = { module = "androidx.test.ext:junit", version.ref = "androidx-test-ext" }
 androidx-test-espresso = { module = "androidx.test.espresso:espresso-core", version.ref = "androidx-test-espresso" }
+androidx-test-runner = { group = "androidx.test", name = "runner", version.ref = "androidTestRunner"}
 #Dagger-Hilt Test
 android-hilt-test = { module = "com.google.dagger:hilt-android-testing", version.ref = "hilt" }
 ksp-hilt-android-test = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt"}
@@ -152,11 +173,11 @@ androidx-recyclerview = { group = "androidx.recyclerview", name = "recyclerview"
 [plugins]
 android-application = { id = "com.android.application", version.ref = "android-application" }
 jetbrains-kotlin = { id = "org.jetbrains.kotlin.android", version.ref = "jetbrains-kotlin"}
-kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "activity-compose" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "jetbrains-kotlin" }
+kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "jetbrains-kotlin" }
 ksp = { id =  "com.google.devtools.ksp", version.ref = "ksp-compiler" }
 kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "jetbrains-kotlin"}
 hilt-plugin = { id = "com.google.dagger.hilt.android", version.ref = "hilt"}
-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "parcelize" }
 android-library = { id = "com.android.library", version.ref = "android-application" }
-jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrains-kotlin-jvm" }
+jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrains-kotlin" }
 

@@ -1,26 +1,43 @@
 package com.vlascitchii.domain.usecase
 
 import androidx.paging.PagingData
-import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideo
+import androidx.paging.cachedIn
+import com.vlascitchii.domain.model.videos.YoutubeVideoDomain
 import com.vlascitchii.domain.repository.VideoListRepository
-import com.vlascitchii.domain.usecase.util.Configuration
+import com.vlascitchii.domain.usecase.util.DispatcherConfiguration
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
-
+import kotlinx.coroutines.flow.flow
 
 class VideoListUseCase(
-    configuration: Configuration,
+    dispatcherConfiguration: DispatcherConfiguration,
     private val videoListRepository: VideoListRepository
-) : UseCase<VideoListUseCase.Request, VideoListUseCase.Response>(configuration) {
+) : UseCase<VideoListUseCase.VideoListRequest, VideoListUseCase.VideoListResponse>(dispatcherConfiguration) {
 
-    object Request : UseCase.Request
-    data class Response(val youTubePopularVideoPagingData: PagingData<YoutubeVideo>) : UseCase.Response
+    sealed class VideoListRequest() : UseCase.CommonRequest {
+        data class VideoRequest(val coroutineScope: CoroutineScope) : VideoListRequest()
+        data class SearchRequest(val query: String, val coroutineScope: CoroutineScope) : VideoListRequest()
+    }
 
-    override fun process(request: Request): Flow<Response> {
+    data class VideoListResponse(val youTubePopularVideoPagingData: Flow<PagingData<YoutubeVideoDomain>>) : UseCase.CommonResponse
 
-        return videoListRepository.getPopularVideos()
-            .map { youTubeVideoResponse: PagingData<YoutubeVideo> ->
-                Response(youTubeVideoResponse)
+    override fun process(request: VideoListRequest): Flow<VideoListResponse> = flow {
+        emit(
+            when (request) {
+                is VideoListRequest.VideoRequest -> {
+                    VideoListResponse(
+                        youTubePopularVideoPagingData = videoListRepository.getPopularVideos()
+                            .cachedIn(request.coroutineScope)
+                    )
+                }
+
+                is VideoListRequest.SearchRequest -> {
+                    VideoListResponse(
+                        videoListRepository.getSearchVideos(request.query)
+                            .cachedIn(request.coroutineScope)
+                    )
+                }
             }
+        )
     }
 }

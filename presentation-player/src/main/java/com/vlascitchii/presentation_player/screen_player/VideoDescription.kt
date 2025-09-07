@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -16,13 +17,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.integration.compose.placeholder
 import com.vlascitchii.presentation_common.R
-import com.vlascitchii.presentation_common.entity.videos.YoutubeVideoUiModel
+import com.vlascitchii.presentation_common.model.videos.YoutubeVideoUiModel
+import com.vlascitchii.presentation_common.ui.theme.BlueTubeComposeTheme
 import com.vlascitchii.presentation_common.utils.Core.CHANNEL_PREVIEW_IMG
 
 @OptIn(ExperimentalGlideComposeApi::class)
@@ -40,14 +42,12 @@ fun VideoDescription(video: YoutubeVideoUiModel, modifier: Modifier = Modifier) 
             modifier = modifier.padding(vertical = 4.dp),
             maxLines = 2,
             style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onBackground
         )
         Text(
             text = com.vlascitchii.presentation_common.utils.formatViews(video.statistics.viewCount) + stringResource(id = R.string.views) +
                     "\t\t" + com.vlascitchii.presentation_common.utils.formatDate(video.snippet.publishedAt),
             modifier = modifier.padding(vertical = 4.dp),
             style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onBackground
         )
 
         Row(
@@ -57,7 +57,7 @@ fun VideoDescription(video: YoutubeVideoUiModel, modifier: Modifier = Modifier) 
             GlideImage(
                 model = video.snippet.channelImgUrl,
                 loading = placeholder(R.drawable.sceleton_thumbnail),
-                contentDescription = stringResource(R.string.channel_name) + video.snippet.channelTitle,
+                contentDescription = stringResource(R.string.channel_description) + video.snippet.channelTitle,
                 contentScale = ContentScale.Crop,
                 modifier = modifier
                     .testTag(CHANNEL_PREVIEW_IMG)
@@ -71,21 +71,23 @@ fun VideoDescription(video: YoutubeVideoUiModel, modifier: Modifier = Modifier) 
                 text = video.snippet.channelTitle,
                 modifier = modifier.padding(end = 8.dp),
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onBackground
             )
 
             Text(
                 text = com.vlascitchii.presentation_common.utils.formatViews(video.statistics.viewCount),
                 modifier = modifier.padding(end = 8.dp),
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onBackground
             )
         }
     }
 }
 
-@Preview
+@PreviewLightDark
 @Composable
 fun VideoDescriptionPreview() {
-    VideoDescription(video = YoutubeVideoUiModel.DEFAULT_VIDEO)
+    BlueTubeComposeTheme {
+        Surface {
+            VideoDescription(video = YoutubeVideoUiModel.DEFAULT_VIDEO)
+        }
+    }
 }

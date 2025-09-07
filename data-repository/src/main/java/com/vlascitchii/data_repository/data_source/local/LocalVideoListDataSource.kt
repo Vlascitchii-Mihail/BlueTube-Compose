@@ -1,15 +1,15 @@
 package com.vlascitchii.data_repository.data_source.local
 
-import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse
+import com.vlascitchii.domain.model.videos.YoutubeVideoResponseDomain
 import kotlinx.coroutines.flow.Flow
 import java.time.OffsetDateTime
 
 interface LocalVideoListDataSource {
 
-    fun insertVideosToDatabaseWithTimeStamp(
-        youTubeVideoResponse: YoutubeVideoResponse,
+    suspend fun insertVideosToDatabaseWithTimeStamp(
+        youTubeVideoResponse: YoutubeVideoResponseDomain,
         loadDate: OffsetDateTime
     )
 
-    fun  getVideosFromDatabase(pageToken: String): Flow<YoutubeVideoResponse>
+    fun  getVideosFromDatabase(pageToken: String): Flow<YoutubeVideoResponseDomain>
 }

@@ -3,21 +3,25 @@ package com.vlascitchii.presentation_common.ui.video_list
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Surface
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
@@ -26,41 +30,32 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
-import com.vlascitchii.presentation_common.entity.videos.YoutubeVideoResponseUiModel
-import com.vlascitchii.presentation_common.entity.videos.YoutubeVideoUiModel
-import com.vlascitchii.presentation_common.entity.videos.YoutubeVideoUiModel.Companion.DEFAULT_VIDEO_LIST
-import com.vlascitchii.presentation_common.ui.PagerContentManager
+import com.vlascitchii.presentation_common.R
+import com.vlascitchii.presentation_common.model.videos.YoutubeVideoUiModel
+import com.vlascitchii.presentation_common.model.videos.YoutubeVideoUiModel.Companion.PREVIEW_VIDEO_LIST
 import com.vlascitchii.presentation_common.ui.error.PaginationRetryItem
 import com.vlascitchii.presentation_common.ui.screen.CommonScreen
+import com.vlascitchii.presentation_common.ui.screen.LocalWindowSizeClass
+import com.vlascitchii.presentation_common.ui.screen.PagerContentManager
+import com.vlascitchii.presentation_common.ui.screen.previewWindowSizeClass
 import com.vlascitchii.presentation_common.ui.state.UiState
-import kotlinx.coroutines.flow.MutableStateFlow
+import com.vlascitchii.presentation_common.ui.theme.BlueTubeComposeTheme
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flowOf
 
 @Composable
 fun YouTubeVideoList(
+    initVideosList: () -> Unit,
     modifier: Modifier = Modifier,
-    videosFlow: StateFlow<UiState<PagingData<YoutubeVideoUiModel>>>,
-    innerPadding: PaddingValues = PaddingValues(0.dp),
-    localWindowSizeClass: WindowWidthSizeClass = WindowWidthSizeClass.Compact,
+    videosFlow: StateFlow<UiState<Flow<PagingData<YoutubeVideoUiModel>>>>,
+    innerPadding: PaddingValues = PaddingValues(),
     navigateToPlayerScreen: (YoutubeVideoUiModel) -> Unit,
 ) {
-    videosFlow.collectAsStateWithLifecycle().value.let { uiStateVideoList: UiState<PagingData<YoutubeVideoUiModel>> ->
-        CommonScreen(uiStateVideoList) { pagingData: PagingData<YoutubeVideoUiModel> ->
-            val lazyVideosPagingItem = flowOf(pagingData).collectAsLazyPagingItems()
-
-            val keyboardController = LocalSoftwareKeyboardController.current
-            val nestedScrollConnection = remember {
-                object : NestedScrollConnection {
-                    override fun onPreScroll(
-                        available: Offset,
-                        source: NestedScrollSource
-                    ): Offset {
-                        keyboardController?.hide()
-                        return Offset.Zero
-                    }
-                }
-            }
+    videosFlow.collectAsStateWithLifecycle().value.let { uiStateVideoList: UiState<Flow<PagingData<YoutubeVideoUiModel>>> ->
+        if (uiStateVideoList == UiState.Loading) initVideosList.invoke()
+        CommonScreen(uiStateVideoList) { pagingData: Flow<PagingData<YoutubeVideoUiModel>> ->
+            val lazyVideosPagingItem = pagingData.collectAsLazyPagingItems()
 
             PagerContentManager(
                 videoState = lazyVideosPagingItem,
@@ -69,13 +64,10 @@ fun YouTubeVideoList(
                         lazyVideosPagingItem,
                         modifier,
                         navigateToPlayerScreen,
-                        localWindowSizeClass
                     )
                 },
+                innerPadding = innerPadding,
                 modifier = modifier
-                    .fillMaxSize()
-                    .nestedScroll(nestedScrollConnection)
-                    .padding(innerPadding)
             )
         }
     }
@@ -86,14 +78,14 @@ fun ItemsList(
     videos: LazyPagingItems<YoutubeVideoUiModel>,
     modifier: Modifier,
     navigateToPlayerScreen: (YoutubeVideoUiModel) -> Unit,
-    windowSize: WindowWidthSizeClass
 ) {
+    val videoListDescr = stringResource(R.string.video_list_description)
 
     LazyColumn(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .fillMaxSize()
-            .testTag(com.vlascitchii.presentation_common.utils.VideoListScreenTags.VIDEO_LIST)
+            .semantics { contentDescription = videoListDescr }
     ) {
         items(
             count = videos.itemCount,
@@ -101,7 +93,7 @@ fun ItemsList(
             contentType = videos.itemContentType()
         ) { index ->
 
-            when (windowSize) {
+            when (LocalWindowSizeClass.current.widthSizeClass) {
                 WindowWidthSizeClass.Compact ->
                     videos[index]?.let {
                         VideoItem(
@@ -114,7 +106,7 @@ fun ItemsList(
                 WindowWidthSizeClass.Medium ->
                     videos[index]?.let {
                         VideoItemLandscape(
-                            youtubeVideo = it,
+                            youtubeVideoUiModel = it,
                             modifier = modifier,
                             navigateToPlayerScreen
                         )
@@ -123,15 +115,6 @@ fun ItemsList(
                 WindowWidthSizeClass.Expanded ->
                     videos[index]?.let {
                         VideoItemLandscape(
-                            youtubeVideo = it,
-                            modifier = modifier,
-                            navigateToPlayerScreen
-                        )
-                    }
-
-                else ->
-                    videos[index]?.let {
-                        VideoItem(
                             youtubeVideoUiModel = it,
                             modifier = modifier,
                             navigateToPlayerScreen
@@ -142,7 +125,7 @@ fun ItemsList(
 
         item {
             when (videos.loadState.append) {
-                is LoadState.Loading -> CircularProgressIndicator(modifier.height(48.dp))
+                is LoadState.Loading -> CircularProgressIndicator(modifier.height(dimensionResource(R.dimen.height_small_40)))
                 is LoadState.Error -> PaginationRetryItem(onRetryClick = { videos.retry() })
                 is LoadState.NotLoading -> Unit
             }
@@ -150,35 +133,39 @@ fun ItemsList(
     }
 }
 
-@Preview
+private lateinit var lazyPagingItems: LazyPagingItems<YoutubeVideoUiModel>
+
+@Preview()
 @Composable
-private fun YouTubeVideoListCompactPreview() {
-    YouTubeVideoList(
-        modifier = Modifier,
-        videosFlow = MutableStateFlow(UiState.Success(PagingData.from(DEFAULT_VIDEO_LIST))),
-        PaddingValues(8.dp),
-        localWindowSizeClass = WindowWidthSizeClass.Compact
-    ) {}
+private fun YouTubeVideoItemsListCompactPreview() {
+    BlueTubeComposeTheme {
+        val pagingData: Flow<PagingData<YoutubeVideoUiModel>> = flowOf(PagingData.from(PREVIEW_VIDEO_LIST))
+        lazyPagingItems = pagingData.collectAsLazyPagingItems()
+
+        Surface {
+            ItemsList(
+                modifier = Modifier,
+                videos = lazyPagingItems,
+            ) {}
+        }
+    }
 }
 
-@Preview
+@Preview(widthDp = 1200, heightDp = 800)
 @Composable
-private fun YouTubeVideoListMediumPreview() {
-    YouTubeVideoList(
-        modifier = Modifier,
-        videosFlow = MutableStateFlow(UiState.Success(PagingData.from(DEFAULT_VIDEO_LIST))),
-        PaddingValues(8.dp),
-        localWindowSizeClass = WindowWidthSizeClass.Medium
-    ) {}
-}
+private fun YouTubeVideoItemsListCompactTabletPreview() {
+    val tabletSize = DpSize(width = 1200.dp, height = 800.dp)
 
-@Preview
-@Composable
-private fun YouTubeVideoListExpandedPreview() {
-    YouTubeVideoList(
-        modifier = Modifier,
-        videosFlow = MutableStateFlow(UiState.Success(PagingData.from(DEFAULT_VIDEO_LIST))),
-        PaddingValues(8.dp),
-        localWindowSizeClass = WindowWidthSizeClass.Expanded
-    ) {}
+    CompositionLocalProvider(
+        LocalWindowSizeClass provides previewWindowSizeClass(tabletSize)
+    ) {
+        BlueTubeComposeTheme {
+            Surface {
+                ItemsList(
+                    modifier = Modifier,
+                    videos = lazyPagingItems,
+                ) {}
+            }
+        }
+    }
 }

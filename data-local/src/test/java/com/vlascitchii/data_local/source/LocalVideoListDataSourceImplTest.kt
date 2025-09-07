@@ -6,8 +6,8 @@ import com.vlascitchii.data_local.source.utils.DatabaseContentManager
 import com.vlascitchii.data_repository.data_source.local.LocalVideoListDataSource
 import com.vlascitchii.domain.custom_coroutine_scopes.AppCoroutineScope
 import com.vlascitchii.domain.custom_coroutine_scopes.VideoCoroutineScope
-import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse.Companion.RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG
-import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse.Companion.testDateTime
+import com.vlascitchii.domain.model.videos.YoutubeVideoResponseDomain.Companion.DOMAIN_RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG
+import com.vlascitchii.domain.model.videos.YoutubeVideoResponseDomain.Companion.testDateTime
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
@@ -27,12 +27,12 @@ class LocalVideoListDataSourceImplTest {
     private val localVideoListDataSource: LocalVideoListDataSource =
         LocalVideoListDataSourceImpl(videoCoroutineScope, databaseContentManager)
     private val testDataRemoteResponse =
-        RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.convertToLocalYoutubeVideoResponseEntity()
+        DOMAIN_RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.convertToLocalYoutubeVideoResponseEntity()
 
     @Test
     fun `LocalVideoListDataSourceImpl calls fun setCurrentPageTokenToVideos() from DatabaseContentManager`() {
         localVideoListDataSource.insertVideosToDatabaseWithTimeStamp(
-            RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG,
+            DOMAIN_RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG,
             testDateTime
         )
 
@@ -44,7 +44,7 @@ class LocalVideoListDataSourceImplTest {
     @Test
     fun `fun insertPageFrom() is called in DatabaseContentManager`() = runTest {
         localVideoListDataSource.insertVideosToDatabaseWithTimeStamp(
-            RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG,
+            DOMAIN_RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG,
             testDateTime
         )
 
@@ -58,7 +58,7 @@ class LocalVideoListDataSourceImplTest {
     @Test
     fun `deleteExtraVideos() is called from LocalVideoListDataSourceImpl`() = runTest {
         localVideoListDataSource.insertVideosToDatabaseWithTimeStamp(
-            RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG,
+            DOMAIN_RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG,
             testDateTime
         )
 
@@ -69,7 +69,7 @@ class LocalVideoListDataSourceImplTest {
     @Test
     fun `updateCurrentPageToken() updates sourceCurrentPageToken in DatabaseContentManager`() {
         localVideoListDataSource.insertVideosToDatabaseWithTimeStamp(
-            RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG,
+            DOMAIN_RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG,
             testDateTime
         )
 

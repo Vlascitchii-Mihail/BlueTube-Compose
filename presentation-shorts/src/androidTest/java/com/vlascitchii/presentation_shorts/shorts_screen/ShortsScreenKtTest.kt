@@ -12,12 +12,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.testing.TestNavHostController
 import androidx.paging.PagingData
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.appelier.bluetubecompose.MainActivity
-import com.appelier.bluetubecompose.navigation.ScreenType
+import com.vlascitchii.bluetubecompose.MainActivity
+import com.vlascitchii.bluetubecompose.navigation.ScreenType
 import com.vlascitchii.presentation_shorts.screen_shorts.screen.ShortsScreen
 import com.vlascitchii.data_local.enetity.video_list.videos.YoutubeVideoEntity
-import com.vlascitchii.presentation_common.utils.Core
-import com.vlascitchii.presentation_common.utils.ShortsItemTag
 //import dagger.hilt.android.testing.HiltAndroidRule
 //import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -50,18 +48,18 @@ class ShortsScreenKtTest {
         composeAndroidTestRule.activity.setContent {
             navController = TestNavHostController(LocalContext.current)
             navController.navigatorProvider.addNavigator(ComposeNavigator())
-            NavHost(navController = navController, startDestination = com.appelier.bluetubecompose.navigation.ScreenType.ShortsScreen) {
-                composable<com.appelier.bluetubecompose.navigation.ScreenType.ShortsScreen> {
+            NavHost(navController = navController, startDestination = com.vlascitchii.bluetubecompose.navigation.ScreenType.ShortsScreen) {
+                composable<com.vlascitchii.bluetubecompose.navigation.ScreenType.ShortsScreen> {
                     com.vlascitchii.presentation_shorts.screen_shorts.screen.ShortsScreen(
                         shortsStateFlow = videoPage,
                         videoQueue = MutableSharedFlow(3),
                         listenToVideoQueue = {},
-                        connectivityStatus = flowOf(com.appelier.bluetubecompose.network_observer.ConnectivityStatus.Available),
+                        networkConnectivityStatus = flowOf(com.vlascitchii.bluetubecompose.network_observer.ConnectivityStatus.Available),
                     )
                 }
             }
 
-            navController.navigate(com.appelier.bluetubecompose.navigation.ScreenType.ShortsScreen)
+            navController.navigate(com.vlascitchii.bluetubecompose.navigation.ScreenType.ShortsScreen)
         }
     }
 

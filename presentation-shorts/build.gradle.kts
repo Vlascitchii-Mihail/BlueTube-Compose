@@ -1,16 +1,17 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin)
+    alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt.plugin)
 }
 
 android {
     namespace = "com.vlascitchii.presentation_shorts"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
-        minSdk = 26
+        minSdk = 31
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
@@ -31,11 +32,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "17"
     }
 }
 
@@ -44,7 +45,6 @@ dependencies {
     implementation(project(":domain"))
     implementation(project(":presentation-common"))
     testImplementation(project(":common-test"))
-    testImplementation(project(":common-test-android"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
@@ -58,10 +58,13 @@ dependencies {
     debugImplementation(libs.compose.ui.tooling)
     implementation(libs.ui.tooling.preview)
     implementation(libs.material3)
-    implementation(libs.androidx.material)
     implementation(libs.constraint.layout.compose)
     implementation(libs.constraint.layout.xml)
     implementation(libs.window.configuration)
+
+    //viewmodel
+    implementation(libs.viewmodel.compose)
+    implementation(libs.lifecycle.runtime.compose)
 
     //dagger hilt
     implementation(libs.hilt.android)
