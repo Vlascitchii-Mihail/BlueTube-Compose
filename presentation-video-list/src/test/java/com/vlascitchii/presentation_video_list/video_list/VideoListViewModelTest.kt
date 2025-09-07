@@ -9,15 +9,15 @@ import com.vlascitchii.domain.usecase.SearchVideoListUseCase
 import com.vlascitchii.domain.usecase.VideoListUseCase
 import com.vlascitchii.domain.util.UseCaseException
 import com.vlascitchii.domain.util.VideoResult
-import com.vlascitchii.presentation_common.entity.util.convertToYoutubeVideoUiMode
+import com.vlascitchii.presentation_common.entity.util.convertToYoutubeVideoUiModel
 import com.vlascitchii.presentation_common.entity.videos.YoutubeVideoUiModel
 import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityObserver
 import com.vlascitchii.presentation_common.ui.state.UiState
-import com.vlascitchii.presentation_video_list.screen.VideoListViewModel
+import com.vlascitchii.presentation_video_list.screen.VideoListVideoViewModel
 import com.vlascitchii.presentation_video_list.util.SearchVideoListConverter
 import com.vlascitchii.presentation_video_list.util.VideoListConverter
-import com.vlascitchii.presentation_video_list.util.state.SearchState
-import com.vlascitchii.presentation_video_list.util.state.VideoType
+import com.vlascitchii.presentation_video_list.screen.state.SearchState
+import com.vlascitchii.presentation_video_list.screen.state.VideoType
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
@@ -46,7 +46,7 @@ class VideoListViewModelTest {
     private val searchVideoListConverter: SearchVideoListConverter = mock()
     private val networkConnectivityObserver: NetworkConnectivityObserver = mock()
     private val videoCoroutineScope: AppCoroutineScope = mock()
-    private val videoListViewModel = VideoListViewModel(
+    private val videoListViewModel = VideoListVideoViewModel(
         videoListUseCase,
         searchVideoListUseCase,
         videoListConverter,
@@ -61,7 +61,7 @@ class VideoListViewModelTest {
     private val pagingData: PagingData<YoutubeVideo> = PagingData.from(RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.items)
     private val pagingUiData: PagingData<YoutubeVideoUiModel> = PagingData.from(
         RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.items.map { video: YoutubeVideo ->
-            video.convertToYoutubeVideoUiMode()
+            video.convertToYoutubeVideoUiModel()
         }
     )
 
@@ -119,13 +119,13 @@ class VideoListViewModelTest {
     fun `fun updateSearchState() changes the state of the SearchAppBar `() {
         positiveCase()
 
-        assertTrue(videoListViewModel.searchState.value == SearchState.CLOSED)
+        assertTrue(videoListViewModel.searchBarState.value == SearchState.CLOSED)
 
         videoListViewModel.updateSearchState(SearchState.OPENED)
-        assertTrue(videoListViewModel.searchState.value == SearchState.OPENED)
+        assertTrue(videoListViewModel.searchBarState.value == SearchState.OPENED)
 
         videoListViewModel.updateSearchState(SearchState.CLOSED)
-        assertTrue(videoListViewModel.searchState.value == SearchState.CLOSED)
+        assertTrue(videoListViewModel.searchBarState.value == SearchState.CLOSED)
     }
 
     @Test

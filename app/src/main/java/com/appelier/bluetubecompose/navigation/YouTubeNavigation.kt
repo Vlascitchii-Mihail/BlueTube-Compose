@@ -1,5 +1,6 @@
 package com.appelier.bluetubecompose.navigation
 
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -22,6 +23,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -31,18 +33,23 @@ import com.appelier.bluetubecompose.LocalWindowSizeClass
 import com.appelier.bluetubecompose.R
 import com.appelier.bluetubecompose.navigation.bottom_navigation.BlueTubeBottomNavigation
 import com.vlascitchii.presentation_common.entity.videos.YoutubeVideoUiModel
-import com.vlascitchii.presentation_common.network_observer.ObserveAsEvents
+import com.vlascitchii.presentation_common.ui.global_snackbar.ObserveAsEvents
 import com.vlascitchii.presentation_common.ui.video_list.YouTubeVideoList
-import com.vlascitchii.presentation_common.utils.SnackbarController
+import com.vlascitchii.presentation_common.ui.global_snackbar.SnackBarController
+import com.vlascitchii.presentation_common.ui.global_snackbar.SnackBarEvent
+import com.vlascitchii.presentation_common.ui.state.UiSingleEvent
 import com.vlascitchii.presentation_player.screen_player.screen.PlayerScreen
 import com.vlascitchii.presentation_player.screen_player.screen.VideoPlayerViewModel
 import com.vlascitchii.presentation_shorts.screen_shorts.screen.ShortsScreen
 import com.vlascitchii.presentation_shorts.screen_shorts.screen.ShortsViewModel
 import com.vlascitchii.presentation_video_list.screen.VideoListScreen
-import com.vlascitchii.presentation_video_list.screen.VideoListViewModel
+import com.vlascitchii.presentation_video_list.screen.VideoListVideoViewModel
 import com.vlascitchii.presentation_video_list.screen.ui.ListScreenAppBar
-import com.vlascitchii.presentation_video_list.util.state.SearchState
-import com.vlascitchii.presentation_video_list.util.state.VideoType
+import com.vlascitchii.presentation_video_list.screen.state.SearchState
+import com.vlascitchii.presentation_video_list.screen.state.UiVideoListAction
+import com.vlascitchii.presentation_video_list.screen.state.UiVideoListAction.TypeInSearchAppBarTextField
+import com.vlascitchii.presentation_video_list.screen.state.UiVideoListSingleEvent
+import com.vlascitchii.presentation_video_list.screen.state.VideoType
 import com.vlascitchii.presenttion_settings.screen_settings.SettingsScreen
 import kotlinx.coroutines.launch
 import kotlin.reflect.typeOf
@@ -56,11 +63,12 @@ fun YouTubeNavigation(
     val snackbarHostState = remember { SnackbarHostState() }
 
     ObserveAsEvents(
-        flow = SnackbarController.events,
+        flow = SnackBarController.events,
         key1 = snackbarHostState,
-        onEvent = { event ->
+        onEvent = { event: SnackBarEvent ->
             scope.launch {
 
+                //dismiss current snackbar
                 snackbarHostState.currentSnackbarData?.dismiss()
 
                 val result = snackbarHostState.showSnackbar(
@@ -69,6 +77,7 @@ fun YouTubeNavigation(
                     duration = SnackbarDuration.Long
                 )
 
+                //allows to respond on clicks
                 if (result == SnackbarResult.ActionPerformed) {
                     event.action?.action?.invoke()
                 }
@@ -90,9 +99,7 @@ fun YouTubeNavigation(
             NavHost(
                 navController = navController,
                 startDestination = ScreenType.VideoList(VideoType.PopularVideo),
-                modifier = Modifier
-//                    .testTag(NAVIGATION)
-                    .align(Alignment.TopCenter)
+                modifier = Modifier.align(Alignment.TopCenter)
             ) {
                 composable<ScreenType.VideoList>(
                     typeMap = mapOf(
@@ -103,31 +110,35 @@ fun YouTubeNavigation(
                     )
                 ) { navBackStackEntry: NavBackStackEntry ->
                     val videoTypeArg = navBackStackEntry.toRoute<ScreenType.VideoList>().videoType
-                    val videoListViewModel: VideoListViewModel = hiltViewModel()
+                    val videoListViewModel: VideoListVideoViewModel = hiltViewModel()
                     //check if this function calls many times
+                    Log.d("Navigation", "VideoListScreen() called")
+
+                    navController.handleVideoListNavigation(videoListViewModel)
+
                     videoListViewModel.fetchVideoPagingData(videoTypeArg)
                     VideoListScreen(
                         connectivityStatus = videoListViewModel.connectivityObserver,
                         listScreenAppBar = { scrollAppBarBehaviour: TopAppBarScrollBehavior ->
                             ListScreenAppBar(
-                                searchViewState = videoListViewModel.searchState,
+                                searchViewState = videoListViewModel.searchBarState,
                                 searchTextState = videoListViewModel.searchTextState,
                                 scrollAppBarBehaviour = scrollAppBarBehaviour,
                                 onTextChange = { searchInput: String ->
-                                    videoListViewModel.updateSearchTextState(
-                                        searchInput
-                                    )
+                                    videoListViewModel.submitAction(TypeInSearchAppBarTextField(searchInput))
                                 },
                                 onSearchClicked = {
-                                    navController.navigate(
-                                        ScreenType.VideoList(
+                                    videoListViewModel.submitNavigationSingleEvent(
+                                        UiVideoListSingleEvent.NavigationToSearchVideoList(
                                             VideoType.SearchVideo(videoListViewModel.searchTextState.value)
                                         )
                                     )
                                 },
                                 updateSearchState = { newSearchState: SearchState ->
-                                    videoListViewModel.updateSearchState(
-                                        newSearchState
+                                    videoListViewModel.submitAction(
+                                        UiVideoListAction.ChangeSearchBarAppearance(
+                                            newSearchState
+                                        )
                                     )
                                 }
                             )
@@ -135,17 +146,19 @@ fun YouTubeNavigation(
                         videoList = { padding: PaddingValues ->
                             val windowSizeClass = LocalWindowSizeClass.current.widthSizeClass
                             YouTubeVideoList(
-                                videosFlow = videoListViewModel.videoStateFlow,
-//                                videosFlow = { videoListViewModel.getVideos() },
+                                videosFlow = videoListViewModel.uiStateFlow,
                                 innerPadding = padding,
                                 localWindowSizeClass = windowSizeClass,
                                 navigateToPlayerScreen = { video: YoutubeVideoUiModel ->
-                                    navController.navigate(ScreenType.PlayerScreen(video))
+                                    videoListViewModel.submitNavigationSingleEvent(
+                                        UiVideoListSingleEvent.NavigationToPlayerEvent(video)
+                                    )
                                 }
                             )
                         }
                     )
                 }
+
                 composable<ScreenType.PlayerScreen>(
                     typeMap = mapOf(
                         typeOf<YoutubeVideoUiModel>() to CustomNavTypeSerializer(
@@ -156,6 +169,8 @@ fun YouTubeNavigation(
                 ) { navBackStackEntry ->
                     val arg = navBackStackEntry.toRoute<ScreenType.PlayerScreen>().video
                     val playerScreenViewModel: VideoPlayerViewModel = hiltViewModel()
+                    Log.d("Navigation", "PlayerScreen() called")
+
                     PlayerScreen(
                         video = arg,
                         relatedVideos = playerScreenViewModel.relatedVideoStateFlow,
@@ -200,11 +215,13 @@ fun YouTubeNavigation(
                 composable<ScreenType.ShortsScreen> {
                     val shortsViewModel: ShortsViewModel = hiltViewModel()
                     shortsViewModel.fetchShorts()
+                    Log.d("Navigation", "ShortsScreen() called")
+
                     ShortsScreen(
                         shortsStateFlow = shortsViewModel.shortsStateFlow,
                         videoQueue = shortsViewModel.videoQueue,
                         listenToVideoQueue = { shortsViewModel.listenToVideoQueue() },
-                        connectivityStatus = shortsViewModel.connectivityObserver,
+                        networkConnectivityStatus = shortsViewModel.connectivityObserver,
                     )
                 }
                 composable<ScreenType.SettingsScreen> {
@@ -222,5 +239,20 @@ fun YouTubeNavigation(
         }
 
         BlueTubeBottomNavigation(navController)
+    }
+}
+
+private fun NavHostController.handleVideoListNavigation(videoListViewModel: VideoListVideoViewModel) {
+    videoListViewModel.viewModelScope.launch {
+        videoListViewModel.navigationSingleEventFlow.collect { singleEvent: UiSingleEvent ->
+            when (singleEvent) {
+                is UiVideoListSingleEvent.NavigationToPlayerEvent -> this@handleVideoListNavigation.navigate(
+                    ScreenType.PlayerScreen(singleEvent.video)
+                )
+                is UiVideoListSingleEvent.NavigationToSearchVideoList -> this@handleVideoListNavigation.navigate(
+                    ScreenType.VideoList(singleEvent.videoType)
+                )
+            }
+        }
     }
 }

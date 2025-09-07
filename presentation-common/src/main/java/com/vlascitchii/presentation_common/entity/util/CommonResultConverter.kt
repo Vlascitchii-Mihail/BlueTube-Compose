@@ -30,14 +30,14 @@ abstract class CommonResultConverter<T: Any, R: Any> {
 
     fun convertPager(youTubeVideoPagingData: PagingData<YoutubeVideo>): PagingData<YoutubeVideoUiModel> {
         return youTubeVideoPagingData.map { youTubeVideo: YoutubeVideo ->
-            youTubeVideo.convertToYoutubeVideoUiMode()
+            youTubeVideo.convertToYoutubeVideoUiModel()
         }
     }
 }
 
 
 
-fun YoutubeVideo.convertToYoutubeVideoUiMode(): YoutubeVideoUiModel {
+fun YoutubeVideo.convertToYoutubeVideoUiModel(): YoutubeVideoUiModel {
     val youTubeVideo: YoutubeVideo = this
 
     val thumbnailsAttributesUiModel = ThumbnailAttributesUiModel(

@@ -53,7 +53,7 @@ private val navItemsList = listOf(
         FIRST_ICON_INDEX,
         R.drawable.ic_house_24,
         R.string.video_list_screen,
-        ScreenType.VideoList
+        ScreenType.VideoList()
     ),
     NavigationItem(
         SECOND_ICON_INDEX,

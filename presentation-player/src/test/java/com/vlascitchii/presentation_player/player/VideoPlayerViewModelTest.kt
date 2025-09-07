@@ -8,7 +8,7 @@ import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse.Com
 import com.vlascitchii.domain.usecase.VideoPlayerUseCase
 import com.vlascitchii.domain.util.UseCaseException
 import com.vlascitchii.domain.util.VideoResult
-import com.vlascitchii.presentation_common.entity.util.convertToYoutubeVideoUiMode
+import com.vlascitchii.presentation_common.entity.util.convertToYoutubeVideoUiModel
 import com.vlascitchii.presentation_common.entity.videos.YoutubeVideoUiModel
 import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityObserver
 import com.vlascitchii.presentation_common.ui.state.UiState
@@ -61,7 +61,7 @@ class VideoPlayerViewModelTest {
     private val pagingData: PagingData<YoutubeVideo> = PagingData.from(RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.items)
     private val pagingUiData: PagingData<YoutubeVideoUiModel> = PagingData.from(
         RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.items.map { video: YoutubeVideo ->
-            video.convertToYoutubeVideoUiMode()
+            video.convertToYoutubeVideoUiModel()
         }
     )
 

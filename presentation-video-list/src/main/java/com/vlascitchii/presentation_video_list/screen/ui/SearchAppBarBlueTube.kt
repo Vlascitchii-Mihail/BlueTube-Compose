@@ -35,7 +35,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vlascitchii.presentation_video_list.R
-import com.vlascitchii.presentation_video_list.util.state.SearchState
+import com.vlascitchii.presentation_video_list.screen.state.SearchState
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -16,8 +16,6 @@ import com.vlascitchii.data_remote.util.PARTICULAR_VIDEO_RESPONSE_4_PATH
 import com.vlascitchii.data_remote.util.PARTICULAR_VIDEO_RESPONSE_5_PATH
 import com.vlascitchii.data_remote.util.SEARCH_RESPONSE_PATH
 import com.vlascitchii.data_repository.data_source.remote.RemoteSearchDataSource
-import com.vlascitchii.domain.custom_coroutine_scopes.AppCoroutineScope
-import com.vlascitchii.domain.custom_coroutine_scopes.VideoCoroutineScope
 import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse.Companion.RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG
 import com.vlascitchii.domain.util.UseCaseException
 import junit.framework.TestCase.assertEquals
@@ -38,7 +36,6 @@ class RemoteSearchDataSourceImplTest {
 
     private lateinit var mockWebServerApiProvider: MockWebServerApiProvider
     private lateinit var searchApiService: SearchApiService
-    private lateinit var videoCoroutineScope: AppCoroutineScope
     private lateinit var remoteSearchDataSource: RemoteSearchDataSource
     private lateinit var mockWebServerScheduler: MockWebServerScheduler
 
@@ -46,8 +43,7 @@ class RemoteSearchDataSourceImplTest {
     fun initResponse() {
         mockWebServerApiProvider = MockWebServerApiProvider()
         searchApiService = mockWebServerApiProvider.provideMockSearchApiService()
-        videoCoroutineScope = VideoCoroutineScope(dispatcher = dispatcherTestRule.testDispatcher)
-        remoteSearchDataSource = RemoteSearchDataSourceImpl(searchApiService, videoCoroutineScope)
+        remoteSearchDataSource = RemoteSearchDataSourceImpl(searchApiService)
         mockWebServerScheduler = mockWebServerApiProvider.mockWebServerScheduler
     }
 

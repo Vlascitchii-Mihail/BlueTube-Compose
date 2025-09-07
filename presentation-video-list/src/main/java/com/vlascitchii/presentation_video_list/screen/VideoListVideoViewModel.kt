@@ -1,22 +1,23 @@
 package com.vlascitchii.presentation_video_list.screen
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import com.vlascitchii.domain.custom_coroutine_scopes.AppCoroutineScope
 import com.vlascitchii.domain.usecase.SearchVideoListUseCase
 import com.vlascitchii.domain.usecase.VideoListUseCase
 import com.vlascitchii.domain.util.VideoResult
+import com.vlascitchii.presentation_common.CommonVideoViewModel
 import com.vlascitchii.presentation_common.entity.videos.YoutubeVideoUiModel
-import com.vlascitchii.presentation_common.network_observer.ConnectivityStatus
 import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityObserver
+import com.vlascitchii.presentation_common.ui.state.UiAction
+import com.vlascitchii.presentation_common.ui.state.UiSingleEvent
 import com.vlascitchii.presentation_common.ui.state.UiState
 import com.vlascitchii.presentation_video_list.util.SearchVideoListConverter
 import com.vlascitchii.presentation_video_list.util.VideoListConverter
-import com.vlascitchii.presentation_video_list.util.state.SearchState
-import com.vlascitchii.presentation_video_list.util.state.VideoType
+import com.vlascitchii.presentation_video_list.screen.state.SearchState
+import com.vlascitchii.presentation_video_list.screen.state.UiVideoListAction
+import com.vlascitchii.presentation_video_list.screen.state.VideoType
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -25,28 +26,36 @@ import javax.inject.Inject
 import javax.inject.Named
 
 @HiltViewModel
-class VideoListViewModel @Inject constructor(
+class VideoListVideoViewModel @Inject constructor(
     private val videoListUseCase: VideoListUseCase,
     private val searchVideoListUseCase: SearchVideoListUseCase,
     private val videoListConverter: VideoListConverter,
     private val searchVideoListConverter: SearchVideoListConverter,
     private val networkConnectivityObserver: NetworkConnectivityObserver,
     @Named("video") private val videoCoroutineScope: AppCoroutineScope,
-) : ViewModel() {
+) : CommonVideoViewModel<YoutubeVideoUiModel, UiState<PagingData<YoutubeVideoUiModel>>, UiAction, UiSingleEvent>(
+        networkConnectivityObserver
+    ) {
 
-    private var _videoStateFlow: MutableStateFlow<UiState<PagingData<YoutubeVideoUiModel>>> =
-        MutableStateFlow<UiState<PagingData<YoutubeVideoUiModel>>>(UiState.Loading)
-    val videoStateFlow: StateFlow<UiState<PagingData<YoutubeVideoUiModel>>> get() = _videoStateFlow
-
-    private var _searchState: MutableStateFlow<SearchState> = MutableStateFlow(SearchState.CLOSED)
-    val searchState: StateFlow<SearchState> = _searchState
+    private var _searchBarState: MutableStateFlow<SearchState> = MutableStateFlow(SearchState.CLOSED)
+    val searchBarState: StateFlow<SearchState> = _searchBarState
 
     private val _searchTextState: MutableStateFlow<String> = MutableStateFlow("")
     val searchTextState: StateFlow<String> = _searchTextState
 
-    private var _connectivityObserver:
-            Flow<ConnectivityStatus> = networkConnectivityObserver.observe()
-    val connectivityObserver: Flow<ConnectivityStatus> = _connectivityObserver
+    override fun handleAction(action: UiAction) {
+        when(action) {
+            is UiVideoListAction.Loading -> fetchVideoPagingData(VideoType.PopularVideo)
+            is UiVideoListAction.SearchVideo -> fetchVideoPagingData(VideoType.SearchVideo(action.query))
+            is UiVideoListAction.ChangeSearchBarAppearance -> updateSearchState(action.searchState)
+            is UiVideoListAction.TypeInSearchAppBarTextField -> updateSearchTextState(action.query)
+        }
+    }
+
+    override fun initState(): MutableStateFlow<UiState<PagingData<YoutubeVideoUiModel>>> =
+        MutableStateFlow<UiState<PagingData<YoutubeVideoUiModel>>>(
+            UiState.Loading
+        )
 
     fun fetchVideoPagingData(videoType: VideoType) {
         viewModelScope.launch {
@@ -56,7 +65,7 @@ class VideoListViewModel @Inject constructor(
                         .map { videoResult: VideoResult<VideoListUseCase.Response> ->
                             videoListConverter.convert(videoResult)
                         }.collect { uiState: UiState<PagingData<YoutubeVideoUiModel>> ->
-                            _videoStateFlow.value = uiState
+                            submitUiState(uiState)
                         }
                 }
 
@@ -66,7 +75,7 @@ class VideoListViewModel @Inject constructor(
                         .map { videoResult: VideoResult<SearchVideoListUseCase.Response> ->
                             searchVideoListConverter.convert(videoResult)
                         }.collect { uiState: UiState<PagingData<YoutubeVideoUiModel>> ->
-                            _videoStateFlow.value = uiState
+                            submitUiState(uiState)
                         }
                 }
             }
@@ -74,11 +83,12 @@ class VideoListViewModel @Inject constructor(
     }
 
     fun updateSearchState(newSearchState: SearchState) {
-        _searchState.value = newSearchState
+        _searchBarState.value = newSearchState
     }
 
-    fun updateSearchTextState(newSearchTextState: String) {
-        _searchTextState.value = newSearchTextState
+    fun updateSearchTextState(newSearchText: String) {
+        _searchTextState.value = newSearchText
+        submitAction(UiVideoListAction.SearchVideo(newSearchText))
     }
 
     override fun onCleared() {

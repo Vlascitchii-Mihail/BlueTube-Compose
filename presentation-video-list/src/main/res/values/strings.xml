@@ -11,6 +11,6 @@
     <!--    Video appearance-->
     <string name="video_thumbnail_item">Video thumbnail item</string>
     <!--    VideoPreviewItemConfiguration-->
-    <string name="video_compact_preview">Video compact preview</string>
+    <string name="video_compact_preview_description">Video compact preview</string>
 
 </resources>

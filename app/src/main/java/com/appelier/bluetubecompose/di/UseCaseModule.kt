@@ -1,6 +1,7 @@
 package com.appelier.bluetubecompose.di
 
 import android.content.Context
+import android.net.ConnectivityManager
 import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityObserver
 import com.vlascitchii.domain.repository.PlayerRepository
 import com.vlascitchii.domain.repository.ShortsRepository
@@ -49,5 +50,7 @@ class UseCaseModule {
     ): VideoPlayerUseCase = VideoPlayerUseCase(configuration, playerRepository)
 
     @Provides
-    fun provideConnectivityObserver(@ApplicationContext context : Context) = NetworkConnectivityObserver(context)
+    fun provideConnectivityObserver(@ApplicationContext context : Context) = NetworkConnectivityObserver(
+        context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    )
 }

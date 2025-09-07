@@ -3,6 +3,7 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin)
+    alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt.plugin)
@@ -10,12 +11,12 @@ plugins {
 
 android {
     namespace = "com.appelier.bluetubecompose"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.appelier.bluetubecompose"
-        minSdk = 26
-        targetSdk = 34
+        minSdk = 31
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
@@ -40,11 +41,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "17"
     }
     buildFeatures {
         compose = true
@@ -117,9 +118,16 @@ dependencies {
     implementation(libs.navigation)
     implementation(libs.kotlinx.serialization.json)
 
+    //Paging
+    implementation(libs.paging)
+    implementation(libs.paging.compose)
+
+    //Youtube player
+    implementation(libs.youtube.player)
+
     //unit test
     testImplementation(libs.junit)
-    testImplementation(libs.mockito)
+//    testImplementation(libs.mockito)
     testImplementation(libs.mockito.inline)
     testImplementation(libs.test.coroutines)
 

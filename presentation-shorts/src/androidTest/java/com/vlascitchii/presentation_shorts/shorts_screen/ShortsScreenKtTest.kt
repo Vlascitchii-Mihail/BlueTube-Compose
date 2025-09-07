@@ -16,8 +16,6 @@ import com.appelier.bluetubecompose.MainActivity
 import com.appelier.bluetubecompose.navigation.ScreenType
 import com.vlascitchii.presentation_shorts.screen_shorts.screen.ShortsScreen
 import com.vlascitchii.data_local.enetity.video_list.videos.YoutubeVideoEntity
-import com.vlascitchii.presentation_common.utils.Core
-import com.vlascitchii.presentation_common.utils.ShortsItemTag
 //import dagger.hilt.android.testing.HiltAndroidRule
 //import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -56,7 +54,7 @@ class ShortsScreenKtTest {
                         shortsStateFlow = videoPage,
                         videoQueue = MutableSharedFlow(3),
                         listenToVideoQueue = {},
-                        connectivityStatus = flowOf(com.appelier.bluetubecompose.network_observer.ConnectivityStatus.Available),
+                        networkConnectivityStatus = flowOf(com.appelier.bluetubecompose.network_observer.ConnectivityStatus.Available),
                     )
                 }
             }

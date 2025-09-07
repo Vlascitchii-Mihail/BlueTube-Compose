@@ -8,7 +8,7 @@ import com.vlascitchii.domain.custom_coroutine_scopes.AppCoroutineScope
 import com.vlascitchii.domain.usecase.ShortsUseCase
 import com.vlascitchii.domain.util.VideoResult
 import com.vlascitchii.presentation_common.entity.videos.YoutubeVideoUiModel
-import com.vlascitchii.presentation_common.network_observer.ConnectivityStatus
+import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityStatus
 import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityObserver
 import com.vlascitchii.presentation_common.ui.state.UiState
 import com.vlascitchii.presentation_shorts.screen_shorts.utils.ShortsConverter
@@ -39,9 +39,9 @@ class ShortsViewModel @Inject constructor(
         MutableStateFlow<UiState<PagingData<YoutubeVideoUiModel>>>(UiState.Loading)
     val shortsStateFlow: StateFlow<UiState<PagingData<YoutubeVideoUiModel>>> get() = _shortsStateFlow
 
-    private var _connectivityObserver: Flow<ConnectivityStatus> =
+    private var _connectivityObserver: Flow<NetworkConnectivityStatus> =
         networkConnectivityObserver.observe()
-    val connectivityObserver: Flow<ConnectivityStatus> = _connectivityObserver
+    val connectivityObserver: Flow<NetworkConnectivityStatus> = _connectivityObserver
 
     fun fetchShorts() {
         viewModelScope.launch {

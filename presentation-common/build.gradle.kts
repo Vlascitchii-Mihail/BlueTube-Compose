@@ -1,6 +1,9 @@
+import com.android.build.api.dsl.Packaging
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin)
+    alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt.plugin)
     alias(libs.plugins.kotlinx.serialization)
@@ -9,13 +12,20 @@ plugins {
 
 android {
     namespace = "com.vlascitchii.presentation_common"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
-        minSdk = 26
+        minSdk = 31
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
+    }
+
+    //choose only dexmaker in android test instead both mockito-inline and dexmaker
+    packaging {
+        resources {
+            pickFirsts += "mockito-extensions/org.mockito.plugins.MockMaker"
+        }
     }
 
     buildTypes {
@@ -34,24 +44,26 @@ android {
         kotlinCompilerExtensionVersion = "1.5.14"
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "17"
     }
 }
 
 dependencies {
 
     implementation(project(":domain"))
+    testImplementation(project(":common-test"))
+    androidTestImplementation(project(":common-test-android"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.appcompat)
 
     //compose
-//    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.activity.compose)
     implementation(libs.material)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.compose.ui)
@@ -91,6 +103,11 @@ dependencies {
     testImplementation(libs.mockito.inline)
     testImplementation(libs.test.coroutines)
 
+    androidTestImplementation(libs.androidx.compose.ui.test)
+    androidTestImplementation(libs.navigation.compose.testing)
+    androidTestImplementation(libs.androidx.test.runner)
     androidTestImplementation(libs.androidx.test.ext)
     androidTestImplementation(libs.androidx.test.espresso)
+    androidTestImplementation(libs.mockito)
+    androidTestImplementation(libs.dexmaker)
 }

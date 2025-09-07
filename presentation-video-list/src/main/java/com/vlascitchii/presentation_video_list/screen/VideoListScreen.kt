@@ -19,14 +19,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.PagingData
 import com.vlascitchii.presentation_common.entity.videos.YoutubeVideoUiModel
 import com.vlascitchii.presentation_common.entity.videos.YoutubeVideoUiModel.Companion.DEFAULT_VIDEO_LIST
-import com.vlascitchii.presentation_common.network_observer.ConnectivityStatus
+import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityStatus
 import com.vlascitchii.presentation_common.ui.state.UiState
 import com.vlascitchii.presentation_common.ui.video_list.YouTubeVideoList
-import com.vlascitchii.presentation_common.utils.SnackbarController
-import com.vlascitchii.presentation_common.utils.SnackbarEvent
-import com.vlascitchii.presentation_video_list.util.state.SearchState
+import com.vlascitchii.presentation_common.ui.global_snackbar.SnackBarController
+import com.vlascitchii.presentation_common.ui.global_snackbar.SnackBarEvent
+import com.vlascitchii.presentation_video_list.screen.state.SearchState
 import com.vlascitchii.presentation_video_list.screen.ui.ListScreenAppBar
-import com.vlascitchii.presentation_video_list.util.state.VideoType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -35,17 +34,17 @@ import kotlinx.coroutines.flow.flowOf
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VideoListScreen(
-    connectivityStatus: Flow<ConnectivityStatus>,
+    connectivityStatus: Flow<NetworkConnectivityStatus>,
     listScreenAppBar: @Composable (scrollAppBarBehaviour: TopAppBarScrollBehavior) -> Unit,
     videoList: @Composable (padding: PaddingValues) -> Unit
 ) {
     val networkConnectivityStatus by connectivityStatus.collectAsStateWithLifecycle(
-        initialValue = ConnectivityStatus.Available
+        initialValue = NetworkConnectivityStatus.Available
     )
     LaunchedEffect(networkConnectivityStatus) {
-        if (networkConnectivityStatus == ConnectivityStatus.Lost) {
-            SnackbarController.sendEvent(
-                event = SnackbarEvent(
+        if (networkConnectivityStatus == NetworkConnectivityStatus.Lost) {
+            SnackBarController.sendEvent(
+                event = SnackBarEvent(
                     message = "Wrong internet connection"
                 )
             )
@@ -78,7 +77,7 @@ fun VideoListScreenPreview() {
     val searchText = remember { MutableStateFlow("Test text") }
 
     VideoListScreen(
-        connectivityStatus = flowOf(ConnectivityStatus.Available),
+        connectivityStatus = flowOf(NetworkConnectivityStatus.Available),
         listScreenAppBar = {
             ListScreenAppBar(
                 searchViewState = closedSearchViewState,
@@ -111,7 +110,7 @@ fun VideoSearchListScreenPreview() {
     val searchText = remember { MutableStateFlow("Test text") }
 
     VideoListScreen(
-        connectivityStatus = flowOf(ConnectivityStatus.Available),
+        connectivityStatus = flowOf(NetworkConnectivityStatus.Available),
         listScreenAppBar = {
             ListScreenAppBar(
                 searchViewState = openedSearchViewState,

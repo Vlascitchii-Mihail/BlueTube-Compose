@@ -11,8 +11,6 @@ import com.vlascitchii.data_remote.util.MockWebServerApiProvider
 import com.vlascitchii.data_remote.util.MockWebServerScheduler
 import com.vlascitchii.data_remote.util.VIDEO_LIST_RESPONSE_PATH
 import com.vlascitchii.data_repository.data_source.remote.RemoteVideoListDataSource
-import com.vlascitchii.domain.custom_coroutine_scopes.AppCoroutineScope
-import com.vlascitchii.domain.custom_coroutine_scopes.VideoCoroutineScope
 import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse
 import com.vlascitchii.domain.enetity.video_list.videos.YoutubeVideoResponse.Companion.RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG
 import com.vlascitchii.domain.util.UseCaseException
@@ -36,7 +34,6 @@ class RemoteVideoListDataSourceImplTest {
 
     private lateinit var mockWebServerApiProvider: MockWebServerApiProvider
     private lateinit var videoListApiServiceMock: VideoListApiService
-    private lateinit var videoCoroutineScope: AppCoroutineScope
     private lateinit var remoteVideoListDataSource: RemoteVideoListDataSource
     private lateinit var mockWebServerScheduler: MockWebServerScheduler
 
@@ -44,8 +41,7 @@ class RemoteVideoListDataSourceImplTest {
     fun init() {
         mockWebServerApiProvider = MockWebServerApiProvider()
         videoListApiServiceMock = spy(mockWebServerApiProvider.provideMockVideoListApiService())
-        videoCoroutineScope = VideoCoroutineScope(dispatcher = dispatcherTestRule.testDispatcher)
-        remoteVideoListDataSource = RemoteVideoListDataSourceImpl(videoListApiServiceMock, videoCoroutineScope)
+        remoteVideoListDataSource = RemoteVideoListDataSourceImpl(videoListApiServiceMock)
         mockWebServerScheduler = mockWebServerApiProvider.mockWebServerScheduler
     }
 

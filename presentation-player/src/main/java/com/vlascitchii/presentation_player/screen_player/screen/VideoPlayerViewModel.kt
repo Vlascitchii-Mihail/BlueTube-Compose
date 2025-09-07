@@ -7,7 +7,7 @@ import com.vlascitchii.domain.custom_coroutine_scopes.AppCoroutineScope
 import com.vlascitchii.domain.usecase.VideoPlayerUseCase
 import com.vlascitchii.domain.util.VideoResult
 import com.vlascitchii.presentation_common.entity.videos.YoutubeVideoUiModel
-import com.vlascitchii.presentation_common.network_observer.ConnectivityStatus
+import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityStatus
 import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityObserver
 import com.vlascitchii.presentation_common.ui.state.UiState
 import com.vlascitchii.presentation_player.screen_player.OrientationState
@@ -48,8 +48,8 @@ class VideoPlayerViewModel @Inject constructor(
     val fullscreenWidgetIsClicked: StateFlow<Boolean> = _fullscreenWidgetIsClicked
 
     private var _connectivityObserver:
-            Flow<ConnectivityStatus> = networkConnectivityObserver.observe()
-    val connectivityObserver: Flow<ConnectivityStatus> = _connectivityObserver
+            Flow<NetworkConnectivityStatus> = networkConnectivityObserver.observe()
+    val connectivityObserver: Flow<NetworkConnectivityStatus> = _connectivityObserver
 
     fun updatePlaybackPosition(newPlaybackTime: Float) {
         videoPlaybackPosition = newPlaybackTime

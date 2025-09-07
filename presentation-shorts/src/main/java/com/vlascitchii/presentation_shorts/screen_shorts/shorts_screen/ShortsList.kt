@@ -15,7 +15,9 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemKey
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.vlascitchii.presentation_common.entity.videos.YoutubeVideoUiModel
-import com.vlascitchii.presentation_common.network_observer.ConnectivityStatus
+import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityStatus
+import com.vlascitchii.presentation_common.ui.global_snackbar.SnackBarController
+import com.vlascitchii.presentation_common.ui.global_snackbar.SnackBarEvent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 
@@ -24,18 +26,18 @@ fun ShortsList(
     videos: LazyPagingItems<YoutubeVideoUiModel>,
     videoQueue: MutableSharedFlow<YouTubePlayer?>,
     listenToVideoQueue: () -> Unit,
-    connectivityStatus: Flow<ConnectivityStatus>,
+    connectivityStatus: Flow<NetworkConnectivityStatus>,
 ) {
     val context = LocalContext.current
     val pagerState = rememberPagerState(pageCount = { videos.itemCount })
     val networkConnectivityStatus by connectivityStatus.collectAsStateWithLifecycle(
-        initialValue = ConnectivityStatus.Available
+        initialValue = NetworkConnectivityStatus.Available
     )
 
     LaunchedEffect(networkConnectivityStatus) {
-        if (networkConnectivityStatus == ConnectivityStatus.Lost) {
-            com.vlascitchii.presentation_common.utils.SnackbarController.sendEvent(
-                event = com.vlascitchii.presentation_common.utils.SnackbarEvent(
+        if (networkConnectivityStatus == NetworkConnectivityStatus.Lost) {
+            SnackBarController.sendEvent(
+                event = SnackBarEvent(
                     message = "Wrong internet connection"
                 )
             )
@@ -65,7 +67,7 @@ fun ShortsList(
             ShortsItem(
                 youTubeVideo = it,
                 videoQueue,
-                connectivityStatus = networkConnectivityStatus
+                networkConnectivityStatus = networkConnectivityStatus
             )
         }
     }

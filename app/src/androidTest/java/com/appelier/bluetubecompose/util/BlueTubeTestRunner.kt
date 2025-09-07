@@ -1,4 +1,4 @@
-package com.appelier.bluetubecompose
+package com.appelier.bluetubecompose.util
 
 import android.app.Application
 import android.content.Context

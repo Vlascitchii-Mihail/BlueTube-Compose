@@ -1,5 +1,6 @@
 package com.vlascitchii.presentation_video_list.screen.ui
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
@@ -21,7 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.vlascitchii.presentation_common.ui.theme.BlueberryBlue
 import com.vlascitchii.presentation_video_list.R
-import com.vlascitchii.presentation_video_list.util.state.SearchState
+import com.vlascitchii.presentation_video_list.screen.state.SearchState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,7 +68,7 @@ fun BlueTubeTopAppBar(
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun CollapsingAppBarPreview() {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())

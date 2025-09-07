@@ -39,7 +39,7 @@ import com.vlascitchii.data_remote.enetity_api_model.video_list_api_model.videos
 import com.vlascitchii.data_remote.enetity_api_model.video_list_api_model.videos_api_model.YoutubeVideoResponseApiModel.Companion.RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG
 import com.vlascitchii.presentation_common.utils.Core.CHANNEL_PREVIEW_IMG
 import com.vlascitchii.presentation_video_list.screen.ui.ListScreenAppBar
-import com.vlascitchii.presentation_video_list.util.state.SearchState
+import com.vlascitchii.presentation_video_list.screen.state.SearchState
 //import dagger.hilt.android.testing.HiltAndroidRule
 //import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.flow.MutableStateFlow

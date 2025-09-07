@@ -10,9 +10,9 @@ import javax.inject.Named
 
 
 class VideoListConverter @Inject constructor()
-    : CommonResultConverter<VideoListUseCase.Response,  PagingData<YoutubeVideoUiModel>>() {
+    : CommonResultConverter<VideoListUseCase.Response, PagingData<YoutubeVideoUiModel>>() {
 
-    override fun convertSuccess(useCaseResponse: VideoListUseCase.Response):  PagingData<YoutubeVideoUiModel> {
+    override fun convertSuccess(useCaseResponse: VideoListUseCase.Response): PagingData<YoutubeVideoUiModel> {
         return convertPager(useCaseResponse.youTubePopularVideoPagingData)
     }
 }

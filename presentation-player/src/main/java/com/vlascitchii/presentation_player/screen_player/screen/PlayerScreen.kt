@@ -11,11 +11,12 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.PagingData
 import com.vlascitchii.presentation_common.entity.videos.YoutubeVideoUiModel
-import com.vlascitchii.presentation_common.network_observer.ConnectivityStatus
+import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityStatus
 import com.vlascitchii.presentation_common.ui.screen.CommonScreen
 import com.vlascitchii.presentation_common.ui.state.UiState
 import com.vlascitchii.presentation_common.ui.video_list.YouTubeVideoList
-import com.vlascitchii.presentation_common.utils.SnackbarController.sendEvent
+import com.vlascitchii.presentation_common.ui.global_snackbar.SnackBarController.sendEvent
+import com.vlascitchii.presentation_common.ui.global_snackbar.SnackBarEvent
 import com.vlascitchii.presentation_player.screen_player.OrientationState
 import com.vlascitchii.presentation_player.screen_player.VideoDescription
 import com.vlascitchii.presentation_player.screen_player.YoutubeVideoPlayer
@@ -37,18 +38,18 @@ fun PlayerScreen(
     updatePlayerOrientationState: (OrientationState) -> Unit,
     fullscreenWidgetIsClicked: StateFlow<Boolean>,
     setFullscreenWidgetIsClicked: (Boolean) -> Unit,
-    connectivityStatus: Flow<ConnectivityStatus>
+    connectivityStatus: Flow<NetworkConnectivityStatus>
 ) {
 
     relatedVideos.collectAsStateWithLifecycle().value.let { uiStatePagingData: UiState<PagingData<YoutubeVideoUiModel>> ->
         CommonScreen(uiStatePagingData) { pagingData: PagingData<YoutubeVideoUiModel> ->
             val networkConnectivityStatus by connectivityStatus.collectAsStateWithLifecycle(
-                initialValue = ConnectivityStatus.Available
+                initialValue = NetworkConnectivityStatus.Available
             )
             LaunchedEffect(networkConnectivityStatus) {
-                if (networkConnectivityStatus == ConnectivityStatus.Lost) {
+                if (networkConnectivityStatus == NetworkConnectivityStatus.Lost) {
                     sendEvent(
-                        event = com.vlascitchii.presentation_common.utils.SnackbarEvent(
+                        event = SnackBarEvent(
                             message = "Wrong internet connection"
                         )
                     )

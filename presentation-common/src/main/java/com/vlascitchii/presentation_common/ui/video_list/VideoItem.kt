@@ -13,7 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -29,11 +28,7 @@ import com.vlascitchii.presentation_common.R
 import com.vlascitchii.presentation_common.entity.videos.YoutubeVideoUiModel
 import com.vlascitchii.presentation_common.entity.videos.YoutubeVideoUiModel.Companion.DEFAULT_VIDEO
 import com.vlascitchii.presentation_common.ui.theme.BlueTubeComposeTheme
-import com.vlascitchii.presentation_common.utils.Core.CHANNEL_PREVIEW_IMG
 import com.vlascitchii.presentation_common.utils.VideoListScreenTags.VIDEO_DURATION
-import com.vlascitchii.presentation_common.utils.VideoListScreenTags.VIDEO_PREVIEW_IMG
-import com.vlascitchii.presentation_common.utils.VideoListScreenTags.VIDEO_STATISTICS
-import com.vlascitchii.presentation_common.utils.VideoListScreenTags.VIDEO_TITLE
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
@@ -45,7 +40,7 @@ fun VideoItem(
     ConstraintLayout(modifier = modifier
         .fillMaxWidth()
         .clickable (
-            onClickLabel = stringResource(R.string.video_compact_preview),
+            onClickLabel = stringResource(R.string.video_compact_preview_description),
             onClick = { navigateToPlayerScreen.invoke(youtubeVideoUiModel) }
         )
         .wrapContentHeight()
@@ -56,13 +51,12 @@ fun VideoItem(
         GlideImage(
             model = youtubeVideoUiModel.snippet.thumbnailsUiModel.medium.url,
             loading = placeholder(R.drawable.sceleton_thumbnail),
-            contentDescription = stringResource(id = R.string.video_preview) + youtubeVideoUiModel.snippet.title,
+            contentDescription = stringResource(id = R.string.video_preview_description),
             contentScale = ContentScale.Crop,
             modifier = modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
                 .clickable { navigateToPlayerScreen.invoke(youtubeVideoUiModel) }
-                .testTag(VIDEO_PREVIEW_IMG)
                 .constrainAs(videoPreview) {
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
@@ -89,10 +83,9 @@ fun VideoItem(
         GlideImage(
             model = youtubeVideoUiModel.snippet.channelImgUrl,
             loading = placeholder(R.drawable.sceleton),
-            contentDescription = stringResource(R.string.channel_name) + youtubeVideoUiModel.snippet.channelTitle,
+            contentDescription = stringResource(R.string.channel_description),
             contentScale = ContentScale.Crop,
             modifier = modifier
-                .testTag(CHANNEL_PREVIEW_IMG)
                 .padding(8.dp)
                 .width(50.dp)
                 .height(50.dp)
@@ -111,8 +104,10 @@ fun VideoItem(
             maxLines = 2,
             textAlign = TextAlign.Start,
             modifier = modifier
-                .testTag(VIDEO_TITLE)
-                .clickable { navigateToPlayerScreen.invoke(youtubeVideoUiModel) }
+                .clickable(
+                    onClickLabel = stringResource(R.string.video_item_title),
+                    onClick = { navigateToPlayerScreen.invoke(youtubeVideoUiModel) }
+                )
                 .padding(top = 8.dp, end = 8.dp)
                 .constrainAs(videoTitle) {
                     start.linkTo(channelImg.end)
@@ -139,8 +134,10 @@ fun VideoItem(
             maxLines = 2,
             textAlign = TextAlign.Start,
             modifier = modifier
-                .testTag(VIDEO_STATISTICS)
-                .clickable { navigateToPlayerScreen.invoke(youtubeVideoUiModel) }
+                .clickable (
+                    onClickLabel = stringResource(R.string.video_statistics),
+                    onClick = { navigateToPlayerScreen.invoke(youtubeVideoUiModel) }
+                )
                 .padding(end = 8.dp, top = 8.dp, bottom = 8.dp)
                 .constrainAs(statisticsFlow) {
                     start.linkTo(channelImg.end)

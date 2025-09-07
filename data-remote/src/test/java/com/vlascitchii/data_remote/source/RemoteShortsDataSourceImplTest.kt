@@ -18,8 +18,6 @@ import com.vlascitchii.data_remote.util.PARTICULAR_VIDEO_RESPONSE_4_PATH
 import com.vlascitchii.data_remote.util.PARTICULAR_VIDEO_RESPONSE_5_PATH
 import com.vlascitchii.data_remote.util.SEARCH_RESPONSE_PATH
 import com.vlascitchii.data_repository.data_source.remote.RemoteShortsDataSource
-import com.vlascitchii.domain.custom_coroutine_scopes.AppCoroutineScope
-import com.vlascitchii.domain.custom_coroutine_scopes.VideoCoroutineScope
 import com.vlascitchii.domain.util.UseCaseException
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.flow.catch
@@ -37,15 +35,13 @@ class RemoteShortsDataSourceImplTest {
     private val mockWebServerApiProvider: MockWebServerApiProvider = MockWebServerApiProvider()
 
     private lateinit var shortsApiService: ShortsApiService
-    private lateinit var videoCoroutineScope: AppCoroutineScope
     private lateinit var remoteShortsDatsSource: RemoteShortsDataSource
     private lateinit var mockWebServerScheduler: MockWebServerScheduler
 
     @Before
     fun initResponse() {
         shortsApiService = mockWebServerApiProvider.provideMockShortsApiService()
-        videoCoroutineScope = VideoCoroutineScope(dispatcher = dispatcherTestRule.testDispatcher)
-        remoteShortsDatsSource = RemoteShortsDataSourceImpl(shortsApiService, videoCoroutineScope)
+        remoteShortsDatsSource = RemoteShortsDataSourceImpl(shortsApiService)
         mockWebServerScheduler = mockWebServerApiProvider.mockWebServerScheduler
     }
 

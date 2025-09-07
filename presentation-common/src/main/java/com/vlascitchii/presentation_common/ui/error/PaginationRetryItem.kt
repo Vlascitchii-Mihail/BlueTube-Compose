@@ -16,22 +16,24 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.vlascitchii.presentation_common.utils.VideoListScreenTags.VIDEO_LIST_RETRY_ITEM
+import com.vlascitchii.presentation_common.R
 
 @Composable
 fun PaginationRetryItem(modifier: Modifier = Modifier, onRetryClick: () -> Unit = {}) {
+    val retryItemDescription = stringResource(R.string.paging_error_retry_item)
+
     Card(
         modifier
             .fillMaxWidth()
             .padding(start = 8.dp, end = 8.dp, bottom = 16.dp)
             .height(48.dp)
             .clickable(
+                onClickLabel = retryItemDescription,
                 onClick = onRetryClick
-            )
-            .testTag(VIDEO_LIST_RETRY_ITEM),
+            ),
         elevation = CardDefaults.cardElevation(defaultElevation = 12.dp),
         shape = RoundedCornerShape(8.dp)
     ) {

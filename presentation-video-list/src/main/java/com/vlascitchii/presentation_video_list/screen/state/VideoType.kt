@@ -1,4 +1,4 @@
-package com.vlascitchii.presentation_video_list.util.state
+package com.vlascitchii.presentation_video_list.screen.state
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize

@@ -24,7 +24,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.integration.compose.placeholder
-import com.vlascitchii.presentation_common.network_observer.ConnectivityStatus
+import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityStatus
 import com.vlascitchii.presentation_common.utils.VideoPlayerScreenTags.VIDEO_PLAYER
 import com.vlascitchii.presentation_player.R
 import com.vlascitchii.presentation_player.databinding.FragmentPlayVideoBinding
@@ -44,7 +44,7 @@ fun YoutubeVideoPlayer(
     updatePlayerOrientationState: (OrientationState) -> Unit,
     fullscreenWidgetIsClicked: StateFlow<Boolean>,
     setFullscreenWidgetIsClicked: (Boolean) -> Unit,
-    connectivityStatus: ConnectivityStatus,
+    networkConnectivityStatus: NetworkConnectivityStatus,
 ) {
 
     val isVideoPlays by isVideoPlaysFlow.collectAsStateWithLifecycle()
@@ -104,8 +104,8 @@ fun YoutubeVideoPlayer(
         }
     }
 
-    when(connectivityStatus) {
-        ConnectivityStatus.Available -> {
+    when(networkConnectivityStatus) {
+        NetworkConnectivityStatus.Available -> {
             AndroidView(
                 modifier = getModifier(localPlayerOrientationState)
                     .background(MaterialTheme.colorScheme.background)
@@ -116,7 +116,7 @@ fun YoutubeVideoPlayer(
             )
         }
 
-        ConnectivityStatus.Lost -> {
+        NetworkConnectivityStatus.Lost -> {
             GlideImage(
                 model = placeholder(R.drawable.sceleton_thumbnail),
                 loading = placeholder(R.drawable.sceleton_thumbnail),

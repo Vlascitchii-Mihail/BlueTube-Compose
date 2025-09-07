@@ -57,7 +57,7 @@ fun VideoDescription(video: YoutubeVideoUiModel, modifier: Modifier = Modifier) 
             GlideImage(
                 model = video.snippet.channelImgUrl,
                 loading = placeholder(R.drawable.sceleton_thumbnail),
-                contentDescription = stringResource(R.string.channel_name) + video.snippet.channelTitle,
+                contentDescription = stringResource(R.string.channel_description) + video.snippet.channelTitle,
                 contentScale = ContentScale.Crop,
                 modifier = modifier
                     .testTag(CHANNEL_PREVIEW_IMG)

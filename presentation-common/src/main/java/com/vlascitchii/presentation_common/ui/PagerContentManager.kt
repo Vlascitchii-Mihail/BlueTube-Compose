@@ -8,6 +8,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
@@ -21,6 +23,8 @@ fun PagerContentManager(
     contentList: @Composable () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val circularProgressIndicatorDescription = stringResource(R.string.circular_progress_indicator)
+
     Box(modifier = modifier, contentAlignment = Alignment.Center) {
         val refreshLoadState = videoState.loadState.refresh
 
@@ -31,7 +35,7 @@ fun PagerContentManager(
                 Modifier
                     .align(Alignment.Center)
                     .height(48.dp)
-                    .testTag(com.vlascitchii.presentation_common.utils.Core.CIRCULAR_PROGRESS_INDICATOR)
+                    .semantics { contentDescription = circularProgressIndicatorDescription }
             )
 
             is LoadState.Error -> PaginationErrorItem(
