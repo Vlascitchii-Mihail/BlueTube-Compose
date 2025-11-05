@@ -44,7 +44,12 @@ abstract class RemoteBaseVideoDataSource<T>(
 
     fun YoutubeVideoResponseApiModel.addChannelUrl(channelUrlList: List<String>): YoutubeVideoResponseApiModel {
         val newItems = this.items.mapIndexed { index: Int, videoItem: YoutubeVideoApiModel ->
-            val newVideoSnippet = videoItem.snippet.copy(channelImgUrl = getElementIfExists(index = index, channelUrlList =channelUrlList))
+            val newVideoSnippet = videoItem.snippet.copy(
+                channelImgUrl = getElementIfExists(
+                    index = index,
+                    channelUrlList = channelUrlList
+                )
+            )
             videoItem.copy(snippet = newVideoSnippet)
         }
         return this.copy(items = newItems)
@@ -63,7 +68,11 @@ abstract class RemoteBaseVideoDataSource<T>(
         val videoListResponse: Response<YoutubeVideoResponseApiModel> =
             baseApiService.fetchParticularVideoList(idList = searchedVideoIdList)
 
-        return videoListResponse.body() ?: YoutubeVideoResponseApiModel()
+        val videoList = videoListResponse.body()
+            ?.copy(nextPageToken = this.nextPageToken, prevPageToken = this.prevPageToken)
+            ?: YoutubeVideoResponseApiModel()
+
+        return videoList
     }
 
     abstract fun checkResponseBodyItemsIsNoteEmpty(responseBody: T): Boolean

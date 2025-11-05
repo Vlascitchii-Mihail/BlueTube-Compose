@@ -19,21 +19,21 @@ class VideoListUseCase(
         data class SearchRequest(val query: String, val coroutineScope: CoroutineScope) : VideoListRequest()
     }
 
-    data class VideoListResponse(val youTubePopularVideoPagingData: Flow<PagingData<YoutubeVideoDomain>>) : UseCase.CommonResponse
+    data class VideoListResponse(val youTubeVideoPagingData: Flow<PagingData<YoutubeVideoDomain>>) : UseCase.CommonResponse
 
     override fun process(request: VideoListRequest): Flow<VideoListResponse> = flow {
         emit(
             when (request) {
                 is VideoListRequest.VideoRequest -> {
                     VideoListResponse(
-                        youTubePopularVideoPagingData = videoListRepository.getPopularVideos()
+                        youTubeVideoPagingData = videoListRepository.getPopularVideos()
                             .cachedIn(request.coroutineScope)
                     )
                 }
 
                 is VideoListRequest.SearchRequest -> {
                     VideoListResponse(
-                        videoListRepository.getSearchVideos(request.query)
+                        youTubeVideoPagingData = videoListRepository.getSearchVideos(request.query)
                             .cachedIn(request.coroutineScope)
                     )
                 }

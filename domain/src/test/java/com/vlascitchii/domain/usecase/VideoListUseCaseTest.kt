@@ -72,8 +72,8 @@ class VideoListUseCaseTest {
             VideoListUseCase.VideoListRequest.VideoRequest(coroutineScope = this)
         )
 
-        val expectedPagingData = positiveExpectedResult.data.youTubePopularVideoPagingData.first()
-        val actualPagingData = (actualResult.first() as VideoResult.Success).data.youTubePopularVideoPagingData.first()
+        val expectedPagingData = positiveExpectedResult.data.youTubeVideoPagingData.first()
+        val actualPagingData = (actualResult.first() as VideoResult.Success).data.youTubeVideoPagingData.first()
 
         val testJob1 = launch { expectedTestPagingDomainYouTubeVideoDiffer.submitData(expectedPagingData) }
         val testJob2 = launch { actualTestPagingDomainYouTubeVideoDiffer.submitData(actualPagingData) }
@@ -96,8 +96,8 @@ class VideoListUseCaseTest {
             VideoListUseCase.VideoListRequest.SearchRequest(query = testQuery, coroutineScope = this)
         )
 
-        val expectedPagingData = positiveExpectedResult.data.youTubePopularVideoPagingData.first()
-        val actualPagingData = (actualResult.first() as VideoResult.Success).data.youTubePopularVideoPagingData.first()
+        val expectedPagingData = positiveExpectedResult.data.youTubeVideoPagingData.first()
+        val actualPagingData = (actualResult.first() as VideoResult.Success).data.youTubeVideoPagingData.first()
 
         val testJob1 = launch { expectedTestPagingDomainYouTubeVideoDiffer.submitData(expectedPagingData) }
         val testJob2 = launch { actualTestPagingDomainYouTubeVideoDiffer.submitData(actualPagingData) }
