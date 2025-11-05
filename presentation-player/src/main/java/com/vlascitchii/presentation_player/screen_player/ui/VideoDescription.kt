@@ -1,4 +1,4 @@
-package com.vlascitchii.presentation_player.screen_player
+package com.vlascitchii.presentation_player.screen_player.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -26,6 +26,9 @@ import com.vlascitchii.presentation_common.R
 import com.vlascitchii.presentation_common.model.videos.YoutubeVideoUiModel
 import com.vlascitchii.presentation_common.ui.theme.BlueTubeComposeTheme
 import com.vlascitchii.presentation_common.utils.Core.CHANNEL_PREVIEW_IMG
+import com.vlascitchii.presentation_common.utils.VideoPlayerScreenTags
+import com.vlascitchii.presentation_common.utils.formatDate
+import com.vlascitchii.presentation_common.utils.formatViews
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
@@ -34,7 +37,7 @@ fun VideoDescription(video: YoutubeVideoUiModel, modifier: Modifier = Modifier) 
         modifier = modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .testTag(com.vlascitchii.presentation_common.utils.VideoPlayerScreenTags.VIDEO_DESCRIPTION)
+            .testTag(VideoPlayerScreenTags.VIDEO_DESCRIPTION)
             .background(MaterialTheme.colorScheme.background)
     ) {
         Text(
@@ -44,8 +47,8 @@ fun VideoDescription(video: YoutubeVideoUiModel, modifier: Modifier = Modifier) 
             style = MaterialTheme.typography.titleMedium,
         )
         Text(
-            text = com.vlascitchii.presentation_common.utils.formatViews(video.statistics.viewCount) + stringResource(id = R.string.views) +
-                    "\t\t" + com.vlascitchii.presentation_common.utils.formatDate(video.snippet.publishedAt),
+            text = formatViews(video.statistics.viewCount) + stringResource(id = R.string.views) +
+                    "\t\t" + formatDate(video.snippet.publishedAt),
             modifier = modifier.padding(vertical = 4.dp),
             style = MaterialTheme.typography.bodySmall,
         )
@@ -74,7 +77,7 @@ fun VideoDescription(video: YoutubeVideoUiModel, modifier: Modifier = Modifier) 
             )
 
             Text(
-                text = com.vlascitchii.presentation_common.utils.formatViews(video.statistics.viewCount),
+                text = formatViews(video.statistics.viewCount),
                 modifier = modifier.padding(end = 8.dp),
                 style = MaterialTheme.typography.bodyMedium,
             )

@@ -1,15 +1,13 @@
-package com.vlascitchii.presentation_player.screen_player
+package com.vlascitchii.presentation_player.screen_player.ui
 
 import android.app.Activity
 import android.view.LayoutInflater
 import android.view.OrientationEventListener
 import androidx.activity.compose.BackHandler
-//import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.MaterialTheme
-//import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -20,6 +18,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
@@ -28,6 +27,9 @@ import com.vlascitchii.presentation_common.R
 import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityStatus
 import com.vlascitchii.presentation_common.utils.VideoPlayerScreenTags.VIDEO_PLAYER
 import com.vlascitchii.presentation_player.databinding.FragmentPlayVideoBinding
+import com.vlascitchii.presentation_player.screen_player.OrientationHandler
+import com.vlascitchii.presentation_player.screen_player.OrientationState
+import com.vlascitchii.presentation_player.screen_player.YouTubePlayerHandler
 import kotlinx.coroutines.flow.StateFlow
 
 @OptIn(ExperimentalGlideComposeApi::class, ExperimentalGlideComposeApi::class)
@@ -50,7 +52,7 @@ fun YoutubeVideoPlayer(
     val isVideoPlays by isVideoPlaysFlow.collectAsStateWithLifecycle()
     val localPlayerOrientationState by playerOrientationState.collectAsStateWithLifecycle()
     val localContext = LocalContext.current
-    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current.lifecycle
+    val lifecycleOwner = LocalLifecycleOwner.current.lifecycle
     val binding =  FragmentPlayVideoBinding.inflate(LayoutInflater.from(localContext))
 
     val orientationHandler = remember {
@@ -64,18 +66,19 @@ fun YoutubeVideoPlayer(
         )
     }
 
-//    remember {
-//        YouTubePlayerHandler(
-//            binding,
-//            lifecycleOwner,
-//            videoId,
-//            isVideoPlays,
-//            updateVideoIsPlayState,
-//            updatePlaybackPosition,
-//            playbackPosition,
-//            orientationHandler
-//        )
-//    }
+    remember {
+        YouTubePlayerHandler(
+            binding,
+            lifecycleOwner,
+            videoId,
+            isVideoPlays,
+            updateVideoIsPlayState,
+            updatePlaybackPosition,
+            playbackPosition,
+            orientationHandler,
+            localContext
+        )
+    }
 
     DisposableEffect(Unit) {
         val orientationEventListener = object : OrientationEventListener(localContext) {
