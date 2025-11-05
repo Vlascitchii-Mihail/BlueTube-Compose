@@ -5,11 +5,11 @@ core-ktx = "1.17.0"
 lifecycle-runtime-ktx = "2.9.4"
 
 #ui
-compose-bom = "2025.10.00"
+compose-bom = "2025.10.01"
 #navigation
-nav3Core = "1.0.0-alpha11"
+nav3Core = "1.0.0-beta01"
 nav3Lifecycle = "1.0.0-alpha04"
-material3Adaptive = "1.2.0-rc01"
+material3Adaptive = "1.2.0"
 
 constraint-layout = "1.1.1"
 constraint-layout-xml = "2.2.1"
@@ -60,10 +60,8 @@ serialization = "1.9.0"
 ksp-compiler = "2.2.20-2.0.3"
 
 navigation-testing = "2.9.5"
-parcelize = "2.2.20"
 appcompat = "1.7.1"
 material-version = "1.13.0"
-junitVersion = "4.12"
 
 
 [libraries]

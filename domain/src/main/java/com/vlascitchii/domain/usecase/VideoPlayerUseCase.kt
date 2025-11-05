@@ -7,7 +7,7 @@ import com.vlascitchii.domain.repository.PlayerRepository
 import com.vlascitchii.domain.usecase.util.DispatcherConfiguration
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flow
 
 class VideoPlayerUseCase(
     configuration: DispatcherConfiguration,
@@ -17,9 +17,8 @@ class VideoPlayerUseCase(
     data class PlayerRequest(val query: String, val coroutineScope: CoroutineScope) : UseCase.CommonRequest
     data class PlayerResponse(val relatedVideoPagingData: Flow<PagingData<YoutubeVideoDomain>>) : UseCase.CommonResponse
 
-    override fun process(request: PlayerRequest): Flow<PlayerResponse> {
-
-        return flowOf(
+    override fun process(request: PlayerRequest): Flow<PlayerResponse> = flow {
+        emit(
             PlayerResponse(
                 playerRepository.getSearchRelayedVideos(request.query)
                     .cachedIn(request.coroutineScope)

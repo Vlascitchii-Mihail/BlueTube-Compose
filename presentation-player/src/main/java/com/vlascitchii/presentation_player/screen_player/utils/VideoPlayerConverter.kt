@@ -14,5 +14,3 @@ class VideoPlayerConverter @Inject constructor()
         return convertPager(data.relatedVideoPagingData)
     }
 }
-
-

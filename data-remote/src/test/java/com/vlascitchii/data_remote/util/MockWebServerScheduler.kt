@@ -10,6 +10,7 @@ const val VIDEO_LIST_RESPONSE_PATH = "${ROOT_PATH}video_list.json"
 const val SEARCH_RESPONSE_PATH = "${ROOT_PATH}search_response.json"
 const val CHANNEL_RESPONSE_PATH = "${ROOT_PATH}channel_response.json"
 const val ERROR_YOUTUBE_RESPONSE = "${ROOT_PATH}error_youtube_response.json"
+const val VIDEO_LIST_FROM_SEARCH_VIDEO_LIST_RESPONSE = "${ROOT_PATH}video_list_from_search_video_list_response.json"
 
 class MockWebServerScheduler(
     private val mockWebServer: MockWebServer,

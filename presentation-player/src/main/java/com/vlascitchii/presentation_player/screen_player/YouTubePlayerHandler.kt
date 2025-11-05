@@ -1,5 +1,6 @@
 package com.vlascitchii.presentation_player.screen_player
 
+import android.content.Context
 import androidx.lifecycle.Lifecycle
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.PlayerConstants
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
@@ -16,6 +17,7 @@ class YouTubePlayerHandler(
     private val updatePlaybackPosition: (Float) -> Unit,
     private val currentPlaybackPosition: Float,
     private val orientationHandler: OrientationHandler,
+    private val localContext: Context,
 ) {
 
     var player: YouTubePlayer? = null
@@ -27,10 +29,11 @@ class YouTubePlayerHandler(
     private fun setupPlayerWidgets() {
         binding.ytPlayer.apply {
             currentComposeLifecycle.addObserver(this)
+            currentComposeLifecycle
             enableAutomaticInitialization = false
-//            val fullScreenControl = IFramePlayerOptions.Builder().controls(1).fullscreen(1).build()
+            val fullScreenControl = IFramePlayerOptions.Builder(localContext).controls(1).fullscreen(1).build()
             val youTubePlayerListener = getYouTubePlayerListener()
-//            initialize(youTubePlayerListener, fullScreenControl)
+            initialize(youTubePlayerListener, fullScreenControl)
         }
     }
 

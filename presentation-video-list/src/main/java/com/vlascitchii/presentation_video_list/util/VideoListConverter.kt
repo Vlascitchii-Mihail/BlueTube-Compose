@@ -11,6 +11,6 @@ class VideoListConverter @Inject constructor()
     : CommonResultConverter<VideoListUseCase.VideoListResponse, Flow<PagingData<YoutubeVideoUiModel>>>() {
 
     override fun convertSuccess(useCaseResponse: VideoListUseCase.VideoListResponse): Flow<PagingData<YoutubeVideoUiModel>> {
-        return convertPager(useCaseResponse.youTubePopularVideoPagingData)
+        return convertPager(useCaseResponse.youTubeVideoPagingData)
     }
 }

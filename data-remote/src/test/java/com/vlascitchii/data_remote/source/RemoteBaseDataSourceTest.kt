@@ -17,6 +17,7 @@ import com.vlascitchii.data_remote.util.ERROR_CODE
 import com.vlascitchii.data_remote.util.ERROR_YOUTUBE_RESPONSE
 import com.vlascitchii.data_remote.util.MockWebServerApiProvider
 import com.vlascitchii.data_remote.util.MockWebServerScheduler
+import com.vlascitchii.data_remote.util.VIDEO_LIST_FROM_SEARCH_VIDEO_LIST_RESPONSE
 import com.vlascitchii.data_remote.util.VIDEO_LIST_RESPONSE_PATH
 import com.vlascitchii.domain.model.ErrorDomain
 import com.vlascitchii.domain.model.videos.YoutubeVideoResponseDomain
@@ -127,8 +128,8 @@ class RemoteBaseDataSourceTest {
     }
 
     @Test
-    fun `convertToVideoResponseApiModel() SearchVideoList to YouTubeVideoList`() = runTest {
-        mockWebServerScheduler.generateMockResponseFrom(VIDEO_LIST_RESPONSE_PATH)
+    fun `convertToVideoResponseApiModel() converts SearchVideoList to YouTubeVideoList`() = runTest {
+        mockWebServerScheduler.generateMockResponseFrom(VIDEO_LIST_FROM_SEARCH_VIDEO_LIST_RESPONSE)
 
         val expectedVideoList: List<YoutubeVideoApiModel> =
             API_VIDEO_RESPONSE_NO_CHANNEL_IMG_URL.items
@@ -138,6 +139,8 @@ class RemoteBaseDataSourceTest {
                 API_RESPONSE_SEARCH_VIDEO_NO_CHANNEL_URL.convertToVideoResponseApiModel()
 
             expectedVideoList.assertListEqualsTo(convertedVideoResponse.items)
+            assertEquals(API_VIDEO_RESPONSE_NO_CHANNEL_IMG_URL.prevPageToken, convertedVideoResponse.prevPageToken)
+            assertEquals(API_VIDEO_RESPONSE_NO_CHANNEL_IMG_URL.nextPageToken, convertedVideoResponse.nextPageToken)
         }
     }
 
