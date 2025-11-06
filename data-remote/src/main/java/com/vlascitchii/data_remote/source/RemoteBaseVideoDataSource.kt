@@ -32,14 +32,26 @@ abstract class RemoteBaseVideoDataSource<T>(
         val channelsIdList: List<String> = videos.map { video: YoutubeVideoApiModel ->
             video.snippet.channelId
         }
-        val videoListResponse: Response<YoutubeChannelResponseApiModel> =
-            baseApiService.fetchChannels(idList = channelsIdList)
+
+        val channelsListResponse: YoutubeChannelResponseApiModel? =
+            baseApiService.fetchChannels(idList = channelsIdList).body()
+                ?.sortChannelListLike(channelsIdList)
 
         val channelIdList: List<String> =
-            videoListResponse.body()?.items?.map { channel: ChannelApiModel ->
+            channelsListResponse?.items?.map { channel: ChannelApiModel ->
                 channel.snippet.thumbnails.medium.url
             } ?: emptyList()
         return channelIdList
+    }
+
+    fun YoutubeChannelResponseApiModel.sortChannelListLike(channelsIdList: List<String>): YoutubeChannelResponseApiModel {
+        val mutableChannelList: MutableList<ChannelApiModel> = mutableListOf()
+        val oldChannelList = this.items
+        channelsIdList.forEach { channelId: String ->
+            mutableChannelList.add(oldChannelList.find { it.id == channelId } ?: ChannelApiModel())
+        }
+
+        return this.copy(items = mutableChannelList.toList())
     }
 
     fun YoutubeVideoResponseApiModel.addChannelUrl(channelUrlList: List<String>): YoutubeVideoResponseApiModel {
