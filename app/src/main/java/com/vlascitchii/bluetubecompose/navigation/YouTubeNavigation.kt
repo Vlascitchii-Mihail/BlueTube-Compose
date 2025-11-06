@@ -110,7 +110,7 @@ fun YouTubeNavigation(
                             video.snippet.title
                         )
                     },
-                    isVideoPlaysFlow = playerScreenViewModel.isVideoPlaysFlow,
+                    isVideoPlayingFlow = playerScreenViewModel.isVideoPlaysFlow,
                     updateVideoIsPlayState = { isPlaying ->
                         playerScreenViewModel.updateVideoPlayState(
                             isPlaying
@@ -121,12 +121,12 @@ fun YouTubeNavigation(
                         backStack.add(ScreenType.PlayerScreen(video))
                     },
                     popBackStack = { backStack.removeLastOrNull() },
+                    playbackPosition = playerScreenViewModel.videoPlaybackPosition,
                     updatePlaybackPosition = { playbackPosition: Float ->
                         playerScreenViewModel.updatePlaybackPosition(
                             playbackPosition
                         )
                     },
-                    playbackPosition = playerScreenViewModel.videoPlaybackPosition,
                     playerOrientationState = playerScreenViewModel.playerOrientationState,
                     updatePlayerOrientationState = { newPlayerOrientationState ->
                         playerScreenViewModel.updatePlayerOrientationState(
@@ -147,7 +147,8 @@ fun YouTubeNavigation(
                             navigateToShorts = { backStack.add(ScreenType.ShortsScreen) },
                             navigateToSettings = { backStack.add(ScreenType.SettingsScreen) }
                         )
-                    }
+                    },
+                    modifier = modifier
                 )
             }
             entry<ScreenType.ShortsScreen> { key: ScreenType.ShortsScreen ->

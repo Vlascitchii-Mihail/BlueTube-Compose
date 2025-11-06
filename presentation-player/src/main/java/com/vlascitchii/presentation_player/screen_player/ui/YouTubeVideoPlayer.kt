@@ -37,7 +37,7 @@ import kotlinx.coroutines.flow.StateFlow
 fun YoutubeVideoPlayer(
     videoId: String,
     modifier: Modifier = Modifier,
-    isVideoPlaysFlow: StateFlow<Boolean>,
+    isVideoPlayingFlow: StateFlow<Boolean>,
     updateVideoIsPlayState: (Boolean) -> Unit,
     popBackStack: () -> Unit,
     updatePlaybackPosition: (Float) -> Unit,
@@ -49,7 +49,7 @@ fun YoutubeVideoPlayer(
     networkConnectivityStatus: NetworkConnectivityStatus,
 ) {
 
-    val isVideoPlays by isVideoPlaysFlow.collectAsStateWithLifecycle()
+    val isVideoPlays by isVideoPlayingFlow.collectAsStateWithLifecycle()
     val localPlayerOrientationState by playerOrientationState.collectAsStateWithLifecycle()
     val localContext = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current.lifecycle

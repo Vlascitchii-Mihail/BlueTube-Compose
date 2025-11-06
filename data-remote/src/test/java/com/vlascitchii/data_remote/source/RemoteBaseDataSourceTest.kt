@@ -6,7 +6,10 @@ import com.vlascitchii.data_remote.model_api.API_ERROR_YOUTUBE_RESPONSE_INSTANCE
 import com.vlascitchii.data_remote.model_api.API_RESPONSE_SEARCH_VIDEO_NO_CHANNEL_URL
 import com.vlascitchii.data_remote.model_api.API_RESPONSE_VIDEO_WITH_CHANNEL_IMG
 import com.vlascitchii.data_remote.model_api.API_VIDEO_RESPONSE_NO_CHANNEL_IMG_URL
+import com.vlascitchii.data_remote.model_api.CHANNELS
+import com.vlascitchii.data_remote.model_api.CHANNELS_LIST_ID
 import com.vlascitchii.data_remote.model_api.DOMAIN_RESPONSE_VIDEO_WITH_CHANNEL_IMG
+import com.vlascitchii.data_remote.model_api.channel_api_model.YoutubeChannelResponseApiModel
 import com.vlascitchii.data_remote.model_api.error.convertErrorApiYouTubeResponseToErrorDomainYouTubeResponse
 import com.vlascitchii.data_remote.model_api.video_api_model.YoutubeVideoApiModel
 import com.vlascitchii.data_remote.model_api.video_api_model.YoutubeVideoResponseApiModel
@@ -110,6 +113,19 @@ class RemoteBaseDataSourceTest {
             API_RESPONSE_VIDEO_WITH_CHANNEL_IMG.items.map { video -> video.snippet.channelImgUrl }
 
         expectedChannelListURL.assertListEqualsTo(actualChannelListURL)
+    }
+
+    @Test
+    fun `sortChannelListLike() sorts the order of List ChannelApiModel`() {
+        val expectedChannelIdList: List<String> = CHANNELS_LIST_ID.shuffled()
+        val channelApiResponse = YoutubeChannelResponseApiModel(items = CHANNELS)
+
+        with(remoteBaseVideoDataSource) {
+            val newChannelApiResponse = channelApiResponse.sortChannelListLike(expectedChannelIdList)
+            val actualCChannelIdList = newChannelApiResponse.items.map { it.id }
+
+            expectedChannelIdList.assertListEqualsTo(actualCChannelIdList)
+        }
     }
 
     @Test
