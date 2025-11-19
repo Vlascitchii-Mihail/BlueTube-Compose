@@ -16,6 +16,7 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import com.vlascitchii.bluetubecompose.mvi.PlayerMVI
 import com.vlascitchii.presentation_common.model.videos.YoutubeVideoUiModel
 import com.vlascitchii.presentation_common.ui.bottom_navigation.BlueTubeBottomNavigation
 import com.vlascitchii.presentation_common.ui.video_list.YouTubeVideoList
@@ -100,46 +101,14 @@ fun YouTubeNavigation(
             }
             entry<ScreenType.PlayerScreen> { key: ScreenType.PlayerScreen ->
                 val playerScreenViewModel: VideoPlayerViewModel = hiltViewModel()
+                val playerMVI = PlayerMVI(playerScreenViewModel, backStack)
                 val video = key.video
 
                 PlayerScreen(
                     video = video,
-                    relatedVideos = playerScreenViewModel.relatedVideoStateFlow,
-                    getRelatedVideos = {
-                        playerScreenViewModel.getSearchedRelatedVideos(
-                            video.snippet.title
-                        )
-                    },
-                    isVideoPlayingFlow = playerScreenViewModel.isVideoPlaysFlow,
-                    updateVideoIsPlayState = { isPlaying ->
-                        playerScreenViewModel.updateVideoPlayState(
-                            isPlaying
-                        )
-                    },
-                    navigateToPlayerScreen = { video: YoutubeVideoUiModel ->
-                        backStack.removeLastOrNull()
-                        backStack.add(ScreenType.PlayerScreen(video))
-                    },
-                    popBackStack = { backStack.removeLastOrNull() },
+                    playerStateFlow = playerScreenViewModel.playerStateFlow,
+                    playerMVI = playerMVI,
                     playbackPosition = playerScreenViewModel.videoPlaybackPosition,
-                    updatePlaybackPosition = { playbackPosition: Float ->
-                        playerScreenViewModel.updatePlaybackPosition(
-                            playbackPosition
-                        )
-                    },
-                    playerOrientationState = playerScreenViewModel.playerOrientationState,
-                    updatePlayerOrientationState = { newPlayerOrientationState ->
-                        playerScreenViewModel.updatePlayerOrientationState(
-                            newPlayerOrientationState
-                        )
-                    },
-                    fullscreenWidgetIsClicked = playerScreenViewModel.fullscreenWidgetIsClicked,
-                    setFullscreenWidgetIsClicked = { isClicked ->
-                        playerScreenViewModel.setFullscreenWidgetIsClicked(
-                            isClicked
-                        )
-                    },
-                    connectivityStatus = playerScreenViewModel.connectivityObserver,
                     bottomNavigation = {
                         BlueTubeBottomNavigation(
                             currentDestinationName = getCurrentNavKey(backStack.lastOrNull()).name,

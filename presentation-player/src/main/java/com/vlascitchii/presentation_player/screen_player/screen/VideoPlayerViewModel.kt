@@ -3,19 +3,23 @@ package com.vlascitchii.presentation_player.screen_player.screen
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
+import com.vlascitchii.domain.custom_scope.CustomCoroutineScope
 import com.vlascitchii.domain.usecase.VideoPlayerUseCase
 import com.vlascitchii.domain.util.VideoResult
 import com.vlascitchii.presentation_common.model.videos.YoutubeVideoUiModel
 import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityObserver
-import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityStatus
 import com.vlascitchii.presentation_common.ui.state.UiState
 import com.vlascitchii.presentation_player.screen_player.OrientationState
+import com.vlascitchii.presentation_player.screen_player.state.PlayerState
 import com.vlascitchii.presentation_player.screen_player.utils.VideoPlayerConverter
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -26,34 +30,49 @@ class VideoPlayerViewModel @Inject constructor(
     private val videoPlayerUseCase: VideoPlayerUseCase,
     private val videoPlayerConverter: VideoPlayerConverter,
     private val networkConnectivityObserver: NetworkConnectivityObserver,
-    ) : ViewModel() {
+    private val customCoroutineScope: CustomCoroutineScope
+) : ViewModel() {
 
-    private var _relatedVideoStateFlow: MutableStateFlow<UiState<Flow<PagingData<YoutubeVideoUiModel>>>> =
+    private val _relatedVideoStateFlow: MutableStateFlow<UiState<Flow<PagingData<YoutubeVideoUiModel>>>> =
         MutableStateFlow<UiState<Flow<PagingData<YoutubeVideoUiModel>>>>(UiState.Loading)
-    val relatedVideoStateFlow: StateFlow<UiState<Flow<PagingData<YoutubeVideoUiModel>>>> get() = _relatedVideoStateFlow
 
     var videoPlaybackPosition: Float = INITIAL_VIDEO_PLAYBACK_POSITION
         private set
 
-    private val _isVideoPlaysFlow = MutableStateFlow(true)
-    val isVideoPlaysFlow: StateFlow<Boolean> = _isVideoPlaysFlow
+    private val _isVideoPlayingFlow: MutableStateFlow<Boolean> = MutableStateFlow(true)
 
-    private var _playerOrientationState = MutableStateFlow(OrientationState.PORTRAIT)
-    val playerOrientationState: StateFlow<OrientationState> = _playerOrientationState
+    private val _playerOrientationState: MutableStateFlow<OrientationState> =
+        MutableStateFlow(OrientationState.PORTRAIT)
 
-    private var _fullscreenWidgetIsClicked = MutableStateFlow(false)
-    val fullscreenWidgetIsClicked: StateFlow<Boolean> = _fullscreenWidgetIsClicked
+    private val _fullscreenWidgetIsClicked: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
-    private var _connectivityObserver:
-            Flow<NetworkConnectivityStatus> = networkConnectivityObserver.observe()
-    val connectivityObserver: Flow<NetworkConnectivityStatus> = _connectivityObserver
+    private var _playerStateFlow: StateFlow<PlayerState> = combine(
+        flow = _relatedVideoStateFlow,
+        flow2 = _isVideoPlayingFlow,
+        flow3 = _playerOrientationState,
+        flow4 = _fullscreenWidgetIsClicked,
+        flow5 = networkConnectivityObserver.observe(),
+    ) { relatedVideoState, isVideoPlaying, playerOrientationState, fullscreenWidgetIsClicked, networkConnectivityObserver ->
+        PlayerState(
+            relatedVideoState = relatedVideoState,
+            isVideoPlaying = isVideoPlaying,
+            playerOrientationState = playerOrientationState,
+            fullscreenWidgetIsClicked = fullscreenWidgetIsClicked,
+            networkConnectivityStatus = networkConnectivityObserver
+        )
+    }.stateIn(
+        viewModelScope,
+        started = SharingStarted.Eagerly,
+        initialValue = PlayerState()
+    )
+    val playerStateFlow: StateFlow<PlayerState> = _playerStateFlow
 
     fun updatePlaybackPosition(newPlaybackTime: Float) {
         videoPlaybackPosition = newPlaybackTime
     }
 
     fun getSearchedRelatedVideos(query: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(customCoroutineScope.coroutineContext) {
             videoPlayerUseCase.execute(VideoPlayerUseCase.PlayerRequest(query, viewModelScope))
                 .map { playerSearchVideoResult: VideoResult<VideoPlayerUseCase.PlayerResponse> ->
                     videoPlayerConverter.convert(playerSearchVideoResult)
@@ -64,7 +83,7 @@ class VideoPlayerViewModel @Inject constructor(
     }
 
     fun updateVideoPlayState(isPlaying: Boolean) {
-        _isVideoPlaysFlow.value = isPlaying
+        _isVideoPlayingFlow.value = isPlaying
     }
 
     fun updatePlayerOrientationState(newPlayerOrientationState: OrientationState) {

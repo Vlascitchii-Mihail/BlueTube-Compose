@@ -51,14 +51,13 @@ class CommonScreenKtTest {
         composeContentTestRule.setContent {
             commonSuccessDesc = stringResource(R.string.common_success_compos_desc)
             commonErrorDesc = stringResource(R.string.common_error_compos_desc)
-            commonLoadDesc = stringResource(R.string.common_loading_compose_desc)
+            commonLoadDesc = stringResource(R.string.common_loading_screen_compose_description)
 
             CommonScreen(testUiState) {
                 TestScreen()
             }
         }
     }
-
 
     @Test
     fun fun_CommonScreen_shows_load_Loading_comp_onLoad_state() {
