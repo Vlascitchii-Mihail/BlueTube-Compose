@@ -48,14 +48,13 @@ fun VideoItemLandscape(
     modifier: Modifier,
     navigateToPlayerScreen: (YoutubeVideoUiModel) -> Unit
 ) {
+    val itemLandscapeDescription = stringResource(R.string.video_medium_preview_description)
     ConstraintLayout(modifier = modifier
         .padding(start = dimensionResource(R.dimen.padding_small_extra_4))
         .fillMaxWidth()
         .wrapContentHeight()
-        .clickable(
-            onClickLabel = stringResource(R.string.video_medium_preview_description),
-            onClick = { navigateToPlayerScreen.invoke(youtubeVideoUiModel) }
-        )
+        .semantics { contentDescription = itemLandscapeDescription }
+        .clickable( onClick = { navigateToPlayerScreen.invoke(youtubeVideoUiModel)})
     ) {
         val (videoPreview, videoTitle, channelImg, videoDuration, statisticsFlow) = createRefs()
         val videoItemTitleDescription = stringResource(R.string.video_item_title)

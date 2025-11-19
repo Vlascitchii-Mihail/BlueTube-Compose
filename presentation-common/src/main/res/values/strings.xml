@@ -25,12 +25,13 @@
 
 <!--    Common screen-->
     <string name="common_error_compos_desc">Common error composable desc</string>
-    <string name="common_loading_compose_desc">Common load composable desc</string>
+    <string name="common_loading_screen_compose_description">Common loading screen</string>
     <string name="common_success_compos_desc">Common success composable desc</string>
     <string name="video_thumbnail_description">Video thumbnail description</string>
 
 <!--    Bottom navigation-->
-    <string name="video_list_screen">Video</string>
+    <string name="video_list_screen">Video list</string>
     <string name="shorts_screen">Shorts</string>
     <string name="settings_screen">Settings</string>
+    <string name="bottom_navigation_description">Bottom Navigation Tab</string>
 </resources>

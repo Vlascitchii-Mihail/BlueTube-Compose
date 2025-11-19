@@ -42,10 +42,11 @@ fun VideoItem(
     modifier: Modifier,
     navigateToPlayerScreen: (YoutubeVideoUiModel) -> Unit
 ) {
+    val videoItemDescription = stringResource(R.string.video_compact_preview_description)
     ConstraintLayout(modifier = modifier
         .fillMaxWidth()
+        .semantics {contentDescription = videoItemDescription }
         .clickable(
-            onClickLabel = stringResource(R.string.video_compact_preview_description),
             onClick = { navigateToPlayerScreen.invoke(youtubeVideoUiModel) }
         )
         .wrapContentHeight()

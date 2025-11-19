@@ -2,20 +2,16 @@ package com.vlascitchii.bluetubecompose.navigation
 
 import androidx.navigation3.runtime.NavKey
 import com.vlascitchii.presentation_common.model.videos.YoutubeVideoUiModel
+import com.vlascitchii.presentation_common.ui.bottom_navigation.*
 import kotlinx.serialization.Serializable
-
-private const val VIDEO = "Video"
-private const val PLAYER = "PLayer"
-private const val SHORTS = "Shorts"
-private const val SETTINGS = "Settings"
 
 @Serializable
 sealed class ScreenType(val name: String) : NavKey {
 
     @Serializable
-    data class VideoList(val query: String = ""): ScreenType(VIDEO)
+    data class VideoList(val query: String = ""): ScreenType(VIDEO_LIST)
     @Serializable
-    data class PlayerScreen(val video: YoutubeVideoUiModel) : ScreenType(PLAYER)
+    data class PlayerScreen(val video: YoutubeVideoUiModel) : ScreenType(VIDEO_LIST)
     @Serializable
     data object ShortsScreen: ScreenType(SHORTS)
     @Serializable
