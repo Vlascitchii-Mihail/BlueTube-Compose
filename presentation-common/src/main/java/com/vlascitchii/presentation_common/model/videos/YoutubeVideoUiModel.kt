@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class YoutubeVideoUiModel(
-    val id: String,
+    val id: String = "",
     var pageToken: String = "",
     var snippet: VideoSnippetUiModel = VideoSnippetUiModel(),
     var statistics: VideoStatisticsUiModel = VideoStatisticsUiModel(),

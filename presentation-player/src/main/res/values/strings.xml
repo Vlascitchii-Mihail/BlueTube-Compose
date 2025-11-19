@@ -3,4 +3,6 @@
     <!--Player Screen-->
     <string name="video_thumbnail_description">Video thumbnail description</string>
     <string name="channel_description">Channel name is </string>
+    <string name="video_player_description">video player</string>
+    <string name="video_content_description">video content description</string>
 </resources>

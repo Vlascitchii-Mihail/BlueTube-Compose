@@ -10,80 +10,73 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.bumptech.glide.integration.compose.GlideImage
-import com.bumptech.glide.integration.compose.placeholder
-import com.vlascitchii.presentation_common.R
+import androidx.paging.PagingData
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import com.vlascitchii.presentation_common.model.videos.YoutubeVideoUiModel
 import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityStatus
-import com.vlascitchii.presentation_common.utils.VideoPlayerScreenTags.VIDEO_PLAYER
+import com.vlascitchii.presentation_common.ui.screen.CommonMVI
+import com.vlascitchii.presentation_common.ui.state.UiState
 import com.vlascitchii.presentation_player.databinding.FragmentPlayVideoBinding
 import com.vlascitchii.presentation_player.screen_player.OrientationHandler
 import com.vlascitchii.presentation_player.screen_player.OrientationState
-import com.vlascitchii.presentation_player.screen_player.YouTubePlayerHandler
-import kotlinx.coroutines.flow.StateFlow
+import com.vlascitchii.presentation_player.screen_player.YouTubePlayerInitializer
+import com.vlascitchii.presentation_player.screen_player.state.PlayerActionState
+import com.vlascitchii.presentation_player.screen_player.state.PlayerNavigationEvent
+import com.vlascitchii.presentation_player.screen_player.state.PlayerState
+import kotlinx.coroutines.flow.Flow
+import com.vlascitchii.presentation_common.R as CommonR
+import com.vlascitchii.presentation_player.R as PlayerR
 
-@OptIn(ExperimentalGlideComposeApi::class, ExperimentalGlideComposeApi::class)
 @Composable
 fun YoutubeVideoPlayer(
     videoId: String,
     modifier: Modifier = Modifier,
-    isVideoPlayingFlow: StateFlow<Boolean>,
-    updateVideoIsPlayState: (Boolean) -> Unit,
-    popBackStack: () -> Unit,
-    updatePlaybackPosition: (Float) -> Unit,
+    playerState: PlayerState,
+    playerMVI: CommonMVI<YoutubeVideoUiModel, UiState<Flow<PagingData<YoutubeVideoUiModel>>>, PlayerActionState, PlayerNavigationEvent>,
     playbackPosition: Float,
-    playerOrientationState: StateFlow<OrientationState>,
-    updatePlayerOrientationState: (OrientationState) -> Unit,
-    fullscreenWidgetIsClicked: StateFlow<Boolean>,
-    setFullscreenWidgetIsClicked: (Boolean) -> Unit,
-    networkConnectivityStatus: NetworkConnectivityStatus,
 ) {
 
-    val isVideoPlays by isVideoPlayingFlow.collectAsStateWithLifecycle()
-    val localPlayerOrientationState by playerOrientationState.collectAsStateWithLifecycle()
     val localContext = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current.lifecycle
-    val binding =  FragmentPlayVideoBinding.inflate(LayoutInflater.from(localContext))
+    val binding = remember { FragmentPlayVideoBinding.inflate(LayoutInflater.from(localContext)) }
+    val videoPlayerDescription = stringResource(PlayerR.string.video_player_description)
 
     val orientationHandler = remember {
         OrientationHandler(
-            binding,
-            localContext as Activity,
-            localPlayerOrientationState,
-            updatePlayerOrientationState,
-            fullscreenWidgetIsClicked,
-            setFullscreenWidgetIsClicked
+            binding = binding,
+            activity = localContext as Activity,
+            playerMVI = playerMVI,
+            playerState = playerState
         )
     }
 
     remember {
-        YouTubePlayerHandler(
-            binding,
-            lifecycleOwner,
-            videoId,
-            isVideoPlays,
-            updateVideoIsPlayState,
-            updatePlaybackPosition,
-            playbackPosition,
-            orientationHandler,
-            localContext
+        YouTubePlayerInitializer(
+            binding = binding,
+            localContext = localContext,
+            currentComposeLifecycle = lifecycleOwner,
+            videoId = videoId,
+            playerMVI = playerMVI,
+            isVideoPlays = playerState.isVideoPlaying,
+            currentPlaybackPosition = playbackPosition,
+            orientationHandler = orientationHandler
         )
     }
 
     DisposableEffect(Unit) {
         val orientationEventListener = object : OrientationEventListener(localContext) {
             override fun onOrientationChanged(orientation: Int) {
-                orientationHandler.setScreenAppearanceOrientationFlag(orientation)
+                orientationHandler.setScreenOrientationFromFlag(orientation)
             }
         }
 
@@ -92,27 +85,27 @@ fun YoutubeVideoPlayer(
     }
 
     BackHandler {
-        if (playerOrientationState.value == OrientationState.FULL_SCREEN)
-            orientationHandler.clickToFullScreenWidget()
+        if (playerState.playerOrientationState == OrientationState.FULL_SCREEN)
+            binding.fullScreenButton.performClick()
         else {
             orientationHandler.setSensorOrientation()
-            popBackStack.invoke()
+            playerMVI.submitSingleNavigationEvent(PlayerNavigationEvent.PopBackStackEvent)
         }
     }
 
     fun getModifier(localPlayerOrientationState: OrientationState): Modifier {
-        return when(localPlayerOrientationState) {
+        return when (localPlayerOrientationState) {
             OrientationState.PORTRAIT -> modifier.fillMaxWidth()
             OrientationState.FULL_SCREEN -> modifier.fillMaxSize()
         }
     }
 
-    when(networkConnectivityStatus) {
+    when (playerState.networkConnectivityStatus) {
         NetworkConnectivityStatus.Available -> {
             AndroidView(
-                modifier = getModifier(localPlayerOrientationState)
+                modifier = getModifier(playerState.playerOrientationState)
                     .background(MaterialTheme.colorScheme.background)
-                    .testTag(VIDEO_PLAYER),
+                    .semantics { contentDescription = videoPlayerDescription },
                 factory = { context ->
                     binding.llPlayerContainer
                 }
@@ -120,12 +113,16 @@ fun YoutubeVideoPlayer(
         }
 
         NetworkConnectivityStatus.Lost -> {
-            GlideImage(
-                model = placeholder(R.drawable.sceleton_thumbnail),
-                loading = placeholder(R.drawable.sceleton_thumbnail),
-                contentDescription = stringResource(id = R.string.video_thumbnail_description),
-                modifier = getModifier(localPlayerOrientationState),
-                contentScale = ContentScale.Crop
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(CommonR.string.video_thumbnail_description)
+                    .crossfade(true)
+                    .placeholder(CommonR.drawable.sceleton_thumbnail)
+                    .error(CommonR.drawable.sceleton_thumbnail)
+                    .build(),
+                contentDescription = stringResource(id = CommonR.string.video_thumbnail_description),
+                contentScale = ContentScale.Crop,
+                modifier = getModifier(playerState.playerOrientationState)
             )
         }
     }

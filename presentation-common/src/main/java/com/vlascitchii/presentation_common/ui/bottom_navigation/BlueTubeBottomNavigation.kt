@@ -11,7 +11,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
-
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import com.vlascitchii.presentation_common.R
 import com.vlascitchii.presentation_common.ui.theme.BlueTubeComposeTheme
@@ -19,39 +20,45 @@ import com.vlascitchii.presentation_common.ui.theme.BlueTubeComposeTheme
 private const val FIRST_INDEX = 0
 private const val SECOND_INDEX = 1
 private const val THIRD_INDEX = 2
+const val VIDEO_LIST = "Video list"
+const val SHORTS: String = "Shorts"
+const val SETTINGS: String = "Settings"
 
 private data class NavigationItem(
     val index: Int,
     val vectorResourceId: Int,
-    val screenDescriptionId: Int,
+    val screenName: String,
 )
 
 private val navItemsList = listOf(
     NavigationItem(
         FIRST_INDEX,
         R.drawable.ic_house_24,
-        R.string.video_list_screen,
+        VIDEO_LIST,
     ),
     NavigationItem(
         SECOND_INDEX,
         R.drawable.ic_youtube_shorts_logo_24,
-        R.string.shorts_screen,
+        SHORTS,
     ),
     NavigationItem(
         THIRD_INDEX,
         R.drawable.ic_settings_24,
-        R.string.settings_screen,
+        SETTINGS,
     )
 )
 
 @Composable
 fun BlueTubeBottomNavigation(
-    currentDestinationName: String,
-    navigateToVideo: () -> Unit,
-    navigateToShorts: () -> Unit,
-    navigateToSettings: () -> Unit,
+    currentDestinationName: String = VIDEO_LIST,
+    navigateToVideo: () -> Unit = {},
+    navigateToShorts: () -> Unit = {},
+    navigateToSettings: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
+
+    val bottomNavigationDescription = stringResource(R.string.bottom_navigation_description)
+
     Surface(
         shadowElevation = dimensionResource(R.dimen.elevation_medium_16),
         tonalElevation = dimensionResource(R.dimen.elevation_medium_16)
@@ -59,9 +66,10 @@ fun BlueTubeBottomNavigation(
         NavigationBar(
             modifier = modifier
                 .height(dimensionResource(R.dimen.height_large_extra_72))
+                .semantics { contentDescription = bottomNavigationDescription }
         ) {
             navItemsList.forEachIndexed { index, navItem ->
-                val itemDestinationName = stringResource(navItem.screenDescriptionId)
+                val itemDestinationName = navItem.screenName
                 NavigationBarItem(
                     selected = itemDestinationName == currentDestinationName,
                     onClick = {
@@ -74,9 +82,10 @@ fun BlueTubeBottomNavigation(
                     icon = {
                         Icon(
                             imageVector = ImageVector.vectorResource(navItem.vectorResourceId),
-                            contentDescription = stringResource(id = navItem.screenDescriptionId)
+                            contentDescription = navItem.screenName
                         )
-                    }
+                    },
+                    modifier = modifier.semantics { contentDescription = itemDestinationName }
                 )
             }
         }
@@ -90,7 +99,7 @@ private fun BlueTubeBottomNavigationPreview() {
     BlueTubeComposeTheme {
         Surface {
             BlueTubeBottomNavigation(
-                "Shorts",
+                SHORTS,
                 {},
                 {},
                 {}

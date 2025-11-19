@@ -51,12 +51,12 @@ fun <T : Any> CommonScreen(
 
 @Composable
 fun Loading() {
-    val loadingDescription = stringResource(R.string.common_loading_compose_desc)
+    val commonLoadingScreenDescription = stringResource(R.string.common_loading_screen_compose_description)
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .semantics { contentDescription = loadingDescription },
+            .semantics { contentDescription = commonLoadingScreenDescription },
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

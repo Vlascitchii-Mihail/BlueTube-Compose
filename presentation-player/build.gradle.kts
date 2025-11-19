@@ -7,6 +7,13 @@ plugins {
     alias(libs.plugins.kapt)
 }
 
+//will be attached to the JVM during tests manually
+val mockitoAgent by configurations.creating {
+    isCanBeResolved = true
+    isCanBeConsumed = false
+    extendsFrom(configurations.testRuntimeOnly.get())
+}
+
 android {
     namespace = "com.vlascitchii.presentation_player"
     compileSdk = 36
@@ -62,7 +69,8 @@ dependencies {
     implementation(libs.material3)
     implementation(libs.constraint.layout.compose)
     implementation(libs.constraint.layout.xml)
-    implementation(libs.window.configuration)
+
+    implementation(libs.coil)
 
     //viewmodel
     implementation(libs.viewmodel.compose)
@@ -80,15 +88,25 @@ dependencies {
     implementation(libs.paging)
     implementation(libs.paging.compose)
 
-    //Glide
-    implementation(libs.glide)
-
     testImplementation(libs.junit)
     testImplementation(libs.mockito)
     testImplementation(libs.mockito.inline)
     testImplementation(libs.test.coroutines)
 
+    androidTestImplementation(libs.androidx.compose.ui.test)
+    androidTestImplementation(libs.navigation.compose.testing)
     androidTestImplementation(libs.androidx.test.ext)
     androidTestImplementation(libs.androidx.test.espresso)
-    androidTestImplementation(libs.espresso.device)
+    androidTestImplementation(libs.mockito)
+    androidTestImplementation(libs.dexmaker)
+
+    //add the agent to the configuration
+    mockitoAgent(libs.mockito.core) {
+        isTransitive = false
+    }
+}
+
+//attache the agent from the configuration
+tasks.withType<Test>().configureEach {
+    jvmArgs("-javaagent:${mockitoAgent.asPath}")
 }
