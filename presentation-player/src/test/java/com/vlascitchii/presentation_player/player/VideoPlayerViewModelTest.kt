@@ -150,12 +150,12 @@ class VideoPlayerViewModelTest {
     }
 
     @Test
-    fun `setFullscreenWidgetIsClicked() gets full screen widget state`() = runTest {
-        assertFalse(viewModelPlayer.playerStateFlow.first().fullscreenWidgetIsClicked)
+    fun `setInitialScreenLaunchRotationController updates _initialScreenLaunchRotationController field`() = runTest {
+        assertFalse(viewModelPlayer.playerStateFlow.first().isOrientationApproved)
 
-        viewModelPlayer.setFullscreenWidgetIsClicked(true)
+        viewModelPlayer.setInitialScreenLaunchRotationController(true)
         advanceUntilIdle()
 
-        assertTrue(viewModelPlayer.playerStateFlow.first().fullscreenWidgetIsClicked)
+        assertTrue(viewModelPlayer.playerStateFlow.first().isOrientationApproved)
     }
 }

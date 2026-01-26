@@ -44,7 +44,7 @@ class YouTubeVideoDaoTest {
         youTubeVideoDao.insertPages(expectedPage)
         youTubeVideoDao.insertPages(TEST_DATABASE_VIDEO_RESPONSE.pageEntity.copy(currentPageToken = "CAoQAA"))
 
-        val actualPage = youTubeVideoDao.getFirstPage().pageEntity
+        val actualPage = youTubeVideoDao.getFirstPage().first().pageEntity
 
         assertEquals(expectedPage, actualPage)
     }
@@ -57,7 +57,7 @@ class YouTubeVideoDaoTest {
 
         youTubeVideoDao.insertPages(expectedPage)
 
-        val actualPage = youTubeVideoDao.getPageByToken(testToken).pageEntity
+        val actualPage = youTubeVideoDao.getPageByToken(testToken).first().pageEntity
 
         assertEquals(expectedPage, actualPage)
     }
@@ -72,7 +72,7 @@ class YouTubeVideoDaoTest {
         insertPage(TEST_DATABASE_VIDEO_RESPONSE.pageEntity)
         insertVideoList(expectedVideoList)
 
-        val actualVideoList = youTubeVideoDao.getFirstPage().items
+        val actualVideoList = youTubeVideoDao.getFirstPage().first().items
 
         val expectedVideoIdList = expectedVideoList.map { video: YoutubeVideoEntity -> video.id }
         val actualVideoIdList = actualVideoList.map { video: YoutubeVideoEntity -> video.id }
@@ -129,7 +129,7 @@ class YouTubeVideoDaoTest {
         insertVideoSnippet(TEST_DATABASE_VIDEO_RESPONSE.items)
 
         val actualVideoSnippet = videoIdList.map { id: String ->
-            youTubeVideoDao.getVideoSnippet(id)
+            youTubeVideoDao.getVideoSnippet(id).first()
         }
 
         expectedVideoSnippet.assertSnippetListEquals(actualVideoSnippet)
@@ -151,7 +151,7 @@ class YouTubeVideoDaoTest {
         }
 
         val actualVideoThumbnails = snippetIdList.map { snippetId: String ->
-            youTubeVideoDao.getThumbnails(snippetId)
+            youTubeVideoDao.getThumbnails(snippetId).first()
         }
 
         expectedVideoThumbnails.assertThumbnailsEquals(actualVideoThumbnails)

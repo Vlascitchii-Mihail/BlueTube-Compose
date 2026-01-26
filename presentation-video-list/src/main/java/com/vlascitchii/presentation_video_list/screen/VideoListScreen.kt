@@ -31,7 +31,6 @@ import com.vlascitchii.presentation_common.R
 import com.vlascitchii.presentation_common.model.videos.YoutubeVideoUiModel
 import com.vlascitchii.presentation_common.model.videos.YoutubeVideoUiModel.Companion.PREVIEW_VIDEO_LIST
 import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityStatus
-import com.vlascitchii.presentation_common.ui.bottom_navigation.BlueTubeBottomNavigation
 import com.vlascitchii.presentation_common.ui.global_snackbar.HandleSnackbar
 import com.vlascitchii.presentation_common.ui.global_snackbar.SnackBarController
 import com.vlascitchii.presentation_common.ui.global_snackbar.SnackBarEvent
@@ -133,14 +132,7 @@ fun VideoListScreenPreview() {
                         navigateToPlayerScreen = {}
                     )
                 },
-                bottomNavigation = {
-                    BlueTubeBottomNavigation(
-                        "Video",
-                        {},
-                        {},
-                        {},
-                    )
-                }
+                bottomNavigation = {}
             )
         }
     }
@@ -178,14 +170,7 @@ fun VideoSearchListScreenPreview() {
                         navigateToPlayerScreen = {}
                     )
                 },
-                bottomNavigation = {
-                    BlueTubeBottomNavigation(
-                        "Video",
-                        {},
-                        {},
-                        {},
-                    )
-                }
+                bottomNavigation = {}
             )
         }
     }
@@ -224,14 +209,7 @@ fun VideoSearchListScreenLandscapePreview() {
                         navigateToPlayerScreen = {}
                     )
                 },
-                bottomNavigation = {
-                    BlueTubeBottomNavigation(
-                        "Video",
-                        {},
-                        {},
-                        {},
-                    )
-                }
+                bottomNavigation = {}
             )
         }
     }

@@ -95,6 +95,13 @@ dependencies {
 
     implementation(libs.coil)
 
+    //navigation
+    implementation(libs.nav3.runtime)
+    implementation(libs.nav3.ui)
+    implementation(libs.androidx.lifecycle.viewmodel.nav3)
+    implementation(libs.kotlinx.serialization.core)
+    implementation(libs.kotlinx.serialization.json)
+
     //unit test
     testImplementation(libs.junit)
     testImplementation(libs.mockito)

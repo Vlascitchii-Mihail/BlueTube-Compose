@@ -7,7 +7,6 @@ import com.vlascitchii.domain.custom_scope.CustomCoroutineScope
 import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityObserver
 import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityStatus
 import com.vlascitchii.presentation_common.ui.state.UiAction
-import com.vlascitchii.presentation_common.ui.state.UiSingleEvent
 import com.vlascitchii.presentation_common.ui.state.UiState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -15,7 +14,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-abstract class CommonVideoViewModel<DATA_MODEL: Any, STATE: UiState<Flow<PagingData<DATA_MODEL>>>, ACTION: UiAction, EVENT: UiSingleEvent>(
+abstract class CommonVideoViewModel<DATA_MODEL: Any, STATE: UiState<Flow<PagingData<DATA_MODEL>>>, ACTION: UiAction>(
     private val networkConnectivityObserver: NetworkConnectivityObserver,
     private val customCoroutineScope: CustomCoroutineScope,
 ) : ViewModel() {

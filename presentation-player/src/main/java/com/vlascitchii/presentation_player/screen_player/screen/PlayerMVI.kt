@@ -1,24 +1,20 @@
-package com.vlascitchii.bluetubecompose.mvi
+package com.vlascitchii.presentation_player.screen_player.screen
 
-import androidx.lifecycle.viewModelScope
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
-import androidx.navigation3.runtime.rememberNavBackStack
-import androidx.paging.PagingData
-import com.vlascitchii.bluetubecompose.navigation.ScreenType
 import com.vlascitchii.presentation_common.model.videos.YoutubeVideoUiModel
-import com.vlascitchii.presentation_common.ui.screen.CommonMVI
-import com.vlascitchii.presentation_common.ui.state.UiState
-import com.vlascitchii.presentation_player.screen_player.screen.VideoPlayerViewModel
+import com.vlascitchii.presentation_common.ui.screen.ScreenType
+import com.vlascitchii.presentation_common.ui.screen.mvi.CommonMVI
 import com.vlascitchii.presentation_player.screen_player.state.PlayerActionState
 import com.vlascitchii.presentation_player.screen_player.state.PlayerNavigationEvent
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.CoroutineScope
 
 class PlayerMVI(
     private val videoPlayerViewModel: VideoPlayerViewModel,
-    private val backStack: NavBackStack<NavKey>
-) : CommonMVI<YoutubeVideoUiModel,UiState<Flow<PagingData<YoutubeVideoUiModel>>>, PlayerActionState, PlayerNavigationEvent>(
-    videoPlayerViewModel.viewModelScope,
+    private val backStack: NavBackStack<NavKey>,
+    coroutineScope: CoroutineScope
+) : CommonMVI<PlayerActionState, PlayerNavigationEvent>(
+    coroutineScope,
 ) {
     override fun handleAction(action: PlayerActionState) {
         when(action) {
@@ -26,7 +22,7 @@ class PlayerMVI(
             is PlayerActionState.UpdatePlayStateAction -> videoPlayerViewModel.updateVideoPlayState(action.isPlaying)
             is PlayerActionState.UpdatePlaybackPositionAction -> videoPlayerViewModel.updatePlaybackPosition(action.playbackPosition)
             is PlayerActionState.UpdatePlayerOrientationStateAction -> videoPlayerViewModel.updatePlayerOrientationState(action.orientationState)
-            is PlayerActionState.SetFullscreenWidgetState -> videoPlayerViewModel.setFullscreenWidgetIsClicked(action.isClicked)
+            is PlayerActionState.ApproveOrientationChange -> { videoPlayerViewModel.setInitialScreenLaunchRotationController(action.isOrientationApproved) }
         }
     }
 

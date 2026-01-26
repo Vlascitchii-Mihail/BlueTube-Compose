@@ -23,6 +23,7 @@
     <dimen name="height_medium_extra_50">50dp</dimen>
     <dimen name="height_large_56">56dp</dimen>
     <dimen name="height_large_extra_72">72dp</dimen>
+    <dimen name="height_large_extra_250">250dp</dimen>
 
 <!--    Width-->
     <dimen name="width_small_extra_35">35dp</dimen>

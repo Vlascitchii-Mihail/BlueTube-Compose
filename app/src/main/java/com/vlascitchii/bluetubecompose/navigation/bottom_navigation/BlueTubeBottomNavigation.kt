@@ -1,4 +1,4 @@
-package com.vlascitchii.presentation_common.ui.bottom_navigation
+package com.vlascitchii.bluetubecompose.navigation.bottom_navigation
 
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Icon
@@ -14,15 +14,18 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation3.runtime.NavBackStack
+import androidx.navigation3.runtime.NavKey
+import com.vlascitchii.presentation_common.ui.screen.ScreenType
 import com.vlascitchii.presentation_common.R
+import com.vlascitchii.presentation_common.ui.screen.SETTINGS
+import com.vlascitchii.presentation_common.ui.screen.SHORTS
+import com.vlascitchii.presentation_common.ui.screen.VIDEO_LIST
 import com.vlascitchii.presentation_common.ui.theme.BlueTubeComposeTheme
 
 private const val FIRST_INDEX = 0
 private const val SECOND_INDEX = 1
 private const val THIRD_INDEX = 2
-const val VIDEO_LIST = "Video list"
-const val SHORTS: String = "Shorts"
-const val SETTINGS: String = "Settings"
 
 private data class NavigationItem(
     val index: Int,
@@ -50,11 +53,8 @@ private val navItemsList = listOf(
 
 @Composable
 fun BlueTubeBottomNavigation(
-    currentDestinationName: String = VIDEO_LIST,
-    navigateToVideo: () -> Unit = {},
-    navigateToShorts: () -> Unit = {},
-    navigateToSettings: () -> Unit = {},
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    backStack: NavBackStack<NavKey> = NavBackStack(ScreenType.ShortsScreen),
 ) {
 
     val bottomNavigationDescription = stringResource(R.string.bottom_navigation_description)
@@ -71,12 +71,12 @@ fun BlueTubeBottomNavigation(
             navItemsList.forEachIndexed { index, navItem ->
                 val itemDestinationName = navItem.screenName
                 NavigationBarItem(
-                    selected = itemDestinationName == currentDestinationName,
+                    selected = itemDestinationName == getCurrentNavKey(backStack.lastOrNull()).name,
                     onClick = {
                         when (index) {
-                            FIRST_INDEX -> navigateToVideo.invoke()
-                            SECOND_INDEX -> navigateToShorts.invoke()
-                            THIRD_INDEX -> navigateToSettings.invoke()
+                            FIRST_INDEX -> backStack.add(ScreenType.VideoList())
+                            SECOND_INDEX -> backStack.add(ScreenType.ShortsScreen)
+                            THIRD_INDEX -> backStack.add(ScreenType.SettingsScreen)
                         }
                     },
                     icon = {
@@ -92,18 +92,22 @@ fun BlueTubeBottomNavigation(
     }
 }
 
+private fun getCurrentNavKey(lastNavigationKey: NavKey?): ScreenType {
+    return when (lastNavigationKey) {
+        is ScreenType.VideoList -> lastNavigationKey
+        is ScreenType.ShortsScreen -> lastNavigationKey
+        is ScreenType.PlayerScreen -> lastNavigationKey
+        else -> lastNavigationKey as ScreenType.SettingsScreen
+    }
+}
+
 
 @Composable
 @Preview
 private fun BlueTubeBottomNavigationPreview() {
     BlueTubeComposeTheme {
         Surface {
-            BlueTubeBottomNavigation(
-                SHORTS,
-                {},
-                {},
-                {}
-            )
+            BlueTubeBottomNavigation()
         }
     }
 }

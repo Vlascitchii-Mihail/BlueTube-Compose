@@ -43,7 +43,6 @@ fun VideoDescription(video: YoutubeVideoUiModel, modifier: Modifier = Modifier) 
             .fillMaxWidth()
             .padding(8.dp)
             .semantics { contentDescription = videoDescription }
-            .testTag(VideoPlayerScreenTags.VIDEO_DESCRIPTION)
             .background(MaterialTheme.colorScheme.background)
     ) {
         Text(
