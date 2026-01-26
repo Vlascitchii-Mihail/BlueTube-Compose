@@ -11,7 +11,6 @@ import com.vlascitchii.presentation_common.model.videos.YoutubeVideoUiModel
 import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityObserver
 import com.vlascitchii.presentation_common.ui.screen.CommonVideoViewModel
 import com.vlascitchii.presentation_common.ui.state.UiAction
-import com.vlascitchii.presentation_common.ui.state.UiSingleEvent
 import com.vlascitchii.presentation_common.ui.state.UiState
 import com.vlascitchii.presentation_video_list.screen.state.SearchState
 import com.vlascitchii.presentation_video_list.screen.state.UiVideoListAction
@@ -32,7 +31,7 @@ class VideoListViewModel @Inject constructor(
     private val videoListConverter: VideoListConverter,
     private val networkConnectivityObserver: NetworkConnectivityObserver,
     private val customCoroutineScope: CustomCoroutineScope
-) : CommonVideoViewModel<YoutubeVideoUiModel, UiState<Flow<PagingData<YoutubeVideoUiModel>>>, UiAction, UiSingleEvent>(
+) : CommonVideoViewModel<YoutubeVideoUiModel, UiState<Flow<PagingData<YoutubeVideoUiModel>>>, UiAction>(
     networkConnectivityObserver, customCoroutineScope
 ) {
 
@@ -81,10 +80,12 @@ class VideoListViewModel @Inject constructor(
         }
     }
 
+    //TODO: set private
     fun updateSearchState(newSearchState: SearchState) {
         _searchBarState.value = newSearchState
     }
 
+    //TODO: set private
     fun updateSearchTextState(newSearchText: String) {
         _searchTextState.value =
             TextFieldValue(text = newSearchText, selection = TextRange(newSearchText.length))

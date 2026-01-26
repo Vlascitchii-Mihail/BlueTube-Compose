@@ -9,5 +9,5 @@ sealed class PlayerActionState : UiAction {
     data class UpdatePlayStateAction(val isPlaying: Boolean) : PlayerActionState()
     data class UpdatePlaybackPositionAction(val playbackPosition: Float) : PlayerActionState()
     data class UpdatePlayerOrientationStateAction(val orientationState: OrientationState) : PlayerActionState()
-    data class SetFullscreenWidgetState(val isClicked: Boolean) : PlayerActionState()
+    data class ApproveOrientationChange(val isOrientationApproved: Boolean) : PlayerActionState()
 }

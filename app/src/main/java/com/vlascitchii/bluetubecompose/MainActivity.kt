@@ -15,7 +15,6 @@ import androidx.compose.ui.Modifier
 import com.vlascitchii.presentation_common.ui.screen.LocalWindowSizeClass
 import dagger.hilt.android.AndroidEntryPoint
 
-
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 

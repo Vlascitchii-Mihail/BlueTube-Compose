@@ -1,6 +1,7 @@
 package com.vlascitchii.presentation_player.screen_player.ui
 
 import android.app.Activity
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.OrientationEventListener
 import androidx.activity.compose.BackHandler
@@ -10,30 +11,30 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.paging.PagingData
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.vlascitchii.presentation_common.model.videos.YoutubeVideoUiModel
 import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityStatus
-import com.vlascitchii.presentation_common.ui.screen.CommonMVI
-import com.vlascitchii.presentation_common.ui.state.UiState
+import com.vlascitchii.presentation_common.ui.screen.mvi.CommonMVI
 import com.vlascitchii.presentation_player.databinding.FragmentPlayVideoBinding
-import com.vlascitchii.presentation_player.screen_player.OrientationHandler
 import com.vlascitchii.presentation_player.screen_player.OrientationState
 import com.vlascitchii.presentation_player.screen_player.YouTubePlayerInitializer
+import com.vlascitchii.presentation_player.screen_player.orientation.PlayerOrientationHandler
 import com.vlascitchii.presentation_player.screen_player.state.PlayerActionState
 import com.vlascitchii.presentation_player.screen_player.state.PlayerNavigationEvent
 import com.vlascitchii.presentation_player.screen_player.state.PlayerState
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 import com.vlascitchii.presentation_common.R as CommonR
 import com.vlascitchii.presentation_player.R as PlayerR
 
@@ -41,22 +42,23 @@ import com.vlascitchii.presentation_player.R as PlayerR
 fun YoutubeVideoPlayer(
     videoId: String,
     modifier: Modifier = Modifier,
-    playerState: PlayerState,
-    playerMVI: CommonMVI<YoutubeVideoUiModel, UiState<Flow<PagingData<YoutubeVideoUiModel>>>, PlayerActionState, PlayerNavigationEvent>,
+    playerStateFlow: StateFlow<PlayerState>,
+    playerMVI: CommonMVI<PlayerActionState, PlayerNavigationEvent>,
     playbackPosition: Float,
 ) {
-
     val localContext = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current.lifecycle
     val binding = remember { FragmentPlayVideoBinding.inflate(LayoutInflater.from(localContext)) }
     val videoPlayerDescription = stringResource(PlayerR.string.video_player_description)
 
-    val orientationHandler = remember {
-        OrientationHandler(
+    val playerState: PlayerState = playerStateFlow.collectAsState().value
+
+    val playerOrientationHandler = remember {
+        PlayerOrientationHandler(
             binding = binding,
             activity = localContext as Activity,
             playerMVI = playerMVI,
-            playerState = playerState
+            playerStateFlow = playerStateFlow
         )
     }
 
@@ -67,29 +69,25 @@ fun YoutubeVideoPlayer(
             currentComposeLifecycle = lifecycleOwner,
             videoId = videoId,
             playerMVI = playerMVI,
-            isVideoPlays = playerState.isVideoPlaying,
+            playerStateFlow = playerStateFlow,
             currentPlaybackPosition = playbackPosition,
-            orientationHandler = orientationHandler
         )
     }
 
-    DisposableEffect(Unit) {
-        val orientationEventListener = object : OrientationEventListener(localContext) {
-            override fun onOrientationChanged(orientation: Int) {
-                orientationHandler.setScreenOrientationFromFlag(orientation)
-            }
-        }
+    ReactOnActivityOrientationChange(playerOrientationHandler)
+    ReactOnAccelerometerOrientationChange(playerOrientationHandler, localContext)
 
-        orientationEventListener.enable()
-        onDispose { orientationEventListener.disable() }
+    fun navigateBack() {
+        playerOrientationHandler.setSensorOrientation()
+        playerMVI.submitSingleNavigationEvent(PlayerNavigationEvent.PopBackStackEvent)
     }
 
     BackHandler {
-        if (playerState.playerOrientationState == OrientationState.FULL_SCREEN)
-            binding.fullScreenButton.performClick()
-        else {
-            orientationHandler.setSensorOrientation()
-            playerMVI.submitSingleNavigationEvent(PlayerNavigationEvent.PopBackStackEvent)
+        when (playerState.playerOrientationState) {
+            OrientationState.FULL_SCREEN -> {
+                playerOrientationHandler.outFromFullScreenSetStaticPortraitOrientation()
+            }
+            OrientationState.PORTRAIT -> navigateBack()
         }
     }
 
@@ -125,5 +123,30 @@ fun YoutubeVideoPlayer(
                 modifier = getModifier(playerState.playerOrientationState)
             )
         }
+    }
+}
+
+@Composable
+fun ReactOnActivityOrientationChange(playerOrientationHandler: PlayerOrientationHandler) {
+    val currentSystemOrientation: Int = LocalConfiguration.current.orientation
+    LaunchedEffect(currentSystemOrientation) {
+        playerOrientationHandler.rotateWhenAutoRotationSettingIsDisabled(currentSystemOrientation)
+    }
+}
+
+@Composable
+fun ReactOnAccelerometerOrientationChange(
+    playerOrientationHandler: PlayerOrientationHandler,
+    localContext: Context
+) {
+    DisposableEffect(Unit) {
+        val orientationEventListener = object : OrientationEventListener(localContext) {
+            override fun onOrientationChanged(orientation: Int) {
+                playerOrientationHandler.rotateWhenScreenAutoRotateSettingIsEnabled(orientation)
+            }
+        }
+
+        orientationEventListener.enable()
+        onDispose { orientationEventListener.disable() }
     }
 }

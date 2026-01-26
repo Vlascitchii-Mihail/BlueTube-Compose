@@ -35,7 +35,7 @@ class CommonVideoViewModelTest {
     val dispatcherTestRule = DispatcherTestRule()
 
     val networkConnectivityObserverMock: NetworkConnectivityObserver = mock()
-    private lateinit var commonViewModel: CommonVideoViewModel<YoutubeVideoUiModel, UiState<Flow<PagingData<YoutubeVideoUiModel>>>, UiAction, UiSingleEvent>
+    private lateinit var commonViewModel: CommonVideoViewModel<YoutubeVideoUiModel, UiState<Flow<PagingData<YoutubeVideoUiModel>>>, UiAction>
     private val customCoroutineScope: CustomCoroutineScope =
         CustomCoroutineScope(dispatcherTestRule.testDispatcher)
     val uiStateSuccess = UiState.Success<Flow<PagingData<YoutubeVideoUiModel>>>(
@@ -50,7 +50,7 @@ class CommonVideoViewModelTest {
     @Before
     fun init() {
         commonViewModel = object :
-            CommonVideoViewModel<YoutubeVideoUiModel, UiState<Flow<PagingData<YoutubeVideoUiModel>>>, UiAction, UiSingleEvent>(
+            CommonVideoViewModel<YoutubeVideoUiModel, UiState<Flow<PagingData<YoutubeVideoUiModel>>>, UiAction>(
                 networkConnectivityObserver = networkConnectivityObserverMock,
                 customCoroutineScope
             ) {
