@@ -1,5 +1,6 @@
 package com.vlascitchii.bluetubecompose.navigation
 
+import android.util.Log
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -9,6 +10,7 @@ import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
@@ -16,9 +18,10 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
-import com.vlascitchii.bluetubecompose.mvi.PlayerMVI
+import com.vlascitchii.presentation_player.screen_player.screen.PlayerMVI
 import com.vlascitchii.presentation_common.model.videos.YoutubeVideoUiModel
-import com.vlascitchii.presentation_common.ui.bottom_navigation.BlueTubeBottomNavigation
+import com.vlascitchii.bluetubecompose.navigation.bottom_navigation.BlueTubeBottomNavigation
+import com.vlascitchii.presentation_common.ui.screen.ScreenType
 import com.vlascitchii.presentation_common.ui.video_list.YouTubeVideoList
 import com.vlascitchii.presentation_player.screen_player.screen.PlayerScreen
 import com.vlascitchii.presentation_player.screen_player.screen.VideoPlayerViewModel
@@ -89,19 +92,16 @@ fun YouTubeNavigation(
                         )
                     },
                     modifier = modifier,
-                    bottomNavigation = {
-                        BlueTubeBottomNavigation(
-                            currentDestinationName = getCurrentNavKey(backStack.lastOrNull()).name,
-                            navigateToVideo = { backStack.add(ScreenType.VideoList()) },
-                            navigateToShorts = { backStack.add(ScreenType.ShortsScreen) },
-                            navigateToSettings = { backStack.add(ScreenType.SettingsScreen) }
-                        )
-                    }
+                    bottomNavigation = { BlueTubeBottomNavigation(backStack = backStack) }
                 )
             }
             entry<ScreenType.PlayerScreen> { key: ScreenType.PlayerScreen ->
                 val playerScreenViewModel: VideoPlayerViewModel = hiltViewModel()
-                val playerMVI = PlayerMVI(playerScreenViewModel, backStack)
+                val playerMVI = PlayerMVI(
+                    videoPlayerViewModel = playerScreenViewModel,
+                    backStack = backStack,
+                    coroutineScope = playerScreenViewModel.viewModelScope
+                )
                 val video = key.video
 
                 PlayerScreen(
@@ -109,14 +109,6 @@ fun YouTubeNavigation(
                     playerStateFlow = playerScreenViewModel.playerStateFlow,
                     playerMVI = playerMVI,
                     playbackPosition = playerScreenViewModel.videoPlaybackPosition,
-                    bottomNavigation = {
-                        BlueTubeBottomNavigation(
-                            currentDestinationName = getCurrentNavKey(backStack.lastOrNull()).name,
-                            navigateToVideo = { backStack.add(ScreenType.VideoList()) },
-                            navigateToShorts = { backStack.add(ScreenType.ShortsScreen) },
-                            navigateToSettings = { backStack.add(ScreenType.SettingsScreen) }
-                        )
-                    },
                     modifier = modifier
                 )
             }
@@ -133,25 +125,9 @@ fun YouTubeNavigation(
             entry<ScreenType.SettingsScreen> { key: ScreenType.SettingsScreen ->
                 SettingsScreen(
                     modifier = modifier,
-                    bottomNavigation = {
-                        BlueTubeBottomNavigation(
-                            currentDestinationName = getCurrentNavKey(backStack.lastOrNull()).name,
-                            navigateToVideo = { backStack.add(ScreenType.VideoList()) },
-                            navigateToShorts = { backStack.add(ScreenType.ShortsScreen) },
-                            navigateToSettings = { backStack.add(ScreenType.SettingsScreen) }
-                        )
-                    }
+                    bottomNavigation = { BlueTubeBottomNavigation(backStack = backStack) }
                 )
             }
         }
     )
-}
-
-private fun getCurrentNavKey(lastNavigationKey: NavKey?): ScreenType {
-    return when (lastNavigationKey) {
-        is ScreenType.VideoList -> lastNavigationKey
-        is ScreenType.ShortsScreen -> lastNavigationKey
-        is ScreenType.PlayerScreen -> lastNavigationKey
-        else -> lastNavigationKey as ScreenType.SettingsScreen
-    }
 }

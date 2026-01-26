@@ -21,7 +21,7 @@
     <string name="video_statistics">video statistics</string>
 
 <!--    Video List-->
-    <string name="video_list_description">video list</string>
+    <string name="video_list_description">list with video thumbnails with information</string>
 
 <!--    Common screen-->
     <string name="common_error_compos_desc">Common error composable desc</string>

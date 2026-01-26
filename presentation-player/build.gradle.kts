@@ -54,6 +54,7 @@ dependencies {
 
     implementation(project(":domain"))
     testImplementation(project(":common-test"))
+    androidTestImplementation(project(":test_common:ui_test"))
     implementation(project(":presentation-common"))
 
     implementation(libs.androidx.core.ktx)
@@ -83,6 +84,9 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.ksp.hilt.compiler)
     implementation(libs.hilt.navigation)
+
+    //navigation
+    implementation(libs.nav3.runtime)
 
     //Paging
     implementation(libs.paging)

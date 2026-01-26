@@ -12,5 +12,6 @@ data class PlayerState(
     val isVideoPlaying: Boolean = true,
     val playerOrientationState: OrientationState = OrientationState.PORTRAIT,
     val fullscreenWidgetIsClicked: Boolean = false,
-    val networkConnectivityStatus: NetworkConnectivityStatus = NetworkConnectivityStatus.Available
+    val networkConnectivityStatus: NetworkConnectivityStatus = NetworkConnectivityStatus.Available,
+    val isOrientationApproved: Boolean = false
 )

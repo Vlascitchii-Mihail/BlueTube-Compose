@@ -2,28 +2,27 @@ package com.vlascitchii.presentation_player.screen_player
 
 import android.content.Context
 import androidx.lifecycle.Lifecycle
-import androidx.paging.PagingData
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.PlayerConstants
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.options.IFramePlayerOptions
-import com.vlascitchii.presentation_common.model.videos.YoutubeVideoUiModel
-import com.vlascitchii.presentation_common.ui.screen.CommonMVI
-import com.vlascitchii.presentation_common.ui.state.UiState
+import com.vlascitchii.presentation_common.ui.screen.mvi.CommonMVI
 import com.vlascitchii.presentation_player.databinding.FragmentPlayVideoBinding
+import com.vlascitchii.presentation_player.screen_player.orientation.PlayerOrientationHandler
 import com.vlascitchii.presentation_player.screen_player.state.PlayerActionState
 import com.vlascitchii.presentation_player.screen_player.state.PlayerNavigationEvent
-import kotlinx.coroutines.flow.Flow
+import com.vlascitchii.presentation_player.screen_player.state.PlayerState
+import kotlinx.coroutines.flow.StateFlow
 
 class YouTubePlayerInitializer(
     private val binding: FragmentPlayVideoBinding,
     private val localContext: Context,
     private val currentComposeLifecycle: Lifecycle,
     private val videoId: String,
-    private val playerMVI: CommonMVI<YoutubeVideoUiModel, UiState<Flow<PagingData<YoutubeVideoUiModel>>>, PlayerActionState, PlayerNavigationEvent>,
-    private val isVideoPlays: Boolean,
+    private val playerMVI: CommonMVI<PlayerActionState, PlayerNavigationEvent>,
+    private val playerStateFlow: StateFlow<PlayerState>,
     private val currentPlaybackPosition: Float,
-    private val orientationHandler: OrientationHandler,
+//    private val playerOrientationHandler: PlayerOrientationHandler,
 ) {
 
     var player: YouTubePlayer? = null
@@ -49,10 +48,7 @@ class YouTubePlayerInitializer(
             override fun onReady(youTubePlayer: YouTubePlayer) {
                 player = youTubePlayer
 
-                orientationHandler.toFullScreenIfIsFullScreenState(player)
-//                orientationHandler.setOnFullscreenClickListener(player)
-
-                when (isVideoPlays) {
+                when (playerStateFlow.value.isVideoPlaying) {
                     true -> youTubePlayer.loadVideo(videoId, currentPlaybackPosition)
                     false -> youTubePlayer.cueVideo(videoId, currentPlaybackPosition)
                 }
