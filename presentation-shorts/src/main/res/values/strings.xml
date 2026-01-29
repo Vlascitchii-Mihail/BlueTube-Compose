@@ -2,5 +2,6 @@
 <resources>
     <!--Shorts Screen-->
     <string name="channel_description">Channel name is </string>
+    <string name="shorts_screen_description">The screen with  short vertical videos</string>
 
 </resources>

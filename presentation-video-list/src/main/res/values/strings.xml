@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="video_list_screen_description">Screen with a video thumbnails list</string>
+
     <!--    AppBar-->
     <string name="appbar_title">BlueTube</string>
     <string name="appbar_logo_descr">Blue Tube Icon</string>

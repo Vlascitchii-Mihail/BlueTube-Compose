@@ -6,5 +6,5 @@
     <string name="video_player_description">video player</string>
     <string name="video_content_description">information area about the video</string>
 
-    <string name="youTube_video_player">video_player_description</string>
+    <string name="player_screen_description">Screen that plays video</string>
 </resources>
