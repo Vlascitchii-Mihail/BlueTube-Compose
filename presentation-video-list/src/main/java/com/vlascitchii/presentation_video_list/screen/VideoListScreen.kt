@@ -27,7 +27,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.PagingData
-import com.vlascitchii.presentation_common.R
+import com.vlascitchii.presentation_common.R as RCommon
+import com.vlascitchii.presentation_video_list.R as RVideoListScreen
 import com.vlascitchii.presentation_common.model.videos.YoutubeVideoUiModel
 import com.vlascitchii.presentation_common.model.videos.YoutubeVideoUiModel.Companion.PREVIEW_VIDEO_LIST
 import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityStatus
@@ -43,6 +44,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flowOf
+
+const val VIDEO_LIST_BOTTOM_NAV_NAME = "Video list"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,7 +65,7 @@ fun VideoListScreen(
         if (networkConnectivityStatus == NetworkConnectivityStatus.Lost) {
             SnackBarController.sendEvent(
                 event = SnackBarEvent(
-                    message = localContext.getString(R.string.wrong_internet_connection)
+                    message = localContext.getString(RCommon.string.wrong_internet_connection)
                 )
             )
         }
@@ -75,7 +78,8 @@ fun VideoListScreen(
         modifier = modifier
             .background(MaterialTheme.colorScheme.background)
             .nestedScroll(scrollBehavior.nestedScrollConnection)
-            .fillMaxSize(),
+            .fillMaxSize()
+            .semantics { contentDescription = localContext.getString(RVideoListScreen.string.video_list_screen_description )},
         topBar = {
             listScreenAppBar.invoke()
         },
@@ -89,7 +93,7 @@ fun VideoListScreen(
             SnackbarHost(
                 modifier = Modifier
                     .semantics {
-                        contentDescription = localContext.getString(R.string.snackbar_description)
+                        contentDescription = localContext.getString(RCommon.string.snackbar_description)
                     },
                 hostState = snackbarHostState
             )

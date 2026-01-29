@@ -14,6 +14,8 @@ import androidx.compose.ui.semantics.semantics
 import com.vlascitchii.presentation_common.ui.TextBodyLargeCentered
 import com.vlascitchii.presenttion_settings.R
 
+const val SETTINGS_BOTTOM_NAV_NAME: String = "Settings"
+
 @Composable
 fun SettingsScreen(
     modifier: Modifier = Modifier,
