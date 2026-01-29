@@ -1,17 +1,14 @@
 package com.vlascitchii.presentation_player.screen_player.screen
 
-import androidx.navigation3.runtime.NavBackStack
-import androidx.navigation3.runtime.NavKey
-import com.vlascitchii.presentation_common.model.videos.YoutubeVideoUiModel
-import com.vlascitchii.presentation_common.ui.screen.ScreenType
 import com.vlascitchii.presentation_common.ui.screen.mvi.CommonMVI
+import com.vlascitchii.presentation_common.ui.state.UiSingleEvent
 import com.vlascitchii.presentation_player.screen_player.state.PlayerActionState
 import com.vlascitchii.presentation_player.screen_player.state.PlayerNavigationEvent
 import kotlinx.coroutines.CoroutineScope
 
 class PlayerMVI(
     private val videoPlayerViewModel: VideoPlayerViewModel,
-    private val backStack: NavBackStack<NavKey>,
+    private val navigationHandler: (UiSingleEvent) -> Unit,
     coroutineScope: CoroutineScope
 ) : CommonMVI<PlayerActionState, PlayerNavigationEvent>(
     coroutineScope,
@@ -27,14 +24,6 @@ class PlayerMVI(
     }
 
     override fun handleNavigationEvent(singleEvent: PlayerNavigationEvent) {
-        when(singleEvent) {
-            is PlayerNavigationEvent.NavigationPlayerScreenEvent -> navigateToPlayerScreen(singleEvent.video)
-            PlayerNavigationEvent.PopBackStackEvent -> backStack.removeLastOrNull()
-        }
-    }
-
-    private fun navigateToPlayerScreen(video: YoutubeVideoUiModel) {
-        backStack.removeLastOrNull()
-        backStack.add(ScreenType.PlayerScreen(video))
+        navigationHandler.invoke(singleEvent)
     }
 }

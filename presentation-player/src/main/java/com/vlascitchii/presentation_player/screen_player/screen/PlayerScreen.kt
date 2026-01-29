@@ -13,6 +13,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -46,6 +47,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flowOf
 import com.vlascitchii.presentation_common.R as CommonR
 
+const val VIDEO_PLAYER_BOTTOM_NAV_NAME = "Video player"
+
 @Composable
 fun PlayerScreen(
     video: YoutubeVideoUiModel,
@@ -57,6 +60,7 @@ fun PlayerScreen(
 ) {
 
     val youTubePlayerDescription = stringResource(R.string.video_player_description)
+    val localContext = LocalContext.current
 
     playerStateFlow.collectAsStateWithLifecycle().value.let { playerUiState: PlayerState ->
         if (playerUiState.relatedVideoState == UiState.Loading) playerMVI.submitAction(
@@ -71,6 +75,7 @@ fun PlayerScreen(
                     .fillMaxSize()
                     .statusBarsPadding()
             else modifier.fillMaxSize()
+                .semantics { contentDescription = localContext.getString(R.string.player_screen_description)}
         ) {
             if (isPreview) CreatePlayerPreview(isPortrait, modifier)
             else YoutubeVideoPlayer(

@@ -126,7 +126,6 @@ class PlayerScreenActivityTest {
     fun playerScreen_updates_when_playerStateFlow_changes() {
         with(composeActivityTestRule) {
             onNodeWithContentDescription(videoPlayerDescription).assertIsDisplayed()
-            onNodeWithContentDescription(videoPlayerDescription).assertIsDisplayed()
             onNodeWithContentDescription(videoContentDescription).assertIsDisplayed()
             onNodeWithContentDescription(circularProgressIndicatorDescription).assertIsDisplayed()
             onNodeWithContentDescription(bottomNavigationDescription).assertDoesNotExist()

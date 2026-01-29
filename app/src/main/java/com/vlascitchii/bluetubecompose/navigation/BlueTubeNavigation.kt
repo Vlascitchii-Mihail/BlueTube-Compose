@@ -1,6 +1,5 @@
 package com.vlascitchii.bluetubecompose.navigation
 
-import android.util.Log
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -18,13 +17,14 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
-import com.vlascitchii.presentation_player.screen_player.screen.PlayerMVI
-import com.vlascitchii.presentation_common.model.videos.YoutubeVideoUiModel
 import com.vlascitchii.bluetubecompose.navigation.bottom_navigation.BlueTubeBottomNavigation
-import com.vlascitchii.presentation_common.ui.screen.ScreenType
+import com.vlascitchii.presentation_common.model.videos.YoutubeVideoUiModel
+import com.vlascitchii.presentation_common.ui.state.UiSingleEvent
 import com.vlascitchii.presentation_common.ui.video_list.YouTubeVideoList
+import com.vlascitchii.presentation_player.screen_player.screen.PlayerMVI
 import com.vlascitchii.presentation_player.screen_player.screen.PlayerScreen
 import com.vlascitchii.presentation_player.screen_player.screen.VideoPlayerViewModel
+import com.vlascitchii.presentation_player.screen_player.state.PlayerNavigationEvent
 import com.vlascitchii.presentation_shorts.screen_shorts.screen.ShortsScreen
 import com.vlascitchii.presentation_shorts.screen_shorts.screen.ShortsViewModel
 import com.vlascitchii.presentation_video_list.screen.VideoListScreen
@@ -37,10 +37,16 @@ import com.vlascitchii.presenttion_settings.screen_settings.SettingsScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun YouTubeNavigation(
-    modifier: Modifier = Modifier
+fun BlueTubeNavigation(
+    modifier: Modifier = Modifier,
+    backStack: NavBackStack<NavKey> = rememberNavBackStack(ScreenType.VideoList())
 ) {
-    val backStack: NavBackStack<NavKey> = rememberNavBackStack(ScreenType.VideoList())
+
+    val navigationHandler: (UiSingleEvent) -> Unit = { navEvent: UiSingleEvent ->
+        when (navEvent) {
+            is PlayerNavigationEvent -> handlePlayerNavEvent(navEvent, backStack)
+        }
+    }
 
     NavDisplay(
         backStack = backStack,
@@ -99,7 +105,7 @@ fun YouTubeNavigation(
                 val playerScreenViewModel: VideoPlayerViewModel = hiltViewModel()
                 val playerMVI = PlayerMVI(
                     videoPlayerViewModel = playerScreenViewModel,
-                    backStack = backStack,
+                    navigationHandler = navigationHandler,
                     coroutineScope = playerScreenViewModel.viewModelScope
                 )
                 val video = key.video
@@ -130,4 +136,14 @@ fun YouTubeNavigation(
             }
         }
     )
+}
+
+private fun handlePlayerNavEvent(singlePlayerEvent: PlayerNavigationEvent, backStack: NavBackStack<NavKey>) {
+    when(singlePlayerEvent) {
+        is PlayerNavigationEvent.NavigationPlayerScreenEvent -> {
+            backStack.removeLastOrNull()
+            backStack.add(ScreenType.PlayerScreen(singlePlayerEvent.video))
+        }
+        is PlayerNavigationEvent.PopBackStackEvent -> backStack.removeLastOrNull()
+    }
 }

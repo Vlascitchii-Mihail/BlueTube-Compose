@@ -2,16 +2,12 @@
 
 package com.vlascitchii.presentation_player.screen_player.mvi
 
-import androidx.navigation3.runtime.NavBackStack
-import androidx.navigation3.runtime.NavKey
 import com.vlascitchii.common_test.rule.DispatcherTestRule
-import com.vlascitchii.presentation_common.model.videos.YoutubeVideoUiModel
-import com.vlascitchii.presentation_common.ui.screen.ScreenType
+import com.vlascitchii.presentation_common.ui.state.UiSingleEvent
 import com.vlascitchii.presentation_player.screen_player.OrientationState
 import com.vlascitchii.presentation_player.screen_player.screen.PlayerMVI
 import com.vlascitchii.presentation_player.screen_player.screen.VideoPlayerViewModel
 import com.vlascitchii.presentation_player.screen_player.state.PlayerActionState
-import com.vlascitchii.presentation_player.screen_player.state.PlayerNavigationEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -29,13 +25,13 @@ class PlayerMVITest {
     val dispatcherTestRule = DispatcherTestRule()
 
     private val viewModelPlayer: VideoPlayerViewModel = mock()
-    private val backStack: NavBackStack<NavKey> = mock()
+    private val navigationHandler: (UiSingleEvent) -> Unit = { event: UiSingleEvent -> }
     private lateinit var playerMVI: PlayerMVI
 
     @Before
     fun setup() {
         playerMVI =
-            PlayerMVI(viewModelPlayer, backStack, CoroutineScope(dispatcherTestRule.testDispatcher))
+            PlayerMVI(viewModelPlayer, navigationHandler, CoroutineScope(dispatcherTestRule.testDispatcher))
     }
 
     @Test
@@ -90,34 +86,6 @@ class PlayerMVITest {
         advanceUntilIdle()
 
         verify(viewModelPlayer).updatePlayerOrientationState(orientationState)
-        job.cancel()
-    }
-
-    @Test
-    fun `submitSingleNavigationEvent(EVENT) calls navigateToPlayerScreen`() = runTest {
-        val youTubeVideo: YoutubeVideoUiModel = YoutubeVideoUiModel()
-        val job = launch {
-            val navigationPlayerScreenEvent = PlayerNavigationEvent.NavigationPlayerScreenEvent(youTubeVideo)
-            playerMVI.submitSingleNavigationEvent(navigationPlayerScreenEvent)
-        }
-
-        advanceUntilIdle()
-
-        verify(backStack).removeLastOrNull()
-        verify(backStack).add(ScreenType.PlayerScreen(youTubeVideo))
-        job.cancel()
-    }
-
-    @Test
-    fun `submitSingleNavigationEvent(EVENT) calls backStack removeLastOrNull`() = runTest {
-        val job = launch {
-            val popBackStackEvent = PlayerNavigationEvent.PopBackStackEvent
-            playerMVI.submitSingleNavigationEvent(popBackStackEvent)
-        }
-
-        advanceUntilIdle()
-
-        verify(backStack).removeLastOrNull()
         job.cancel()
     }
 }
