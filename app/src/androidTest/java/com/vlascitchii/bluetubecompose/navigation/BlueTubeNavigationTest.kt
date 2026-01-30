@@ -21,11 +21,11 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.spy
-import com.vlascitchii.presentation_common.R as RCommon
-import com.vlascitchii.presentation_player.R as RPlayer
-import com.vlascitchii.presentation_shorts.R as RShorts
-import com.vlascitchii.presentation_video_list.R as RVideoList
-import com.vlascitchii.presenttion_settings.R as RSettings
+import com.vlascitchii.common_ui.R as RCommon
+import com.vlascitchii.player_screen.R as RPlayer
+import com.vlascitchii.shorts_screen.R as RShorts
+import com.vlascitchii.video_list_screen.R as RVideoList
+import com.vlascitchii.settings_screen.R as RSettings
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
