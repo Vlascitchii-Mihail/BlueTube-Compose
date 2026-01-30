@@ -17,7 +17,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import com.vlascitchii.bluetubecompose.navigation.ScreenType
-import com.vlascitchii.presentation_common.R
+import com.vlascitchii.common_ui.R
 import com.vlascitchii.presentation_common.ui.theme.BlueTubeComposeTheme
 import com.vlascitchii.presentation_shorts.screen_shorts.screen.SHORTS_BOTTOM_NAV_NAME
 import com.vlascitchii.presentation_video_list.screen.VIDEO_LIST_BOTTOM_NAV_NAME
