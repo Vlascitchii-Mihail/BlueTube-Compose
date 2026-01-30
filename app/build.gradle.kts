@@ -77,15 +77,15 @@ android {
 }
 
 dependencies {
-    implementation(project(":presentation-settings"))
-    implementation(project(":presentation-video-list"))
-    implementation(project(":presentation-shorts"))
-    implementation(project(":presentation-player"))
-    implementation(project(":presentation-common"))
-    implementation(project(":domain"))
-    implementation(project(":data-repository"))
-    implementation(project(":data-remote"))
-    implementation(project(":data-local"))
+    implementation(project(":feature:settings_screen"))
+    implementation(project(":feature:video_list_screen"))
+    implementation(project(":feature:shorts_screen"))
+    implementation(project(":feature:player_screen"))
+    implementation(project(":feature:common_ui"))
+    implementation(project(":domain:domain_video"))
+    implementation(project(":repository:repository_video"))
+    implementation(project(":data:remote_source"))
+    implementation(project(":data:local_source"))
 
     //core
     implementation(libs.androidx.core.ktx)
