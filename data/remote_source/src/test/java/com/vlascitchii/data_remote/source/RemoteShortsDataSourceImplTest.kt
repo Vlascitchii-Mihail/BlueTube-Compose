@@ -16,7 +16,7 @@ import com.vlascitchii.data_remote.util.MockWebServerApiProvider
 import com.vlascitchii.data_remote.util.MockWebServerScheduler
 import com.vlascitchii.data_remote.util.SEARCH_RESPONSE_PATH
 import com.vlascitchii.data_remote.util.VIDEO_LIST_RESPONSE_PATH
-import com.vlascitchii.data_repository.data_source.remote.RemoteShortsDataSource
+import com.vlascitchii.data_repository.data_source.remote.RemoteVideoListDataSource
 import com.vlascitchii.domain.model.videos.YoutubeVideoResponseDomain
 import com.vlascitchii.domain.util.UseCaseException
 import kotlinx.coroutines.test.runTest
@@ -39,7 +39,7 @@ class RemoteShortsDataSourceImplTest {
     private lateinit var mockWebServerApiProvider: MockWebServerApiProvider
     private lateinit var mockShortsApiService: ShortsApiService
     private lateinit var mockWebServerScheduler: MockWebServerScheduler
-    private lateinit var remoteShortsDataSource: RemoteShortsDataSource
+    private lateinit var remoteShortsDataSource: RemoteVideoListDataSource
     val testPageToken = ""
 
     @Before
@@ -67,7 +67,7 @@ class RemoteShortsDataSourceImplTest {
     @Test
     fun `fetchShorts() returns YoutubeVideoResponseDomain`() = runTest {
         initMockApiResponse()
-        val actualResult: YoutubeVideoResponseDomain = remoteShortsDataSource.fetchShorts(testPageToken)
+        val actualResult: YoutubeVideoResponseDomain = remoteShortsDataSource.fetchVideos(testPageToken)
 
         DOMAIN_RESPONSE_VIDEO_WITH_CHANNEL_IMG.items.assertListEqualsTo(actualResult.items)
         assertEquals(DOMAIN_RESPONSE_VIDEO_WITH_CHANNEL_IMG.nextPageToken, actualResult.nextPageToken)
@@ -78,14 +78,14 @@ class RemoteShortsDataSourceImplTest {
     fun `fetchShorts() throws UseCaseException VideoListLoadException`() = runTest {
         mockWebServerScheduler.generateMockResponseFrom("", ERROR_CODE)
 
-        remoteShortsDataSource.fetchShorts(testPageToken)
+        remoteShortsDataSource.fetchVideos(testPageToken)
     }
 
     @Test
     fun `verify ShortsApiService fetchShorts() was called with correct arguments`() = runTest {
         initMockApiResponse()
 
-        remoteShortsDataSource.fetchShorts(testPageToken)
+        remoteShortsDataSource.fetchVideos(testPageToken)
 
         verify(mockShortsApiService).fetchShorts(
             part = SNIPPET,

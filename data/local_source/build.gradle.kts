@@ -64,6 +64,10 @@ dependencies {
     testImplementation(libs.mockito.inline)
     testImplementation(libs.test.coroutines)
 
+    //hilt testing
+    androidTestImplementation(libs.android.hilt.test)
+    kspAndroidTest(libs.ksp.hilt.android.test)
+
     //android tests
     androidTestImplementation(libs.test.arch.core)
     androidTestImplementation(libs.androidx.test.ext)

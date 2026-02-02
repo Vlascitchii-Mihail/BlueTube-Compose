@@ -5,9 +5,14 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import com.vlascitchii.domain.custom_scope.CustomCoroutineScope
+import com.vlascitchii.domain.di_common.VIDEO_LIST_CONVERTER
+import com.vlascitchii.domain.di_common.VIDEO_LIST_USE_CASE
+import com.vlascitchii.domain.usecase.UseCase
 import com.vlascitchii.domain.usecase.VideoListUseCase
 import com.vlascitchii.domain.util.VideoResult
+import com.vlascitchii.presentation_common.model.util.CommonResultConverter
 import com.vlascitchii.presentation_common.model.videos.YoutubeVideoUiModel
+import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityAbstraction
 import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityObserver
 import com.vlascitchii.presentation_common.ui.screen.CommonVideoViewModel
 import com.vlascitchii.presentation_common.ui.state.UiAction
@@ -22,14 +27,17 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import javax.inject.Named
 
 private const val INITIAL_CURSOR_POSITION = 0
 
 @HiltViewModel
 class VideoListViewModel @Inject constructor(
-    private val videoListUseCase: VideoListUseCase,
-    private val videoListConverter: VideoListConverter,
-    private val networkConnectivityObserver: NetworkConnectivityObserver,
+    @param:Named(VIDEO_LIST_USE_CASE)
+    private val videoListUseCase: UseCase<VideoListUseCase.VideoListRequest, VideoListUseCase.VideoListResponse>,
+    @param:Named(VIDEO_LIST_CONVERTER)
+    private val videoListConverter: CommonResultConverter<VideoListUseCase.VideoListResponse, @JvmSuppressWildcards Flow<PagingData<YoutubeVideoUiModel>>>,
+    private val networkConnectivityObserver: NetworkConnectivityAbstraction,
     private val customCoroutineScope: CustomCoroutineScope
 ) : CommonVideoViewModel<YoutubeVideoUiModel, UiState<Flow<PagingData<YoutubeVideoUiModel>>>, UiAction>(
     networkConnectivityObserver, customCoroutineScope

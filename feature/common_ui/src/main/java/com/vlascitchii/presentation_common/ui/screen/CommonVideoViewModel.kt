@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import com.vlascitchii.domain.custom_scope.CustomCoroutineScope
+import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityAbstraction
 import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityObserver
 import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityStatus
 import com.vlascitchii.presentation_common.ui.state.UiAction
@@ -15,7 +16,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 abstract class CommonVideoViewModel<DATA_MODEL: Any, STATE: UiState<Flow<PagingData<DATA_MODEL>>>, ACTION: UiAction>(
-    private val networkConnectivityObserver: NetworkConnectivityObserver,
+    private val networkConnectivityObserver: NetworkConnectivityAbstraction,
     private val customCoroutineScope: CustomCoroutineScope,
 ) : ViewModel() {
 

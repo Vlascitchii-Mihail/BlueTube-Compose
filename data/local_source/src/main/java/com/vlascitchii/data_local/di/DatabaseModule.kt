@@ -32,7 +32,4 @@ object DatabaseModule {
     @Provides
     fun provideDatabaseContentManager(youTubeVideoDao: YouTubeVideoDao) =
         DatabaseContentManager(youTubeVideoDao)
-
-    @Provides
-    fun provideCustomCoroutineScope(): CustomCoroutineScope = CustomCoroutineScope()
 }

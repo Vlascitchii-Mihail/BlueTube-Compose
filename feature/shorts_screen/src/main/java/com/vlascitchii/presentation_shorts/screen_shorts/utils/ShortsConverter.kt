@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class ShortsConverter @Inject constructor()
-    : CommonResultConverter<ShortsUseCase.ShortsResponse, Flow<PagingData<YoutubeVideoUiModel>>>() {
+    : CommonResultConverter<ShortsUseCase.ShortsResponse, @JvmSuppressWildcards Flow<PagingData<YoutubeVideoUiModel>>>() {
 
     override fun convertSuccess(data: ShortsUseCase.ShortsResponse): Flow<PagingData<YoutubeVideoUiModel>> {
         return convertPager(data.shortsPopularVideoPagingData)

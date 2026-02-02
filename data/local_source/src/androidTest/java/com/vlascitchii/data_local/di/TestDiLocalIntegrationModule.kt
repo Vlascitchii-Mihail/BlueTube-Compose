@@ -1,10 +1,9 @@
-package com.vlascitchii.bluetubecompose.di_mock_api
+package com.vlascitchii.data_local.di
 
 import android.content.Context
 import androidx.room.Room
 import com.vlascitchii.data_local.database.YouTubeDatabase
 import com.vlascitchii.data_local.database.YouTubeVideoDao
-import com.vlascitchii.data_local.di.DatabaseModule
 import com.vlascitchii.data_local.source.utils.DatabaseContentManager
 import com.vlascitchii.domain.custom_scope.CustomCoroutineScope
 import dagger.Module
@@ -19,7 +18,7 @@ import javax.inject.Singleton
     components = [SingletonComponent::class],
     replaces = [DatabaseModule::class]
 )
-object TestDiIntegrationModule {
+object TestDiLocalIntegrationModule {
 
     @Singleton
     @Provides
@@ -38,6 +37,6 @@ object TestDiIntegrationModule {
     fun provideFakeDatabaseContentManager(youTubeVideoDao: YouTubeVideoDao) =
         DatabaseContentManager(youTubeVideoDao)
 
-    @Provides
-    fun provideCustomCoroutineScope(): CustomCoroutineScope = CustomCoroutineScope()
+//    @Provides
+//    fun provideCustomCoroutineScope(): CustomCoroutineScope = CustomCoroutineScope()
 }

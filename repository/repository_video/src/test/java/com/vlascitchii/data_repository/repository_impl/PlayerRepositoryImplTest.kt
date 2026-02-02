@@ -80,6 +80,6 @@ class PlayerRepositoryImplTest {
         testJob.cancel()
 
         assertTrue(testPagingDomainYouTubeVideoDiffer.snapshot().isNotEmpty())
-        verify(localVideoListDataSource).insertVideosToDatabaseWithTimeStamp(any(), any())
+        verify(localVideoListDataSource).insertVideosWithTimeStamp(any(), any())
     }
 }

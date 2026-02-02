@@ -7,8 +7,9 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import javax.inject.Inject
 
-class NetworkConnectivityObserver(
+class NetworkConnectivityObserver @Inject constructor(
     var systemConnectivityManager: ConnectivityManager
 ) : NetworkConnectivityAbstraction {
 
