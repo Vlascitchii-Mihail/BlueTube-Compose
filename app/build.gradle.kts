@@ -139,7 +139,7 @@ dependencies {
 
     //unit test
     testImplementation(libs.junit)
-//    testImplementation(libs.mockito)
+    testImplementation(libs.mockito)
     testImplementation(libs.mockito.inline)
     testImplementation(libs.test.coroutines)
 

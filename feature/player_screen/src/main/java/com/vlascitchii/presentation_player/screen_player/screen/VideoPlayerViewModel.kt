@@ -4,9 +4,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import com.vlascitchii.domain.custom_scope.CustomCoroutineScope
+import com.vlascitchii.domain.di_common.PLAYER_CONVERTER
+import com.vlascitchii.domain.di_common.VIDEO_PLAYER_USE_CASE
+import com.vlascitchii.domain.usecase.UseCase
 import com.vlascitchii.domain.usecase.VideoPlayerUseCase
 import com.vlascitchii.domain.util.VideoResult
+import com.vlascitchii.presentation_common.model.util.CommonResultConverter
 import com.vlascitchii.presentation_common.model.videos.YoutubeVideoUiModel
+import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityAbstraction
 import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityObserver
 import com.vlascitchii.presentation_common.ui.state.UiState
 import com.vlascitchii.presentation_common.utils.combineSix
@@ -22,14 +27,17 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import javax.inject.Named
 
 private const val INITIAL_VIDEO_PLAYBACK_POSITION = 0F
 
 @HiltViewModel
 class VideoPlayerViewModel @Inject constructor(
-    private val videoPlayerUseCase: VideoPlayerUseCase,
-    private val videoPlayerConverter: VideoPlayerConverter,
-    private val networkConnectivityObserver: NetworkConnectivityObserver,
+    @param:Named(VIDEO_PLAYER_USE_CASE)
+    private val videoPlayerUseCase: UseCase<VideoPlayerUseCase.PlayerRequest, VideoPlayerUseCase.PlayerResponse>,
+    @param:Named(PLAYER_CONVERTER)
+    private val videoPlayerConverter: CommonResultConverter<VideoPlayerUseCase.PlayerResponse, @JvmSuppressWildcards Flow<PagingData<YoutubeVideoUiModel>>>,
+    private val networkConnectivityObserver: NetworkConnectivityAbstraction,
     private val customCoroutineScope: CustomCoroutineScope
 ) : ViewModel() {
 

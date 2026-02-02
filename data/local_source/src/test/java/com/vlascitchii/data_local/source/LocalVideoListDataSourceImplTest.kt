@@ -25,13 +25,13 @@ class LocalVideoListDataSourceImplTest {
         VideoCoroutineScope(dispatcher = dispatcherTestRule.testDispatcher)
     private val databaseContentManager: DatabaseContentManager = mock()
     private val localVideoListDataSource: LocalVideoListDataSource =
-        LocalVideoListDataSourceImpl(videoCoroutineScope, databaseContentManager)
+        DatabaseVideoSourceImpl(videoCoroutineScope, databaseContentManager)
     private val testDataRemoteResponse =
         DOMAIN_RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.convertToLocalYoutubeVideoResponseEntity()
 
     @Test
     fun `LocalVideoListDataSourceImpl calls fun setCurrentPageTokenToVideos() from DatabaseContentManager`() {
-        localVideoListDataSource.insertVideosToDatabaseWithTimeStamp(
+        localVideoListDataSource.insertVideosWithTimeStamp(
             DOMAIN_RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG,
             testDateTime
         )
@@ -43,7 +43,7 @@ class LocalVideoListDataSourceImplTest {
 
     @Test
     fun `fun insertPageFrom() is called in DatabaseContentManager`() = runTest {
-        localVideoListDataSource.insertVideosToDatabaseWithTimeStamp(
+        localVideoListDataSource.insertVideosWithTimeStamp(
             DOMAIN_RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG,
             testDateTime
         )
@@ -57,7 +57,7 @@ class LocalVideoListDataSourceImplTest {
 
     @Test
     fun `deleteExtraVideos() is called from LocalVideoListDataSourceImpl`() = runTest {
-        localVideoListDataSource.insertVideosToDatabaseWithTimeStamp(
+        localVideoListDataSource.insertVideosWithTimeStamp(
             DOMAIN_RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG,
             testDateTime
         )
@@ -68,7 +68,7 @@ class LocalVideoListDataSourceImplTest {
 
     @Test
     fun `updateCurrentPageToken() updates sourceCurrentPageToken in DatabaseContentManager`() {
-        localVideoListDataSource.insertVideosToDatabaseWithTimeStamp(
+        localVideoListDataSource.insertVideosWithTimeStamp(
             DOMAIN_RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG,
             testDateTime
         )

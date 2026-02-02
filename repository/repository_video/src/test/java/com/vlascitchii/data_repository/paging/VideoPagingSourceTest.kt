@@ -113,7 +113,7 @@ class VideoPagingSourceTest {
 
         videoPagingSource.load(refreshLoadParamsRequest)
 
-        verify(localVideoListDataSource).insertVideosToDatabaseWithTimeStamp(
+        verify(localVideoListDataSource).insertVideosWithTimeStamp(
             any<YoutubeVideoResponseDomain>(),
             any<OffsetDateTime>()
         )
