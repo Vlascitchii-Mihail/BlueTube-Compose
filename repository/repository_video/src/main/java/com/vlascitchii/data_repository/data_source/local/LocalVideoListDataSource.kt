@@ -6,10 +6,10 @@ import java.time.OffsetDateTime
 
 interface LocalVideoListDataSource {
 
-    suspend fun insertVideosToDatabaseWithTimeStamp(
+    suspend fun insertVideosWithTimeStamp(
         youTubeVideoResponse: YoutubeVideoResponseDomain,
         loadDate: OffsetDateTime
     )
 
-    fun  getVideosFromDatabase(pageToken: String): Flow<YoutubeVideoResponseDomain>
+    fun  getVideosFromStore(pageToken: String): Flow<YoutubeVideoResponseDomain>
 }

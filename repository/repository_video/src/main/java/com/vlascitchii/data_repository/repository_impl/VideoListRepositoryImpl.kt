@@ -8,17 +8,25 @@ import com.vlascitchii.data_repository.data_source.remote.RemoteSearchDataSource
 import com.vlascitchii.data_repository.data_source.remote.RemoteVideoListDataSource
 import com.vlascitchii.data_repository.paging.VideoPagingSource
 import com.vlascitchii.domain.custom_scope.CustomCoroutineScope
+import com.vlascitchii.domain.di_common.DATABASE_SOURCE
+import com.vlascitchii.domain.di_common.REMOTE_SEARCH_VIDEO_OR_SHORTS_LIST_SOURCE
+import com.vlascitchii.domain.di_common.REMOTE_VIDEO_LIST_SOURCE
 import com.vlascitchii.domain.model.videos.YoutubeVideoDomain
 import com.vlascitchii.domain.repository.VideoListRepository
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
+import javax.inject.Named
 
 internal const val PAGING_DEFAULT_PAGE_SIZE = 5
 internal const val PREPARE_EXTRA_PAGES_MODIFIER = 3
 
-class VideoListRepositoryImpl(
+class VideoListRepositoryImpl @Inject constructor(
+    @param:Named(REMOTE_VIDEO_LIST_SOURCE)
     private val remoteVideoListDataSource: RemoteVideoListDataSource,
+    @param:Named(REMOTE_SEARCH_VIDEO_OR_SHORTS_LIST_SOURCE)
     private val remoteSearchDataSource: RemoteSearchDataSource,
-    private val localVideoListDataSource: LocalVideoListDataSource,
+    @param:Named(DATABASE_SOURCE)
+    private val databaseVideoSourceImpl: LocalVideoListDataSource,
     private val customCoroutineScope: CustomCoroutineScope
 ) : VideoListRepository {
 
@@ -32,7 +40,7 @@ class VideoListRepositoryImpl(
             config = pagerConfig,
             pagingSourceFactory = {
                 VideoPagingSource(
-                    localDataSource = localVideoListDataSource,
+                    localDataSource = databaseVideoSourceImpl,
                     customCoroutineScope = customCoroutineScope
                 ) { page: String ->
                     remoteVideoListDataSource.fetchVideos(page)
@@ -45,7 +53,7 @@ class VideoListRepositoryImpl(
             config = pagerConfig,
             pagingSourceFactory = {
                 VideoPagingSource(
-                    localDataSource = localVideoListDataSource,
+                    localDataSource = databaseVideoSourceImpl,
                     customCoroutineScope = customCoroutineScope
                 ) { page: String ->
                     remoteSearchDataSource.searchVideos(query = query, nextPageToken = page)

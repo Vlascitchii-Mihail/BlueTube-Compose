@@ -19,12 +19,12 @@ import java.time.OffsetDateTime
 import javax.inject.Inject
 import kotlin.coroutines.coroutineContext
 
-class LocalVideoListDataSourceImpl @Inject constructor(
+class DatabaseVideoSourceImpl @Inject constructor(
     private val databaseContentManager: DatabaseContentManager,
     private val customCoroutineScope: CustomCoroutineScope
 ) : LocalVideoListDataSource {
 
-    override suspend fun insertVideosToDatabaseWithTimeStamp(
+    override suspend fun insertVideosWithTimeStamp(
         youTubeVideoResponse: YoutubeVideoResponseDomain,
         loadDate: OffsetDateTime,
     ) {
@@ -50,7 +50,7 @@ class LocalVideoListDataSourceImpl @Inject constructor(
         }
     }
 
-    override fun getVideosFromDatabase(pageToken: String): Flow<YoutubeVideoResponseDomain> = flow {
+    override fun getVideosFromStore(pageToken: String): Flow<YoutubeVideoResponseDomain> = flow {
 
         with(databaseContentManager) {
             val videoResponse: Flow<YoutubeVideoResponseEntity> =

@@ -4,9 +4,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
+import com.vlascitchii.domain.di_common.SHORTS_CONVERTER
+import com.vlascitchii.domain.di_common.SHORTS_USE_CASE
 import com.vlascitchii.domain.usecase.ShortsUseCase
+import com.vlascitchii.domain.usecase.UseCase
 import com.vlascitchii.domain.util.VideoResult
+import com.vlascitchii.presentation_common.model.util.CommonResultConverter
 import com.vlascitchii.presentation_common.model.videos.YoutubeVideoUiModel
+import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityAbstraction
 import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityObserver
 import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityStatus
 import com.vlascitchii.presentation_common.ui.state.UiState
@@ -21,12 +26,15 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import javax.inject.Named
 
 @HiltViewModel
 class ShortsViewModel @Inject constructor(
-    private val shortsUseCase: ShortsUseCase,
-    private val shortsConverter: ShortsConverter,
-    private val networkConnectivityObserver: NetworkConnectivityObserver,
+    @param:Named(SHORTS_USE_CASE)
+    private val shortsUseCase: UseCase<ShortsUseCase.ShortsRequest, ShortsUseCase.ShortsResponse>,
+    @param:Named(SHORTS_CONVERTER)
+    private val shortsConverter: CommonResultConverter<ShortsUseCase.ShortsResponse, @JvmSuppressWildcards Flow<PagingData<YoutubeVideoUiModel>>>,
+    private val networkConnectivityObserver: NetworkConnectivityAbstraction,
 ) : ViewModel() {
 
     val videoQueueSize: Int = 3

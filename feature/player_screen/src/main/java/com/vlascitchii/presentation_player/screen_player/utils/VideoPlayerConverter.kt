@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class VideoPlayerConverter @Inject constructor()
-    : CommonResultConverter<VideoPlayerUseCase.PlayerResponse, Flow<PagingData<YoutubeVideoUiModel>>>() {
+    : CommonResultConverter<VideoPlayerUseCase.PlayerResponse, @JvmSuppressWildcards Flow<PagingData<YoutubeVideoUiModel>>>() {
 
     override fun convertSuccess(data: VideoPlayerUseCase.PlayerResponse): Flow<PagingData<YoutubeVideoUiModel>> {
         return convertPager(data.relatedVideoPagingData)

@@ -8,9 +8,9 @@ import com.vlascitchii.domain.usecase.util.DispatcherConfiguration
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
+import javax.inject.Inject
 
-class ShortsUseCase(
+class ShortsUseCase @Inject constructor(
     configuration: DispatcherConfiguration,
     private val shortsRepository: ShortsRepository
 ) : UseCase<ShortsUseCase.ShortsRequest, ShortsUseCase.ShortsResponse>(configuration) {

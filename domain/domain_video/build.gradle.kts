@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt.plugin)
 }
 
 //will be attached to the JVM during tests manually
@@ -49,6 +51,11 @@ dependencies {
     //Paging
     implementation(libs.paging)
     implementation(libs.paging.compose)
+
+    //dagger hilt
+    implementation(libs.hilt.android)
+    ksp(libs.ksp.hilt.compiler)
+    implementation(libs.hilt.navigation)
 
     //unit test
     testImplementation(libs.junit)

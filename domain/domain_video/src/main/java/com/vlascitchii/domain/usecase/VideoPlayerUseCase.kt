@@ -8,8 +8,9 @@ import com.vlascitchii.domain.usecase.util.DispatcherConfiguration
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import javax.inject.Inject
 
-class VideoPlayerUseCase(
+class VideoPlayerUseCase @Inject constructor(
     configuration: DispatcherConfiguration,
     private val playerRepository: PlayerRepository
 ) : UseCase<VideoPlayerUseCase.PlayerRequest, VideoPlayerUseCase.PlayerResponse>(configuration){

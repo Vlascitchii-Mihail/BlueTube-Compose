@@ -4,20 +4,20 @@ import com.vlascitchii.data_remote.model_api.search_api_model.SearchVideoRespons
 import com.vlascitchii.data_remote.model_api.video_api_model.convertToDomainYouTubeVideoResponse
 import com.vlascitchii.data_remote.networking.service.ShortsApiService
 import com.vlascitchii.data_remote.source.util.MoshiParser
-import com.vlascitchii.data_repository.data_source.remote.RemoteShortsDataSource
+import com.vlascitchii.data_repository.data_source.remote.RemoteVideoListDataSource
 import com.vlascitchii.domain.model.videos.YoutubeVideoResponseDomain
 import javax.inject.Inject
 
 class RemoteShortsDataSourceImpl @Inject constructor(
     private val shortsApiService: ShortsApiService,
     moshiParser: MoshiParser
-) : RemoteShortsDataSource,
+) : RemoteVideoListDataSource,
     RemoteBaseVideoDataSource<SearchVideoResponseApiModel>(
         baseApiService = shortsApiService,
         moshiParser = moshiParser
     ) {
 
-    override suspend fun fetchShorts(nextPageToken: String): YoutubeVideoResponseDomain {
+    override suspend fun fetchVideos(nextPageToken: String): YoutubeVideoResponseDomain {
         return fetch(fetchData = { shortsApiService.fetchShorts(nextPageToken = nextPageToken) } )
     }
 

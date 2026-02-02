@@ -1,4 +1,4 @@
-package com.vlascitchii.bluetubecompose.instrumented
+package com.vlascitchii.data_local.instrumented
 
 //import androidx.test.ext.junit.runners.AndroidJUnit4
 //import com.vlascitchii.data_local.source.LocalVideoListDataSourceImpl

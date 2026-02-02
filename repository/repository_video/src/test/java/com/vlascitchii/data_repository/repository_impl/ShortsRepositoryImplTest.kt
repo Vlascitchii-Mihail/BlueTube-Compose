@@ -32,8 +32,8 @@ class ShortsRepositoryImplTest {
     private val remoteShortsDataSource: RemoteShortsDataSource = mock()
     private val localVideoListDataSource: LocalVideoListDataSource = mock()
     private val customCoroutineScope: CustomCoroutineScope = CustomCoroutineScope(dispatcherTestRule.testDispatcher)
-    private val shortsRepositoryImpl =
-        ShortsRepositoryImpl(remoteShortsDataSource, localVideoListDataSource, customCoroutineScope)
+    private val shortsListRepositoryImpl =
+        ShortsListRepositoryImpl(remoteShortsDataSource, localVideoListDataSource, customCoroutineScope)
 
     private val initialPageToken = ""
     private val expectedResult = DOMAIN_RESPONSE_VIDEO_WITH_CHANNEL_IMG
@@ -58,7 +58,7 @@ class ShortsRepositoryImplTest {
 
     @Test
     fun `fun getShorts returns correct Flow with YoutubeVideoResponse`() = runTest {
-        val actualValue = shortsRepositoryImpl.getShorts().first()
+        val actualValue = shortsListRepositoryImpl.getShorts().first()
         val testJob = launch { testPagingDomainYouTubeVideoDiffer.submitData(actualValue) }
 
         advanceUntilIdle()
@@ -69,13 +69,13 @@ class ShortsRepositoryImplTest {
 
     @Test
     fun `fun getShorts inserts each video into the DB`() = runTest {
-        val actualValue = shortsRepositoryImpl.getShorts().first()
+        val actualValue = shortsListRepositoryImpl.getShorts().first()
         val testJob = launch { testPagingDomainYouTubeVideoDiffer.submitData(actualValue) }
 
         advanceUntilIdle()
         testJob.cancel()
 
         assertTrue(testPagingDomainYouTubeVideoDiffer.snapshot().isNotEmpty())
-        verify(localVideoListDataSource).insertVideosToDatabaseWithTimeStamp(any(), any())
+        verify(localVideoListDataSource).insertVideosWithTimeStamp(any(), any())
     }
 }
