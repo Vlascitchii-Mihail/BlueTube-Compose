@@ -15,7 +15,7 @@ abstract class UseCase<REQUEST : UseCase.CommonRequest, RESPONSE : UseCase.Commo
     interface CommonRequest
     interface CommonResponse
 
-    internal abstract fun process(request: REQUEST): Flow<RESPONSE>
+    abstract fun process(request: REQUEST): Flow<RESPONSE>
 
      fun execute(request: REQUEST): Flow<VideoResult<RESPONSE>> = process(request)
         .map { VideoResult.Success(it) as VideoResult<RESPONSE> }

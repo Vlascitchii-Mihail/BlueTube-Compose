@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
-
 class VideoListUseCase @Inject constructor(
     dispatcherConfiguration: DispatcherConfiguration,
     private val videoListRepository: VideoListRepository

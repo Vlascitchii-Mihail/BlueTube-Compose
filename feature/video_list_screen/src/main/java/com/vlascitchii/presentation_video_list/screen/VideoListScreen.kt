@@ -129,10 +129,11 @@ fun VideoListScreenPreview() {
                         updateSearchState = {}
                     )
                 },
-                videoList = {
+                videoList = { innerPadding: PaddingValues ->
                     YouTubeVideoList(
                         initVideosList = {},
                         videosFlow = previewVideoStateFlow,
+                        innerPadding = innerPadding,
                         navigateToPlayerScreen = {}
                     )
                 },
