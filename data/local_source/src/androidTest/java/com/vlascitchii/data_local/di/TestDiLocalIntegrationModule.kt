@@ -5,7 +5,6 @@ import androidx.room.Room
 import com.vlascitchii.data_local.database.YouTubeDatabase
 import com.vlascitchii.data_local.database.YouTubeVideoDao
 import com.vlascitchii.data_local.source.utils.DatabaseContentManager
-import com.vlascitchii.domain.custom_scope.CustomCoroutineScope
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -36,7 +35,4 @@ object TestDiLocalIntegrationModule {
     @Provides
     fun provideFakeDatabaseContentManager(youTubeVideoDao: YouTubeVideoDao) =
         DatabaseContentManager(youTubeVideoDao)
-
-//    @Provides
-//    fun provideCustomCoroutineScope(): CustomCoroutineScope = CustomCoroutineScope()
 }

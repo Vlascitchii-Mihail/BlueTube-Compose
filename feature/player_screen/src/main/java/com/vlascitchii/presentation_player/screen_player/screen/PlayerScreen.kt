@@ -74,6 +74,7 @@ fun PlayerScreen(
                 modifier
                     .fillMaxSize()
                     .statusBarsPadding()
+                    .semantics { contentDescription = localContext.getString(R.string.player_screen_description)}
             else modifier.fillMaxSize()
                 .semantics { contentDescription = localContext.getString(R.string.player_screen_description)}
         ) {
