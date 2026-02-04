@@ -2,7 +2,10 @@ package com.vlascitchii.presentation_player.screen_player.screen
 
 import android.content.Context
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithContentDescription
+import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.paging.PagingData
 import androidx.test.core.app.ApplicationProvider
@@ -82,14 +85,13 @@ class PlayerScreenActivityTest {
         }
     )
 
-    private val circularProgressIndicatorDescription: String =
-        context.getString(CommonR.string.circular_progress_indicator)
     private val videoPlayerDescription: String =
         context.getString(PlayerR.string.video_player_description)
     private val videoContentDescription: String =
         context.getString(PlayerR.string.video_content_description)
     private val bottomNavigationDescription: String =
         context.getString(CommonR.string.bottom_navigation_description)
+    private val videoItemDescription = context.getString(CommonR.string.video_compact_preview_description)
 
     private fun initPlayer() {
         composeActivityTestRule.setContent {
@@ -127,7 +129,7 @@ class PlayerScreenActivityTest {
         with(composeActivityTestRule) {
             onNodeWithContentDescription(videoPlayerDescription).assertIsDisplayed()
             onNodeWithContentDescription(videoContentDescription).assertIsDisplayed()
-            onNodeWithContentDescription(circularProgressIndicatorDescription).assertIsDisplayed()
+            onAllNodesWithContentDescription(videoItemDescription).onFirst().assertIsDisplayed()
             onNodeWithContentDescription(bottomNavigationDescription).assertDoesNotExist()
         }
     }
@@ -141,7 +143,7 @@ class PlayerScreenActivityTest {
 
             onNodeWithContentDescription(videoPlayerDescription).assertIsDisplayed()
             onNodeWithContentDescription(videoContentDescription).assertDoesNotExist()
-            onNodeWithContentDescription(circularProgressIndicatorDescription).assertDoesNotExist()
+            onAllNodesWithContentDescription(videoItemDescription).onFirst().assertIsNotDisplayed()
         }
     }
 
@@ -156,8 +158,7 @@ class PlayerScreenActivityTest {
             onNodeWithContentDescription(videoPlayerDescription).assertIsDisplayed()
             onNodeWithContentDescription(videoContentDescription).assertExists()
             onNodeWithContentDescription(videoContentDescription).assertIsDisplayed()
-            onNodeWithContentDescription(circularProgressIndicatorDescription).assertIsDisplayed()
-            onNodeWithContentDescription(circularProgressIndicatorDescription).assertExists()
+            onAllNodesWithContentDescription(videoItemDescription).onFirst().assertIsDisplayed()
             onNodeWithContentDescription(bottomNavigationDescription).assertDoesNotExist()
         }
     }

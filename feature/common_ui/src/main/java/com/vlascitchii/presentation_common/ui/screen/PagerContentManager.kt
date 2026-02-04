@@ -56,21 +56,23 @@ fun PagerContentManager(
     ) {
         val refreshLoadState = videoState.loadState.refresh
 
-        when (refreshLoadState) {
-            is LoadState.NotLoading -> PullToRefresh(
-                scrollableView = { contentList.invoke() },
-                onRefresh = { videoState.refresh() },
-                modifier = modifier
-            )
-
-            is LoadState.Loading -> CircularProgressIndicator(
+        when (true) {
+            (refreshLoadState is LoadState.NotLoading || videoState.itemCount > 0) -> {
+                PullToRefresh(
+                    scrollableView = {
+                        contentList.invoke()
+                    },
+                    onRefresh = { videoState.refresh() },
+                    modifier = modifier
+                )
+            }
+            (refreshLoadState is LoadState.Loading && videoState.itemCount == 0) -> CircularProgressIndicator(
                 Modifier
                     .align(Alignment.Center)
                     .height(dimensionResource(R.dimen.height_medium_48))
                     .semantics { contentDescription = circularProgressIndicatorDescription }
             )
-
-            is LoadState.Error -> {
+            else -> {
                 PaginationErrorItem(
                     errorText = castLoadState(refreshLoadState, stringResource(id = R.string.error_msg_empty_list)),
                     onRetryClick = { videoState.refresh() }

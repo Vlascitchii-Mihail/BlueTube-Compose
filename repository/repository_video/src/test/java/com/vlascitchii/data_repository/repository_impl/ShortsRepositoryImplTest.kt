@@ -5,7 +5,7 @@ import com.vlascitchii.common_test.paging.CommonTestPagingDiffer
 import com.vlascitchii.common_test.rule.DispatcherTestRule
 import com.vlascitchii.common_test.util.assertListEqualsTo
 import com.vlascitchii.data_repository.data_source.local.LocalVideoListDataSource
-import com.vlascitchii.data_repository.data_source.remote.RemoteShortsDataSource
+import com.vlascitchii.data_repository.data_source.remote.RemoteVideoListDataSource
 import com.vlascitchii.data_repository.mock_model.DOMAIN_RESPONSE_VIDEO_WITH_CHANNEL_IMG
 import com.vlascitchii.domain.custom_scope.CustomCoroutineScope
 import com.vlascitchii.domain.model.videos.YoutubeVideoDomain
@@ -29,7 +29,7 @@ class ShortsRepositoryImplTest {
     @get:Rule
     var dispatcherTestRule = DispatcherTestRule()
 
-    private val remoteShortsDataSource: RemoteShortsDataSource = mock()
+    private val remoteShortsDataSource: RemoteVideoListDataSource = mock()
     private val localVideoListDataSource: LocalVideoListDataSource = mock()
     private val customCoroutineScope: CustomCoroutineScope = CustomCoroutineScope(dispatcherTestRule.testDispatcher)
     private val shortsListRepositoryImpl =
@@ -52,7 +52,7 @@ class ShortsRepositoryImplTest {
 
     @Before
     fun init() {
-        wheneverBlocking { remoteShortsDataSource.fetchShorts(initialPageToken) }
+        wheneverBlocking { remoteShortsDataSource.fetchVideos(initialPageToken) }
             .thenReturn(expectedResult)
     }
 
