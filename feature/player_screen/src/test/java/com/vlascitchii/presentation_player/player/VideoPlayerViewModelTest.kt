@@ -10,7 +10,7 @@ import com.vlascitchii.domain.util.VideoResult
 import com.vlascitchii.presentation_common.model.videos.YoutubeVideoUiModel
 import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityObserver
 import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityStatus
-import com.vlascitchii.presentation_common.ui.state.UiState
+import com.vlascitchii.presentation_common.ui.state_common.UiState
 import com.vlascitchii.presentation_player.screen_player.OrientationState
 import com.vlascitchii.presentation_player.screen_player.screen.VideoPlayerViewModel
 import com.vlascitchii.presentation_player.screen_player.utils.VideoPlayerConverter

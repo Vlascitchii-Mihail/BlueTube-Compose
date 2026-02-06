@@ -1,6 +1,6 @@
 package com.vlascitchii.presentation_player.screen_player.state
 
-import com.vlascitchii.presentation_common.ui.state.UiAction
+import com.vlascitchii.presentation_common.ui.state_common.UiAction
 import com.vlascitchii.presentation_player.screen_player.OrientationState
 
 sealed class PlayerActionState : UiAction {

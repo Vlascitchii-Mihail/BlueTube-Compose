@@ -1,14 +1,22 @@
 package com.vlascitchii.presentation_common.ui.screen.mvi
 
 import com.vlascitchii.domain.custom_scope.CustomCoroutineScope
-import com.vlascitchii.presentation_common.ui.state.UiAction
-import com.vlascitchii.presentation_common.ui.state.UiSingleEvent
+import com.vlascitchii.presentation_common.ui.state_common.UiAction
+import com.vlascitchii.presentation_common.ui.state_common.UiSingleEvent
+import com.vlascitchii.presentation_common.ui.video_list.state.UiVideoListAction
+import com.vlascitchii.presentation_common.ui.video_list.state.VideoListNavigationEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+
+val PREVIEW_VIDEO_LIST_MVI: CommonMVI<UiVideoListAction, VideoListNavigationEvent> =
+    object : CommonMVI<UiVideoListAction, VideoListNavigationEvent>() {
+        override fun handleAction(action: UiVideoListAction) {}
+        override fun handleNavigationEvent(singleEvent: VideoListNavigationEvent) {}
+    }
 
 abstract class CommonMVI<ACTION : UiAction, EVENT : UiSingleEvent>(
     private val coroutineScope: CoroutineScope = CustomCoroutineScope()

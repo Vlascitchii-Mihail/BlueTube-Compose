@@ -41,13 +41,15 @@ fun VideoItem(
     youtubeVideoUiModel: YoutubeVideoUiModel,
     modifier: Modifier,
     navigateToPlayerScreen: (YoutubeVideoUiModel) -> Unit
-) {
+    ) {
     val videoItemDescription = stringResource(R.string.video_compact_preview_description)
     ConstraintLayout(modifier = modifier
         .fillMaxWidth()
         .semantics {contentDescription = videoItemDescription }
         .clickable(
-            onClick = { navigateToPlayerScreen.invoke(youtubeVideoUiModel) }
+            onClick = {
+                navigateToPlayerScreen.invoke(youtubeVideoUiModel)
+            }
         )
         .wrapContentHeight()
     ) {
@@ -167,7 +169,8 @@ fun VideoItem(
 private fun ItemPreview() {
     BlueTubeComposeTheme {
         Surface {
-            VideoItem(DEFAULT_VIDEO, Modifier, navigateToPlayerScreen = { YoutubeVideoUiModel })
+            VideoItem(youtubeVideoUiModel = DEFAULT_VIDEO, modifier = Modifier, navigateToPlayerScreen = {}
+            )
         }
     }
 }

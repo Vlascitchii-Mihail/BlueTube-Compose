@@ -12,12 +12,10 @@ import com.vlascitchii.domain.util.VideoResult
 import com.vlascitchii.presentation_common.model.util.CommonResultConverter
 import com.vlascitchii.presentation_common.model.videos.YoutubeVideoUiModel
 import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityAbstraction
-import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityObserver
-import com.vlascitchii.presentation_common.ui.state.UiState
+import com.vlascitchii.presentation_common.ui.state_common.UiState
 import com.vlascitchii.presentation_common.utils.combineSix
 import com.vlascitchii.presentation_player.screen_player.OrientationState
 import com.vlascitchii.presentation_player.screen_player.state.PlayerState
-import com.vlascitchii.presentation_player.screen_player.utils.VideoPlayerConverter
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow

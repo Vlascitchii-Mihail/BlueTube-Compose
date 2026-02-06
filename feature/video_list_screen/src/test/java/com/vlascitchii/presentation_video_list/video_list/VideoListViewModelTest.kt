@@ -9,10 +9,10 @@ import com.vlascitchii.domain.util.UseCaseException
 import com.vlascitchii.domain.util.VideoResult
 import com.vlascitchii.presentation_common.model.videos.YoutubeVideoUiModel
 import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityObserver
-import com.vlascitchii.presentation_common.ui.state.UiState
+import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityStatus
+import com.vlascitchii.presentation_common.ui.state_common.UiState
+import com.vlascitchii.presentation_common.ui.video_list.state.SearchState
 import com.vlascitchii.presentation_video_list.screen.VideoListViewModel
-import com.vlascitchii.presentation_video_list.screen.state.SearchState
-import com.vlascitchii.presentation_video_list.screen.state.UiVideoListAction
 import com.vlascitchii.presentation_video_list.util.VideoListConverter
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -22,6 +22,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -37,18 +38,12 @@ class VideoListViewModelTest {
 
     @get:Rule
     val dispatcherTestRule = DispatcherTestRule()
-
     private val customCoroutineScope: CustomCoroutineScope = CustomCoroutineScope(dispatcherTestRule.testDispatcher)
 
     private val videoListUseCase: VideoListUseCase = mock()
     private val videoListConverter: VideoListConverter = mock()
     private val networkConnectivityObserver: NetworkConnectivityObserver = mock()
-    private val videoListViewModel = VideoListViewModel(
-        videoListUseCase,
-        videoListConverter,
-        networkConnectivityObserver,
-        customCoroutineScope
-    )
+    private lateinit var videoListViewModel: VideoListViewModel
 
     private val testQuery = "TestQuery"
     private val testErrorMessage = "Test Error Message"
@@ -63,7 +58,7 @@ class VideoListViewModelTest {
         UiState.Success(pagingUiData)
 
     private fun positiveCase() {
-        whenever(videoListUseCase.execute(any()))
+        whenever(videoListUseCase.execute(any<VideoListUseCase.VideoListRequest>()))
             .thenReturn(flowOf(expectedVideoListUseCaseResponse))
 
         whenever(videoListConverter.convert(expectedVideoListUseCaseResponse))
@@ -78,11 +73,23 @@ class VideoListViewModelTest {
         UiState.Error(testErrorMessage)
 
     private fun negativeCase() {
-        whenever(videoListUseCase.execute(any()))
+        whenever(videoListUseCase.execute(any<VideoListUseCase.VideoListRequest>()))
              .thenReturn(flowOf(expectedNegativeVideoListUseCaseResponse))
 
         whenever(videoListConverter.convert(expectedNegativeVideoListUseCaseResponse))
             .thenReturn(negativeConvertResult)
+    }
+
+    @Before
+    fun setup() {
+        whenever(networkConnectivityObserver.observe()).thenReturn(flowOf(NetworkConnectivityStatus.Available))
+
+        videoListViewModel = VideoListViewModel(
+            videoListUseCase,
+            videoListConverter,
+            networkConnectivityObserver,
+            customCoroutineScope
+        )
     }
 
     @Test
@@ -107,52 +114,55 @@ class VideoListViewModelTest {
     }
 
     @Test
-    fun `fetchVideoPagingData() gets UiState Error and assigns it to the ViewModel state`() = runTest {
+    fun `getVideos() VideoRequest gets UiState Error and assigns it to the ViewModel state`() = runTest {
         negativeCase()
 
-        videoListViewModel.submitAction(UiVideoListAction.GetVideo(""))
+        videoListViewModel.getVideos("")
         advanceUntilIdle()
-        val actualErrorResult = videoListViewModel.uiStateFlow.first()
+        val actualErrorResult = videoListViewModel.videoListUIStateFlow.first().videoListState
 
         verify(videoListConverter).convert(expectedNegativeVideoListUseCaseResponse)
         assertEquals(negativeConvertResult, actualErrorResult)
     }
 
     @Test
-    fun `fetchVideoPagingData() gets UiState Error when VideoType is SearchVideo and assigns it to the ViewModel state`() = runTest {
+    fun `getVideos() SearchRequest gets UiState Error and assigns it to the ViewModel state`() = runTest {
         negativeCase()
 
-        videoListViewModel.submitAction(UiVideoListAction.GetVideo(testQuery))
+        videoListViewModel.getVideos(testQuery)
         advanceUntilIdle()
 
-        val actualErrorResult = videoListViewModel.uiStateFlow.first()
+        val actualErrorResult: UiState<Flow<PagingData<YoutubeVideoUiModel>>> = videoListViewModel.videoListUIStateFlow.first().videoListState
 
+        verify(videoListUseCase).execute(any<VideoListUseCase.VideoListRequest>())
         verify(videoListConverter).convert(expectedNegativeVideoListUseCaseResponse)
         assertEquals(negativeConvertResult, actualErrorResult)
     }
 
     @Test
-    fun `fetchVideoPagingData() gets UiState Success and assigns it to the ViewModel state`() = runTest {
+    fun `getVideos() VideoRequest gets UiState Success and assigns it to the ViewModel state`() = runTest {
         positiveCase()
 
-        videoListViewModel.submitAction(UiVideoListAction.GetVideo(""))
+        videoListViewModel.getVideos("")
         advanceUntilIdle()
 
-        val actualResult = videoListViewModel.uiStateFlow.first()
+        val actualResult = videoListViewModel.videoListUIStateFlow.first().videoListState
 
+        verify(videoListUseCase).execute(any<VideoListUseCase.VideoListRequest>())
         verify(videoListConverter).convert(expectedVideoListUseCaseResponse)
         assertEquals(positiveConvertResult, actualResult)
     }
 
     @Test
-    fun `fetchVideoPagingData() search gets UiState Success and assigns it to the ViewModel state`() = runTest {
+    fun `getVideos() SearchRequest gets UiState Success and assigns it to the ViewModel state`() = runTest {
         positiveCase()
 
-        videoListViewModel.submitAction(UiVideoListAction.GetVideo(testQuery))
+        videoListViewModel.getVideos(testQuery)
         advanceUntilIdle()
 
-        val actualResult = videoListViewModel.uiStateFlow.first()
+        val actualResult = videoListViewModel.videoListUIStateFlow.first().videoListState
 
+        verify(videoListUseCase).execute(any<VideoListUseCase.VideoListRequest>())
         verify(videoListConverter).convert(expectedVideoListUseCaseResponse)
         assertEquals(positiveConvertResult, actualResult)
     }

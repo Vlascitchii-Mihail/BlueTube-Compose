@@ -10,7 +10,7 @@ import com.vlascitchii.presentation_common.model.videos.ThumbnailsUiModel
 import com.vlascitchii.presentation_common.model.videos.VideoSnippetUiModel
 import com.vlascitchii.presentation_common.model.videos.VideoStatisticsUiModel
 import com.vlascitchii.presentation_common.model.videos.YoutubeVideoUiModel
-import com.vlascitchii.presentation_common.ui.state.UiState
+import com.vlascitchii.presentation_common.ui.state_common.UiState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 

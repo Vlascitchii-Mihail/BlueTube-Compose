@@ -1,0 +1,3 @@
+package com.vlascitchii.presentation_common.ui.state_common
+
+interface UiSingleEvent
