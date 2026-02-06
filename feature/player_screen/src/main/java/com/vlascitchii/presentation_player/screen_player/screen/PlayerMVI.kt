@@ -1,7 +1,7 @@
 package com.vlascitchii.presentation_player.screen_player.screen
 
 import com.vlascitchii.presentation_common.ui.screen.mvi.CommonMVI
-import com.vlascitchii.presentation_common.ui.state.UiSingleEvent
+import com.vlascitchii.presentation_common.ui.state_common.UiSingleEvent
 import com.vlascitchii.presentation_player.screen_player.state.PlayerActionState
 import com.vlascitchii.presentation_player.screen_player.state.PlayerNavigationEvent
 import kotlinx.coroutines.CoroutineScope

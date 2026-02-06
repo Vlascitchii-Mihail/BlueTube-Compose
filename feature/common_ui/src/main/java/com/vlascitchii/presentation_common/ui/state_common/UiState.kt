@@ -1,4 +1,4 @@
-package com.vlascitchii.presentation_common.ui.state
+package com.vlascitchii.presentation_common.ui.state_common
 
 sealed class UiState<out RESULT: Any> {
 

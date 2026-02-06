@@ -3,7 +3,7 @@
 package com.vlascitchii.presentation_player.screen_player.mvi
 
 import com.vlascitchii.common_test.rule.DispatcherTestRule
-import com.vlascitchii.presentation_common.ui.state.UiSingleEvent
+import com.vlascitchii.presentation_common.ui.state_common.UiSingleEvent
 import com.vlascitchii.presentation_player.screen_player.OrientationState
 import com.vlascitchii.presentation_player.screen_player.screen.PlayerMVI
 import com.vlascitchii.presentation_player.screen_player.screen.VideoPlayerViewModel

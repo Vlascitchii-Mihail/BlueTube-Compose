@@ -22,7 +22,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.vlascitchii.common_ui.R
-import com.vlascitchii.presentation_common.ui.state.UiState
+import com.vlascitchii.presentation_common.ui.state_common.UiState
 import com.vlascitchii.presentation_common.ui.theme.BlueTubeComposeTheme
 
 internal val ASPECT_RATIO_16_BY_9 = 1.7.dp

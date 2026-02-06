@@ -18,7 +18,7 @@ import androidx.paging.PagingData
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.vlascitchii.common_ui.R
 import com.vlascitchii.presentation_common.model.videos.YoutubeVideoUiModel
-import com.vlascitchii.presentation_common.ui.state.UiState
+import com.vlascitchii.presentation_common.ui.state_common.UiState
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test

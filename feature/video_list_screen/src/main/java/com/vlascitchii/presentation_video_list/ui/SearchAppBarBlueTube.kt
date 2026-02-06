@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.vlascitchii.presentation_video_list.screen.ui
+package com.vlascitchii.presentation_video_list.ui
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -37,13 +37,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.PreviewLightDark
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.vlascitchii.presentation_common.ui.screen.mvi.CommonMVI
+import com.vlascitchii.presentation_common.ui.screen.mvi.PREVIEW_VIDEO_LIST_MVI
 import com.vlascitchii.presentation_common.ui.theme.BlueTubeComposeTheme
-import com.vlascitchii.presentation_video_list.screen.state.SearchState
+import com.vlascitchii.presentation_common.ui.video_list.state.SearchState
+import com.vlascitchii.presentation_common.ui.video_list.state.UiVideoListAction
+import com.vlascitchii.presentation_common.ui.video_list.state.VideoListNavigationEvent
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import com.vlascitchii.common_ui.R as RCommon
 import com.vlascitchii.video_list_screen.R as RPresentationList
@@ -53,10 +54,8 @@ private const val SEARCH_INPUT_DELAY = 2000L
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchAppBarBlueTube(
-    searchText: StateFlow<TextFieldValue>,
-    onTextChange: (String) -> Unit,
-    updateSearchState: (SearchState) -> Unit,
-    onSearchClicked: () -> Unit,
+    searchText: TextFieldValue,
+    videoListMVI: CommonMVI<UiVideoListAction, VideoListNavigationEvent>,
     scrollAppBarBehaviour: TopAppBarScrollBehavior,
     modifier: Modifier,
 ) {
@@ -64,20 +63,21 @@ fun SearchAppBarBlueTube(
     val focusRequester = remember { FocusRequester() }
     val inputScope = rememberCoroutineScope()
     var inputSearchJob by remember { mutableStateOf<Job?>(null) }
-    val searchQuery by searchText.collectAsStateWithLifecycle()
     var previousQuery: String = remember { "" }
 
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
     }
 
-    fun performSearch(input: String) {
-        if (input != "" && input != previousQuery) {
+    fun performSearch(searchInput: String) {
+        if (searchInput != "" && searchInput != previousQuery) {
             inputSearchJob?.cancel()
             inputSearchJob = inputScope.launch {
                 delay(SEARCH_INPUT_DELAY)
-                onSearchClicked.invoke()
-                previousQuery = input
+                videoListMVI.submitSingleNavigationEvent(
+                    VideoListNavigationEvent.NavigationToParticularSearchedVideoList(searchInput)
+                )
+                previousQuery = searchInput
             }
         }
     }
@@ -107,9 +107,9 @@ fun SearchAppBarBlueTube(
                     modifier = modifier
                         .fillMaxWidth()
                         .focusRequester(focusRequester),
-                    value = searchQuery,
+                    value = searchText,
                     onValueChange = { input ->
-                        onTextChange.invoke(input.text)
+                        videoListMVI.submitAction(UiVideoListAction.TypeInSearchAppBarTextField(input.text))
                         performSearch(input.text)
                     },
                     placeholder = {
@@ -123,8 +123,12 @@ fun SearchAppBarBlueTube(
                     trailingIcon = {
                         IconButton(
                             onClick = {
-                                if (searchQuery.text.isNotEmpty()) onTextChange("")
-                                else updateSearchState.invoke(SearchState.CLOSED)
+                                if (searchText.text.isNotEmpty()) {
+                                    videoListMVI.submitAction(UiVideoListAction.TypeInSearchAppBarTextField(""))
+                                }
+                                else {
+                                    videoListMVI.submitAction(UiVideoListAction.ChangeSearchBarAppearance(SearchState.CLOSED))
+                                }
                             }
                         ) {
                             Icon(
@@ -138,7 +142,7 @@ fun SearchAppBarBlueTube(
                     ),
                     keyboardActions = KeyboardActions(
                         onSearch = {
-                            performSearch(searchQuery.text)
+                            performSearch(searchText.text)
                             keyboardController?.hide()
                         }
                     )
@@ -152,16 +156,13 @@ fun SearchAppBarBlueTube(
 @PreviewLightDark
 @Composable
 fun PreviewSearchAppBarBlueTube() {
-    val searchText = remember { MutableStateFlow(TextFieldValue("")) }
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
 
     BlueTubeComposeTheme {
         Surface {
             SearchAppBarBlueTube(
-                searchText = searchText,
-                onTextChange = {},
-                updateSearchState = {},
-                onSearchClicked = {},
+                searchText = TextFieldValue(""),
+                videoListMVI = PREVIEW_VIDEO_LIST_MVI,
                 scrollAppBarBehaviour = scrollBehavior,
                 modifier = Modifier,
             )
@@ -172,16 +173,13 @@ fun PreviewSearchAppBarBlueTube() {
 @PreviewLightDark
 @Composable
 fun PreviewSearchAppBarBlueTubeWithText() {
-    val searchText = remember { MutableStateFlow(TextFieldValue("Test text")) }
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
 
     BlueTubeComposeTheme {
         Surface {
             SearchAppBarBlueTube(
-                searchText = searchText,
-                onTextChange = {},
-                updateSearchState = {},
-                onSearchClicked = {},
+                searchText = TextFieldValue("Test text"),
+                videoListMVI = PREVIEW_VIDEO_LIST_MVI,
                 scrollAppBarBehaviour = scrollBehavior,
                 modifier = Modifier,
             )

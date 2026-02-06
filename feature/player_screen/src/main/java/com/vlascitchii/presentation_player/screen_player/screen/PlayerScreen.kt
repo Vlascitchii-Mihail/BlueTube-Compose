@@ -2,20 +2,22 @@ package com.vlascitchii.presentation_player.screen_player.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
@@ -23,6 +25,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.vlascitchii.player_screen.R
 import com.vlascitchii.presentation_common.model.videos.YoutubeVideoUiModel
 import com.vlascitchii.presentation_common.model.videos.YoutubeVideoUiModel.Companion.PREVIEW_VIDEO_LIST
 import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityStatus
@@ -31,10 +34,9 @@ import com.vlascitchii.presentation_common.ui.global_snackbar.SnackBarEvent
 import com.vlascitchii.presentation_common.ui.screen.CommonScreen
 import com.vlascitchii.presentation_common.ui.screen.PagerContentManager
 import com.vlascitchii.presentation_common.ui.screen.mvi.CommonMVI
-import com.vlascitchii.presentation_common.ui.state.UiState
+import com.vlascitchii.presentation_common.ui.state_common.UiState
 import com.vlascitchii.presentation_common.ui.theme.BlueTubeComposeTheme
 import com.vlascitchii.presentation_common.ui.video_list.ItemsList
-import com.vlascitchii.player_screen.R
 import com.vlascitchii.presentation_player.screen_player.OrientationState
 import com.vlascitchii.presentation_player.screen_player.state.PlayerActionState
 import com.vlascitchii.presentation_player.screen_player.state.PlayerNavigationEvent
@@ -59,7 +61,6 @@ fun PlayerScreen(
     isPreview: Boolean = false
 ) {
 
-    val youTubePlayerDescription = stringResource(R.string.video_player_description)
     val localContext = LocalContext.current
 
     playerStateFlow.collectAsStateWithLifecycle().value.let { playerUiState: PlayerState ->
@@ -69,59 +70,60 @@ fun PlayerScreen(
 
         val isPortrait = playerUiState.playerOrientationState == OrientationState.PORTRAIT
 
-        Column(
-            modifier = if (isPortrait)
-                modifier
+        Scaffold(
+            modifier = modifier
+        ) { contentPadding: PaddingValues ->
+            Column(
+                modifier =
+                    if (isPortrait)
+                    modifier
+                        .fillMaxSize()
+                        .padding(contentPadding)
+                        .semantics { contentDescription = localContext.getString(R.string.player_screen_description)}
+                else modifier
                     .fillMaxSize()
-                    .statusBarsPadding()
                     .semantics { contentDescription = localContext.getString(R.string.player_screen_description)}
-            else modifier.fillMaxSize()
-                .semantics { contentDescription = localContext.getString(R.string.player_screen_description)}
-        ) {
-            if (isPreview) CreatePlayerPreview(isPortrait, modifier)
-            else YoutubeVideoPlayer(
-                videoId = video.id,
-                modifier = modifier.semantics { contentDescription = youTubePlayerDescription },
-                playerStateFlow = playerStateFlow,
-                playerMVI = playerMVI,
-                playbackPosition = playbackPosition,
-            )
+            ) {
+                if (isPreview) CreatePlayerPreview(isPortrait, modifier)
+                else YoutubeVideoPlayer(
+                    videoId = video.id,
+                    modifier = modifier.semantics { contentDescription = localContext.getString(R.string.video_player_description) },
+                    playerStateFlow = playerStateFlow,
+                    playerMVI = playerMVI,
+                    playbackPosition = playbackPosition,
+                )
 
-            if (isPortrait) VideoDescription(video = video)
+                if (isPortrait) VideoDescription(video = video, modifier = modifier)
 
-            CommonScreen(playerUiState.relatedVideoState) { pagingData: Flow<PagingData<YoutubeVideoUiModel>> ->
+                CommonScreen(playerUiState.relatedVideoState) { pagingData: Flow<PagingData<YoutubeVideoUiModel>> ->
 
-                LaunchedEffect(playerUiState.networkConnectivityStatus) {
-                    if (playerUiState.networkConnectivityStatus == NetworkConnectivityStatus.Lost) {
-                        sendEvent(
-                            event = SnackBarEvent(
-                                message = "Wrong internet connection"
+                    LaunchedEffect(playerUiState.networkConnectivityStatus) {
+                        if (playerUiState.networkConnectivityStatus == NetworkConnectivityStatus.Lost) {
+                            sendEvent(
+                                event = SnackBarEvent(
+                                    message = "Wrong internet connection"
+                                )
                             )
+                        }
+                    }
+
+                    if (isPortrait) {
+                        val lazyPagingData = pagingData.collectAsLazyPagingItems()
+
+                        PagerContentManager(
+                            videoState = lazyPagingData,
+                            contentList = {
+                                ItemsList(
+                                    lazyPagingData,
+                                    modifier,
+                                    navigateToPlayerScreen = { video: YoutubeVideoUiModel ->
+                                        playerMVI.submitSingleNavigationEvent(PlayerNavigationEvent.NavigationPlayerScreenEvent(video))
+                                    }
+                                )
+                            },
+                            modifier = modifier.fillMaxSize()
                         )
                     }
-                }
-
-                if (isPortrait) {
-                    val lazyPagingData = pagingData.collectAsLazyPagingItems()
-
-                    PagerContentManager(
-                        videoState = lazyPagingData,
-                        contentList = {
-                            ItemsList(
-                                lazyPagingData,
-                                modifier,
-                                //TODO: Refactor after update VideoListScreen to MVI
-                                navigateToPlayerScreen = { video: YoutubeVideoUiModel ->
-                                    playerMVI.submitSingleNavigationEvent(
-                                        PlayerNavigationEvent.NavigationPlayerScreenEvent(
-                                            video
-                                        )
-                                    )
-                                },
-                            )
-                        },
-                        modifier = modifier.fillMaxSize()
-                    )
                 }
             }
         }
