@@ -18,7 +18,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
@@ -32,39 +31,39 @@ import com.vlascitchii.presentation_common.ui.error.PaginationRetryItem
 import com.vlascitchii.presentation_common.ui.screen.CommonScreen
 import com.vlascitchii.presentation_common.ui.screen.LocalWindowSizeClass
 import com.vlascitchii.presentation_common.ui.screen.PagerContentManager
+import com.vlascitchii.presentation_common.ui.screen.mvi.CommonMVI
 import com.vlascitchii.presentation_common.ui.screen.previewWindowSizeClass
-import com.vlascitchii.presentation_common.ui.state.UiState
 import com.vlascitchii.presentation_common.ui.theme.BlueTubeComposeTheme
+import com.vlascitchii.presentation_common.ui.video_list.state.UiVideoListAction
+import com.vlascitchii.presentation_common.ui.video_list.state.VideoListNavigationEvent
+import com.vlascitchii.presentation_common.ui.video_list.state.VideoListUIState
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flowOf
 
 @Composable
 fun YouTubeVideoList(
-    initVideosList: () -> Unit,
+    videoListUIState: VideoListUIState,
+    videoListMVI: CommonMVI<UiVideoListAction, VideoListNavigationEvent>,
     modifier: Modifier = Modifier,
-    videosFlow: StateFlow<UiState<Flow<PagingData<YoutubeVideoUiModel>>>>,
     innerPadding: PaddingValues = PaddingValues(),
-    navigateToPlayerScreen: (YoutubeVideoUiModel) -> Unit,
 ) {
-    videosFlow.collectAsStateWithLifecycle().value.let { uiStateVideoList: UiState<Flow<PagingData<YoutubeVideoUiModel>>> ->
-        if (uiStateVideoList == UiState.Loading) initVideosList.invoke()
-        CommonScreen(uiStateVideoList) { pagingData: Flow<PagingData<YoutubeVideoUiModel>> ->
-            val lazyVideosPagingItem = pagingData.collectAsLazyPagingItems()
+    CommonScreen(videoListUIState.videoListState) { pagingData: Flow<PagingData<YoutubeVideoUiModel>> ->
+        val lazyVideosPagingItem = pagingData.collectAsLazyPagingItems()
 
-            PagerContentManager(
-                videoState = lazyVideosPagingItem,
-                contentList = {
-                    ItemsList(
-                        lazyVideosPagingItem,
-                        modifier,
-                        navigateToPlayerScreen,
-                    )
-                },
-                innerPadding = innerPadding,
-                modifier = modifier
-            )
-        }
+        PagerContentManager(
+            videoState = lazyVideosPagingItem,
+            contentList = {
+                ItemsList(
+                    lazyVideosPagingItem,
+                    modifier,
+                    navigateToPlayerScreen = { video: YoutubeVideoUiModel ->
+                        videoListMVI.submitSingleNavigationEvent(VideoListNavigationEvent.NavigationPlayerScreenEvent(video))
+                    }
+                )
+            },
+            innerPadding = innerPadding,
+            modifier = modifier
+        )
     }
 }
 
@@ -120,7 +119,14 @@ fun ItemsList(
 
         item {
             when (videos.loadState.append) {
-                is LoadState.Loading -> CircularProgressIndicator(modifier.height(dimensionResource(R.dimen.height_small_40)))
+                is LoadState.Loading -> CircularProgressIndicator(
+                    modifier.height(
+                        dimensionResource(
+                            R.dimen.height_small_40
+                        )
+                    )
+                )
+
                 is LoadState.Error -> PaginationRetryItem(onRetryClick = { videos.retry() })
                 is LoadState.NotLoading -> Unit
             }
@@ -134,7 +140,8 @@ private lateinit var lazyPagingItems: LazyPagingItems<YoutubeVideoUiModel>
 @Composable
 private fun YouTubeVideoItemsListCompactPreview() {
     BlueTubeComposeTheme {
-        val pagingData: Flow<PagingData<YoutubeVideoUiModel>> = flowOf(PagingData.from(PREVIEW_VIDEO_LIST))
+        val pagingData: Flow<PagingData<YoutubeVideoUiModel>> =
+            flowOf(PagingData.from(PREVIEW_VIDEO_LIST))
         lazyPagingItems = pagingData.collectAsLazyPagingItems()
 
         Surface {

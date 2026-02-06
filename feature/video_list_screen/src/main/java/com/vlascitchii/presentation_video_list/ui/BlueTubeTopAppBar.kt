@@ -1,4 +1,4 @@
-package com.vlascitchii.presentation_video_list.screen.ui
+package com.vlascitchii.presentation_video_list.ui
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -21,8 +21,12 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import com.vlascitchii.presentation_common.ui.screen.mvi.CommonMVI
+import com.vlascitchii.presentation_common.ui.screen.mvi.PREVIEW_VIDEO_LIST_MVI
 import com.vlascitchii.presentation_common.ui.theme.BlueTubeComposeTheme
-import com.vlascitchii.presentation_video_list.screen.state.SearchState
+import com.vlascitchii.presentation_common.ui.video_list.state.SearchState
+import com.vlascitchii.presentation_common.ui.video_list.state.UiVideoListAction
+import com.vlascitchii.presentation_common.ui.video_list.state.VideoListNavigationEvent
 import com.vlascitchii.common_ui.R as RCommon
 import com.vlascitchii.video_list_screen.R as RPresentationList
 
@@ -32,7 +36,7 @@ fun BlueTubeTopAppBar(
     title: String,
     icon: ImageVector,
     scrollBehavior: TopAppBarScrollBehavior,
-    updateSearchState:(newSearchState: SearchState) -> Unit,
+    videoListMVI: CommonMVI<UiVideoListAction, VideoListNavigationEvent>,
     modifier: Modifier
 ) {
     Surface(
@@ -58,15 +62,17 @@ fun BlueTubeTopAppBar(
             },
             actions = {
 
-                    IconButton(
-                        onClick = { updateSearchState.invoke(SearchState.OPENED) },
-                    ) {
-                        Icon(
-                            imageVector = icon,
-                            contentDescription = stringResource(id = RPresentationList.string.appbar_search_icon_descr),
-                        )
-                    }
-                },
+                IconButton(
+                    onClick = {
+                        videoListMVI.submitAction(UiVideoListAction.ChangeSearchBarAppearance(SearchState.OPENED))
+                    },
+                ) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = stringResource(id = RPresentationList.string.appbar_search_icon_descr),
+                    )
+                }
+            },
             scrollBehavior = scrollBehavior,
         )
     }
@@ -79,7 +85,7 @@ private fun CollapsingAppBarPreview() {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     BlueTubeComposeTheme {
         Surface {
-            BlueTubeTopAppBar("Test title", Icons.Filled.Search, scrollBehavior, {}, Modifier)
+            BlueTubeTopAppBar("Test title", Icons.Filled.Search, scrollBehavior, PREVIEW_VIDEO_LIST_MVI, Modifier)
         }
     }
 }

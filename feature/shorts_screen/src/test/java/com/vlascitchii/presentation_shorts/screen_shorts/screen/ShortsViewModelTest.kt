@@ -12,7 +12,7 @@ import com.vlascitchii.domain.util.VideoResult
 import com.vlascitchii.presentation_common.model.util.convertToYoutubeVideoUiModel
 import com.vlascitchii.presentation_common.model.videos.YoutubeVideoUiModel
 import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityObserver
-import com.vlascitchii.presentation_common.ui.state.UiState
+import com.vlascitchii.presentation_common.ui.state_common.UiState
 import com.vlascitchii.presentation_shorts.screen_shorts.utils.ShortsConverter
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first

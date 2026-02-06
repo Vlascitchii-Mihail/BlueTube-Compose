@@ -14,7 +14,7 @@ import com.vlascitchii.presentation_common.model.videos.YoutubeVideoUiModel
 import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityStatus
 import com.vlascitchii.presentation_common.ui.screen.CommonScreen
 import com.vlascitchii.presentation_common.ui.screen.PagerContentManager
-import com.vlascitchii.presentation_common.ui.state.UiState
+import com.vlascitchii.presentation_common.ui.state_common.UiState
 import com.vlascitchii.shorts_screen.R
 import com.vlascitchii.presentation_shorts.screen_shorts.ui.ShortsList
 import kotlinx.coroutines.flow.Flow

@@ -1,6 +1,5 @@
 package com.vlascitchii.presentation_player.screen_player.ui
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,13 +23,13 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.vlascitchii.common_ui.R as CommonR
-import com.vlascitchii.player_screen.R as PlayerR
 import com.vlascitchii.presentation_common.model.videos.YoutubeVideoUiModel
 import com.vlascitchii.presentation_common.ui.theme.BlueTubeComposeTheme
 import com.vlascitchii.presentation_common.utils.Core.CHANNEL_PREVIEW_IMG
 import com.vlascitchii.presentation_common.utils.formatDate
 import com.vlascitchii.presentation_common.utils.formatViews
+import com.vlascitchii.common_ui.R as CommonR
+import com.vlascitchii.player_screen.R as PlayerR
 
 @Composable
 fun VideoDescription(video: YoutubeVideoUiModel, modifier: Modifier = Modifier) {
@@ -42,7 +41,6 @@ fun VideoDescription(video: YoutubeVideoUiModel, modifier: Modifier = Modifier) 
             .fillMaxWidth()
             .padding(8.dp)
             .semantics { contentDescription = videoDescription }
-            .background(MaterialTheme.colorScheme.background)
     ) {
         Text(
             text = video.snippet.title,

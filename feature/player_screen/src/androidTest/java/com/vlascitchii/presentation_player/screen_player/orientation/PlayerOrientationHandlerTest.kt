@@ -8,7 +8,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.vlascitchii.presentation_common.model.videos.YoutubeVideoUiModel
 import com.vlascitchii.presentation_common.model.videos.YoutubeVideoUiModel.Companion.PREVIEW_VIDEO_LIST
 import com.vlascitchii.presentation_common.ui.screen.mvi.CommonMVI
-import com.vlascitchii.presentation_common.ui.state.UiState
+import com.vlascitchii.presentation_common.ui.state_common.UiState
 import com.vlascitchii.player_screen.databinding.FragmentPlayVideoBinding
 import com.vlascitchii.presentation_player.screen_player.OrientationState
 import com.vlascitchii.presentation_player.screen_player.TestActivity

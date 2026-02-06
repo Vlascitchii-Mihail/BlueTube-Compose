@@ -47,14 +47,16 @@ fun VideoItemLandscape(
     youtubeVideoUiModel: YoutubeVideoUiModel,
     modifier: Modifier,
     navigateToPlayerScreen: (YoutubeVideoUiModel) -> Unit
-) {
+    ) {
     val itemLandscapeDescription = stringResource(R.string.video_medium_preview_description)
     ConstraintLayout(modifier = modifier
         .padding(start = dimensionResource(R.dimen.padding_small_extra_4))
         .fillMaxWidth()
         .wrapContentHeight()
         .semantics { contentDescription = itemLandscapeDescription }
-        .clickable( onClick = { navigateToPlayerScreen.invoke(youtubeVideoUiModel)})
+        .clickable( onClick = {
+            navigateToPlayerScreen.invoke(youtubeVideoUiModel)
+        })
     ) {
         val (videoPreview, videoTitle, channelImg, videoDuration, statisticsFlow) = createRefs()
         val videoItemTitleDescription = stringResource(R.string.video_item_title)
@@ -171,7 +173,9 @@ fun VideoItemLandscape(
 private fun ItemLandscapePreview() {
     BlueTubeComposeTheme {
         Surface {
-            VideoItemLandscape(DEFAULT_VIDEO, Modifier, navigateToPlayerScreen = { YoutubeVideoUiModel })
+            VideoItemLandscape(youtubeVideoUiModel = DEFAULT_VIDEO, modifier = Modifier,
+                navigateToPlayerScreen = {}
+            )
         }
     }
 }
@@ -186,7 +190,9 @@ fun ItemLandscapePreviewTablet() {
     ) {
         BlueTubeComposeTheme {
             Surface {
-                VideoItemLandscape(DEFAULT_VIDEO, Modifier, navigateToPlayerScreen = { YoutubeVideoUiModel })
+                VideoItemLandscape(youtubeVideoUiModel = DEFAULT_VIDEO, modifier = Modifier,
+                    navigateToPlayerScreen = {}
+                )
             }
         }
     }
