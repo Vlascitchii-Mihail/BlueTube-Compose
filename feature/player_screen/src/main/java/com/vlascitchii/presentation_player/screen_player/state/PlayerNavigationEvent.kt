@@ -1,7 +1,7 @@
 package com.vlascitchii.presentation_player.screen_player.state
 
 import com.vlascitchii.presentation_common.model.videos.YoutubeVideoUiModel
-import com.vlascitchii.presentation_common.ui.state.UiSingleEvent
+import com.vlascitchii.presentation_common.ui.state_common.UiSingleEvent
 
 sealed class PlayerNavigationEvent : UiSingleEvent {
 
