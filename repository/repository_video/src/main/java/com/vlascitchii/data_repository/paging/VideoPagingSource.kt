@@ -25,9 +25,8 @@ class VideoPagingSource(
     override suspend fun getLoadedDataList(params: LoadParams<String>): List<YoutubeVideoDomain> {
 
         try {
-            withContext(customCoroutineScope.coroutineContext) {
-                youTubeVideoResponseDomain = fetch.invoke(params.key ?: "")
-            }
+            youTubeVideoResponseDomain = fetch.invoke(params.key ?: "")
+
             //TODO: refactor database
 //            localDataSource.insertVideosToDatabaseWithTimeStamp(
 //                youTubeVideoResponseDomain,

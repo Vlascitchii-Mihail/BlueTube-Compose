@@ -17,8 +17,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
@@ -30,26 +32,24 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.integration.compose.placeholder
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
-import com.vlascitchii.common_ui.R
 import com.vlascitchii.presentation_common.model.videos.YoutubeVideoUiModel
 import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityStatus
 import com.vlascitchii.presentation_common.ui.theme.BlueTubeComposeTheme
-import com.vlascitchii.presentation_common.utils.Core.CHANNEL_PREVIEW_IMG
-import com.vlascitchii.presentation_common.utils.ShortsItemTag.SHORTS_CHANNEL_TITLE
-import com.vlascitchii.presentation_common.utils.ShortsItemTag.SHORTS_VIDEO_PLAYER
-import com.vlascitchii.presentation_common.utils.ShortsItemTag.SHORTS_VIDEO_TITLE
 import com.vlascitchii.presentation_shorts.screen_shorts.screen.ShortsPlayerHandler
 import kotlinx.coroutines.flow.MutableSharedFlow
+import com.vlascitchii.common_ui.R as RCommon
+import com.vlascitchii.shorts_screen.R as RShorts
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun ShortsItem(
+    modifier: Modifier = Modifier,
     youTubeVideo: YoutubeVideoUiModel,
     videoQueue: MutableSharedFlow<YouTubePlayer?> = MutableSharedFlow(),
-    modifier: Modifier = Modifier,
     networkConnectivityStatus: NetworkConnectivityStatus
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current.lifecycle
+    val context = LocalContext.current
     val shortsPlayerHandler = remember { ShortsPlayerHandler(lifecycleOwner, youTubeVideo.id, videoQueue) }
 
     ConstraintLayout(
@@ -61,30 +61,30 @@ fun ShortsItem(
 
         when(networkConnectivityStatus) {
             NetworkConnectivityStatus.Available -> {
-//                AndroidView(
-//                    factory = { context ->
-//                        val youTubePlayerView = YouTubePlayerView(context)
-//                        shortsPlayerHandler.setupPlayer(youTubePlayerView)
-//                        youTubePlayerView
-//                    },
-//                    modifier = modifier
-//                        .fillMaxSize()
-//                        .testTag(SHORTS_VIDEO_PLAYER)
-//                        .constrainAs(videoPlayer) {
-//                            start.linkTo(parent.start)
-//                            end.linkTo(parent.end)
-//                            top.linkTo(parent.top)
-//                            bottom.linkTo(parent.bottom)
-//                        }
-//                )
+                AndroidView(
+                    factory = { context ->
+                        val youTubePlayerView = YouTubePlayerView(context)
+                        shortsPlayerHandler.setupPlayer(youTubePlayerView)
+                        youTubePlayerView
+                    },
+                    modifier = modifier
+                        .fillMaxSize()
+                        .semantics { contentDescription = context.getString(RShorts.string.shorts_video_description) }
+                        .constrainAs(videoPlayer) {
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                            top.linkTo(parent.top)
+                            bottom.linkTo(parent.bottom)
+                        }
+                )
             }
 
             NetworkConnectivityStatus.Lost -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     GlideImage(
-                        model = placeholder(R.drawable.sceleton_thumbnail),
-                        loading = placeholder(R.drawable.sceleton_thumbnail),
-                        contentDescription = stringResource(id = R.string.video_thumbnail_description),
+                        model = placeholder(RCommon.drawable.sceleton_thumbnail),
+                        loading = placeholder(RCommon.drawable.sceleton_thumbnail),
+                        contentDescription = stringResource(id = RCommon.string.video_thumbnail_description),
                         modifier = Modifier.fillMaxWidth(),
                         contentScale = ContentScale.Crop
                     )
@@ -94,10 +94,9 @@ fun ShortsItem(
 
         GlideImage(
             model = youTubeVideo.snippet.channelImgUrl,
-            contentDescription = stringResource(id = R.string.channel_description) + youTubeVideo.snippet.channelTitle,
-            loading = placeholder(R.drawable.sceleton_thumbnail),
+            contentDescription = stringResource(id = RCommon.string.channel_description) + youTubeVideo.snippet.channelTitle,
+            loading = placeholder(RCommon.drawable.sceleton_thumbnail),
             modifier = modifier
-                .testTag(CHANNEL_PREVIEW_IMG)
                 .padding(8.dp)
                 .width(50.dp)
                 .height(50.dp)
@@ -114,7 +113,7 @@ fun ShortsItem(
             maxLines = 1,
             textAlign = TextAlign.Start,
             modifier = modifier
-                .testTag(SHORTS_VIDEO_TITLE)
+                .semantics { contentDescription = context.getString(RShorts.string.shorts_title) }
                 .padding(start = 8.dp)
                 .constrainAs(channelTitle) {
                     start.linkTo(channelImg.end)
@@ -129,7 +128,7 @@ fun ShortsItem(
             maxLines = 2,
             textAlign = TextAlign.Start,
             modifier = modifier
-                .testTag(SHORTS_CHANNEL_TITLE)
+                .semantics { contentDescription = context.getString(RShorts.string.shorts_channel_icon_description)}
                 .padding(start = 8.dp, bottom = 70.dp)
                 .constrainAs(videoTitle) {
                     start.linkTo(parent.start)
@@ -144,7 +143,7 @@ fun ShortsItem(
 fun ShortsNetworkAvailableItemPreview() {
     BlueTubeComposeTheme {
         Surface {
-            ShortsItem(YoutubeVideoUiModel.DEFAULT_VIDEO, networkConnectivityStatus = NetworkConnectivityStatus.Available)
+            ShortsItem(youTubeVideo = YoutubeVideoUiModel.DEFAULT_VIDEO, networkConnectivityStatus = NetworkConnectivityStatus.Available)
         }
     }
 }
@@ -154,7 +153,7 @@ fun ShortsNetworkAvailableItemPreview() {
 fun ShortsNetworkUnavailableItemPreview() {
     BlueTubeComposeTheme {
         Surface {
-            ShortsItem(YoutubeVideoUiModel.DEFAULT_VIDEO, networkConnectivityStatus = NetworkConnectivityStatus.Lost)
+            ShortsItem(youTubeVideo = YoutubeVideoUiModel.DEFAULT_VIDEO, networkConnectivityStatus = NetworkConnectivityStatus.Lost)
         }
     }
 }

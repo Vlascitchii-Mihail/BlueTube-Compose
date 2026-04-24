@@ -3,23 +3,24 @@ package com.vlascitchii.presentation_shorts.screen_shorts.screen
 import androidx.paging.PagingData
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.vlascitchii.common_test.rule.DispatcherTestRule
-import com.vlascitchii.domain.custom_coroutine_scopes.AppCoroutineScope
 import com.vlascitchii.domain.model.videos.YoutubeVideoDomain
-import com.vlascitchii.domain.model.videos.YoutubeVideoResponseDomain.Companion.DOMAIN_RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG
 import com.vlascitchii.domain.usecase.ShortsUseCase
 import com.vlascitchii.domain.util.UseCaseException
 import com.vlascitchii.domain.util.VideoResult
-import com.vlascitchii.presentation_common.model.util.convertToYoutubeVideoUiModel
 import com.vlascitchii.presentation_common.model.videos.YoutubeVideoUiModel
 import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityObserver
+import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityStatus
 import com.vlascitchii.presentation_common.ui.state_common.UiState
+import com.vlascitchii.presentation_shorts.screen_shorts.state.ShortsAction
 import com.vlascitchii.presentation_shorts.screen_shorts.utils.ShortsConverter
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -38,26 +39,16 @@ class ShortsViewModelTest {
     private val shortsUseCase: ShortsUseCase = mock()
     private val shortsConverter: ShortsConverter = mock()
     private val networkConnectivityObserver: NetworkConnectivityObserver = mock()
-    private val videoCoroutineScope: AppCoroutineScope = mock()
-    private val shortsViewModel = ShortsViewModel(
-        shortsUseCase,
-        shortsConverter,
-        networkConnectivityObserver,
-        videoCoroutineScope
-    )
+    private lateinit var shortsViewModel: ShortsViewModel
 
     private val testErrorMessage = "Test Error Message"
 
-    private val pagingData: PagingData<YoutubeVideoDomain> = PagingData.from(DOMAIN_RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.items)
-    private val pagingUiData: PagingData<YoutubeVideoUiModel> = PagingData.from(
-        DOMAIN_RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.items.map { video: YoutubeVideoDomain ->
-            video.convertToYoutubeVideoUiModel()
-        }
-    )
+    private val pagingData: Flow<PagingData<YoutubeVideoDomain>> = flowOf(PagingData.from(emptyList()))
+    private val pagingUiData: Flow<PagingData<YoutubeVideoUiModel>> = flowOf(PagingData.from(emptyList()))
 
     private val expectedShortsUseCaseResponse: VideoResult<ShortsUseCase.ShortsResponse> =
         VideoResult.Success(ShortsUseCase.ShortsResponse(pagingData))
-    private val positiveConvertResult: UiState<PagingData<YoutubeVideoUiModel>> =
+    private val positiveConvertResult: UiState<Flow<PagingData<YoutubeVideoUiModel>>> =
         UiState.Success(pagingUiData)
 
     private fun positiveCase() {
@@ -71,7 +62,7 @@ class ShortsViewModelTest {
     private val runtimeShortsException = RuntimeException("VideoList Exception")
     private val expectedNegativeShortsUseCaseResponse: VideoResult<ShortsUseCase.ShortsResponse> = VideoResult
         .Error(UseCaseException.ShortsLoadException(runtimeShortsException))
-    private val negativeConvertResultShorts: UiState<PagingData<YoutubeVideoUiModel>> =
+    private val negativeConvertResultShorts: UiState<Flow<PagingData<YoutubeVideoUiModel>>> =
         UiState.Error(testErrorMessage)
 
     private fun negativeCase() {
@@ -81,6 +72,19 @@ class ShortsViewModelTest {
             .thenReturn(negativeConvertResultShorts)
     }
 
+    @Before
+    fun setup() {
+        whenever(networkConnectivityObserver.observe())
+            .thenReturn(flowOf(NetworkConnectivityStatus.Available))
+
+        shortsViewModel = ShortsViewModel(
+            shortsUseCase,
+            shortsConverter,
+            networkConnectivityObserver,
+            dispatcherTestRule.testDispatcher
+        )
+    }
+
     @Test
     fun `fun fetchShorts() gets UiState Success and assigns it to the ViewModel state`() = runTest {
         positiveCase()
@@ -88,7 +92,7 @@ class ShortsViewModelTest {
         shortsViewModel.fetchShorts()
         advanceUntilIdle()
 
-        val actualResult = shortsViewModel.shortsStateFlow.first()
+        val actualResult = shortsViewModel.shortsUiStateFlow.first().shortsState
 
         verify(shortsUseCase).execute(ShortsUseCase.ShortsRequest)
         verify(shortsConverter).convert(expectedShortsUseCaseResponse)
@@ -102,7 +106,7 @@ class ShortsViewModelTest {
         shortsViewModel.fetchShorts()
         advanceUntilIdle()
 
-        val actualErrorResult = shortsViewModel.shortsStateFlow.first()
+        val actualErrorResult = shortsViewModel.shortsUiStateFlow.first().shortsState
 
         verify(shortsUseCase).execute(ShortsUseCase.ShortsRequest)
         verify(shortsConverter).convert(expectedNegativeShortsUseCaseResponse)
@@ -152,5 +156,17 @@ class ShortsViewModelTest {
 
         advanceUntilIdle()
         verify(youTubePLayer1).play()
+    }
+
+    @Test
+    fun`submitAction(FetchShortsAction) calls ShortsViewModel handleAction, then fetchShorts()`() = runTest {
+        positiveCase()
+
+        val action = ShortsAction.FetchShortsAction
+
+        shortsViewModel.submitAction(action)
+        advanceUntilIdle()
+
+        verify(shortsUseCase).execute(ShortsUseCase.ShortsRequest)
     }
 }

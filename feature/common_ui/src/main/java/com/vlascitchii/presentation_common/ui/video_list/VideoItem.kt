@@ -31,7 +31,6 @@ import com.vlascitchii.presentation_common.model.videos.YoutubeVideoUiModel
 import com.vlascitchii.presentation_common.model.videos.YoutubeVideoUiModel.Companion.DEFAULT_VIDEO
 import com.vlascitchii.presentation_common.ui.theme.BlueTubeComposeTheme
 import com.vlascitchii.presentation_common.ui.theme.statisticsBodySmall
-import com.vlascitchii.presentation_common.utils.VideoListScreenTags.VIDEO_DURATION
 import com.vlascitchii.presentation_common.utils.formatDate
 import com.vlascitchii.presentation_common.utils.formatVideoDuration
 import com.vlascitchii.presentation_common.utils.formatViews
@@ -45,7 +44,7 @@ fun VideoItem(
     val videoItemDescription = stringResource(R.string.video_compact_preview_description)
     ConstraintLayout(modifier = modifier
         .fillMaxWidth()
-        .semantics {contentDescription = videoItemDescription }
+        .semantics { contentDescription = videoItemDescription }
         .clickable(
             onClick = {
                 navigateToPlayerScreen.invoke(youtubeVideoUiModel)
@@ -82,7 +81,6 @@ fun VideoItem(
             style = MaterialTheme.typography.bodyLarge,
             color = Color.White,
             modifier = modifier
-                .semantics { contentDescription = VIDEO_DURATION }
                 .padding(dimensionResource(R.dimen.padding_small_8))
                 .clip(MaterialTheme.shapes.small)
                 .background(MaterialTheme.colorScheme.outline)

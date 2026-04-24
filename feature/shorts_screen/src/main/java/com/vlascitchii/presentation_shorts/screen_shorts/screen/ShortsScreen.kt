@@ -11,12 +11,15 @@ import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.vlascitchii.presentation_common.model.videos.YoutubeVideoUiModel
-import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityStatus
 import com.vlascitchii.presentation_common.ui.screen.CommonScreen
 import com.vlascitchii.presentation_common.ui.screen.PagerContentManager
+import com.vlascitchii.presentation_common.ui.screen.mvi.MviHandler
 import com.vlascitchii.presentation_common.ui.state_common.UiState
-import com.vlascitchii.shorts_screen.R
+import com.vlascitchii.presentation_shorts.screen_shorts.state.ShortsAction
+import com.vlascitchii.presentation_shorts.screen_shorts.state.ShortsUIEvent
+import com.vlascitchii.presentation_shorts.screen_shorts.state.ShortsUiState
 import com.vlascitchii.presentation_shorts.screen_shorts.ui.ShortsList
+import com.vlascitchii.shorts_screen.R
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,16 +28,17 @@ const val SHORTS_BOTTOM_NAV_NAME: String = "Shorts"
 
 @Composable
 fun ShortsScreen(
-    shortsStateFlow: StateFlow<UiState<Flow<PagingData<YoutubeVideoUiModel>>>>,
+    shortsStateFlow: StateFlow<ShortsUiState>,
     videoQueue: MutableSharedFlow<YouTubePlayer?>,
-    listenToVideoQueue: () -> Unit,
-    networkConnectivityStatus: Flow<NetworkConnectivityStatus>,
+    shortsMviHandler: MviHandler<ShortsAction, ShortsUIEvent>,
 ) {
-    val localContext = LocalContext.current
+    Surface {
+        shortsStateFlow.collectAsStateWithLifecycle().value.let { shortsUiState: ShortsUiState ->
+            if (shortsUiState.shortsState == UiState.Loading) shortsMviHandler.submitAction(
+                ShortsAction.FetchShortsAction
+            )
 
-    Surface(modifier = Modifier.semantics { localContext.getString(R.string.shorts_screen_description) }) {
-        shortsStateFlow.collectAsStateWithLifecycle().value.let { uiStatePagingData: UiState<Flow<PagingData<YoutubeVideoUiModel>>> ->
-            CommonScreen(uiStatePagingData) { pagingData: Flow<PagingData<YoutubeVideoUiModel>> ->
+            CommonScreen(shortsUiState.shortsState) { pagingData: Flow<PagingData<YoutubeVideoUiModel>> ->
                 val shorts = pagingData.collectAsLazyPagingItems()
 
                 PagerContentManager(
@@ -43,8 +47,8 @@ fun ShortsScreen(
                         ShortsList(
                             videos = shorts,
                             videoQueue = videoQueue,
-                            listenToVideoQueue,
-                            connectivityStatus = networkConnectivityStatus
+                            shortsMviHandler,
+                            connectivityStatus = shortsUiState.networkConnectivityStatus
                         )
                     },
                     modifier = Modifier.fillMaxSize()

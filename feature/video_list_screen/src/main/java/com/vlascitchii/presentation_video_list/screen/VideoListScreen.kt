@@ -25,8 +25,7 @@ import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityS
 import com.vlascitchii.presentation_common.ui.global_snackbar.HandleSnackbar
 import com.vlascitchii.presentation_common.ui.global_snackbar.SnackBarController
 import com.vlascitchii.presentation_common.ui.global_snackbar.SnackBarEvent
-import com.vlascitchii.presentation_common.ui.screen.mvi.CommonMVI
-import com.vlascitchii.presentation_common.ui.screen.mvi.PREVIEW_VIDEO_LIST_MVI
+import com.vlascitchii.presentation_common.ui.screen.mvi.MviHandler
 import com.vlascitchii.presentation_common.ui.state_common.UiState
 import com.vlascitchii.presentation_common.ui.theme.BlueTubeComposeTheme
 import com.vlascitchii.presentation_common.ui.video_list.YouTubeVideoList
@@ -45,7 +44,7 @@ const val VIDEO_LIST_BOTTOM_NAV_NAME = "Video list"
 @Composable
 fun VideoListScreen(
     videoListUIStateFlow: StateFlow<VideoListUIState>,
-    videoListMVI: CommonMVI<UiVideoListAction, VideoListNavigationEvent>,
+    videoListMviHandler: MviHandler<UiVideoListAction, VideoListNavigationEvent>,
     videoSearchQuery: String,
     modifier: Modifier = Modifier,
     bottomNavigation: @Composable () -> Unit
@@ -56,9 +55,9 @@ fun VideoListScreen(
 
     videoListUIStateFlow.collectAsStateWithLifecycle().value.let { videoListUIState: VideoListUIState ->
 
-        if (videoListUIState.videoListState == UiState.Loading) videoListMVI.submitAction(
-            UiVideoListAction.GetVideo(videoSearchQuery)
-        )
+        if (videoListUIState.videoListState == UiState.Loading) videoListMviHandler.submitAction(
+                UiVideoListAction.GetVideo(videoSearchQuery)
+            )
 
         LaunchedEffect(videoListUIState.networkConnectivityStatus) {
             if (videoListUIState.networkConnectivityStatus == NetworkConnectivityStatus.Lost) {
@@ -85,14 +84,14 @@ fun VideoListScreen(
                 ListScreenAppBar(
                     videoListUIState = videoListUIState,
                     scrollAppBarBehaviour = scrollBehavior,
-                    videoListMVI = videoListMVI,
+                    videoListMVI = videoListMviHandler,
                     modifier = modifier
                 )
             },
             content = { innerPadding ->
                 YouTubeVideoList(
                     videoListUIState = videoListUIState,
-                    videoListMVI = videoListMVI,
+                    videoListMVI = videoListMviHandler,
                     innerPadding = innerPadding,
                     modifier = modifier
                 )
@@ -113,6 +112,17 @@ fun VideoListScreen(
     }
 }
 
+private val previewVideoListMviHandler: MviHandler<UiVideoListAction, VideoListNavigationEvent> =
+    object : MviHandler<UiVideoListAction, VideoListNavigationEvent>  {
+        override fun submitAction(action: UiVideoListAction) {
+            println("Preview")
+        }
+
+        override fun submitSingleNavigationEvent(event: VideoListNavigationEvent) {
+            println("Preview")
+        }
+    }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @PreviewLightDark
 @Composable
@@ -122,7 +132,7 @@ fun VideoListScreenPreview() {
 
             VideoListScreen(
                 videoListUIStateFlow = MutableStateFlow(VideoListUIState()),
-                videoListMVI = PREVIEW_VIDEO_LIST_MVI,
+                videoListMviHandler = previewVideoListMviHandler,
                 videoSearchQuery = "",
                 modifier = Modifier,
                 bottomNavigation = {  }
@@ -139,7 +149,7 @@ fun VideoSearchListScreenPreview() {
         Surface {
             VideoListScreen(
                 videoListUIStateFlow = MutableStateFlow(VideoListUIState()),
-                videoListMVI = PREVIEW_VIDEO_LIST_MVI,
+                videoListMviHandler = previewVideoListMviHandler,
                 videoSearchQuery = "",
                 modifier = Modifier,
                 bottomNavigation = {  }
@@ -157,7 +167,7 @@ fun VideoSearchListScreenLandscapePreview() {
         Surface {
             VideoListScreen(
                 videoListUIStateFlow = MutableStateFlow(VideoListUIState()),
-                videoListMVI = PREVIEW_VIDEO_LIST_MVI,
+                videoListMviHandler = previewVideoListMviHandler,
                 videoSearchQuery = "",
                 modifier = Modifier,
                 bottomNavigation = {  }

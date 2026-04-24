@@ -56,6 +56,7 @@ class VideoListUseCaseTest {
     @Before
     fun init() {
         whenever(configuration.dispatcher).thenReturn(dispatcherTestRule.testDispatcher)
+
         videoListUseCase = VideoListUseCase(configuration, videoListRepository)
         expectedTestPagingDomainYouTubeVideoDiffer =
             CommonTestPagingDiffer(dispatcherTestRule.testDispatcher, differCallback).pagingDiffer
@@ -69,7 +70,7 @@ class VideoListUseCaseTest {
         whenever(videoListRepository.getPopularVideos()).thenReturn(repositoryExpectedResultFlow)
 
         val actualResult = videoListUseCase.execute(
-            VideoListUseCase.VideoListRequest.VideoRequest(coroutineScope = this)
+            VideoListUseCase.VideoListRequest.VideoRequest
         )
 
         val expectedPagingData = positiveExpectedResult.data.youTubeVideoPagingData.first()
@@ -93,7 +94,7 @@ class VideoListUseCaseTest {
             .thenReturn(repositoryExpectedResultFlow)
 
         val actualResult = videoListUseCase.execute(
-            VideoListUseCase.VideoListRequest.SearchRequest(query = testQuery, coroutineScope = this)
+            VideoListUseCase.VideoListRequest.SearchRequest(query = testQuery)
         )
 
         val expectedPagingData = positiveExpectedResult.data.youTubeVideoPagingData.first()
