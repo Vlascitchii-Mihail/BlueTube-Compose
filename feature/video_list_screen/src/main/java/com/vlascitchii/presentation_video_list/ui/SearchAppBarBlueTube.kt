@@ -17,9 +17,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
-import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -36,10 +34,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.tooling.preview.PreviewLightDark
-import com.vlascitchii.presentation_common.ui.screen.mvi.CommonMVI
-import com.vlascitchii.presentation_common.ui.screen.mvi.PREVIEW_VIDEO_LIST_MVI
-import com.vlascitchii.presentation_common.ui.theme.BlueTubeComposeTheme
+import com.vlascitchii.presentation_common.ui.screen.mvi.MviHandler
 import com.vlascitchii.presentation_common.ui.video_list.state.SearchState
 import com.vlascitchii.presentation_common.ui.video_list.state.UiVideoListAction
 import com.vlascitchii.presentation_common.ui.video_list.state.VideoListNavigationEvent
@@ -55,7 +50,7 @@ private const val SEARCH_INPUT_DELAY = 2000L
 @Composable
 fun SearchAppBarBlueTube(
     searchText: TextFieldValue,
-    videoListMVI: CommonMVI<UiVideoListAction, VideoListNavigationEvent>,
+    videoListMVI: MviHandler<UiVideoListAction, VideoListNavigationEvent>,
     scrollAppBarBehaviour: TopAppBarScrollBehavior,
     modifier: Modifier,
 ) {
@@ -153,36 +148,36 @@ fun SearchAppBarBlueTube(
     }
 }
 
-@PreviewLightDark
-@Composable
-fun PreviewSearchAppBarBlueTube() {
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+//@PreviewLightDark
+//@Composable
+//fun PreviewSearchAppBarBlueTube() {
+//    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+//
+//    BlueTubeComposeTheme {
+//        Surface {
+//            SearchAppBarBlueTube(
+//                searchText = TextFieldValue(""),
+//                videoListMVI = PREVIEW_VIDEO_LIST_MVI,
+//                scrollAppBarBehaviour = scrollBehavior,
+//                modifier = Modifier,
+//            )
+//        }
+//    }
+//}
 
-    BlueTubeComposeTheme {
-        Surface {
-            SearchAppBarBlueTube(
-                searchText = TextFieldValue(""),
-                videoListMVI = PREVIEW_VIDEO_LIST_MVI,
-                scrollAppBarBehaviour = scrollBehavior,
-                modifier = Modifier,
-            )
-        }
-    }
-}
-
-@PreviewLightDark
-@Composable
-fun PreviewSearchAppBarBlueTubeWithText() {
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
-
-    BlueTubeComposeTheme {
-        Surface {
-            SearchAppBarBlueTube(
-                searchText = TextFieldValue("Test text"),
-                videoListMVI = PREVIEW_VIDEO_LIST_MVI,
-                scrollAppBarBehaviour = scrollBehavior,
-                modifier = Modifier,
-            )
-        }
-    }
-}
+//@PreviewLightDark
+//@Composable
+//fun PreviewSearchAppBarBlueTubeWithText() {
+//    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+//
+//    BlueTubeComposeTheme {
+//        Surface {
+//            SearchAppBarBlueTube(
+//                searchText = TextFieldValue("Test text"),
+//                videoListMVI = PREVIEW_VIDEO_LIST_MVI,
+//                scrollAppBarBehaviour = scrollBehavior,
+//                modifier = Modifier,
+//            )
+//        }
+//    }
+//}

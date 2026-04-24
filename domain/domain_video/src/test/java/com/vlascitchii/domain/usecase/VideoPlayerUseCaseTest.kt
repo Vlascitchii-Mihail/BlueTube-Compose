@@ -69,7 +69,7 @@ class VideoPlayerUseCaseTest {
             .thenReturn(repositoryExpectedResultFlow)
 
         val actualResult = videoPlayerUseCase.execute(
-            VideoPlayerUseCase.PlayerRequest("Test query", this)
+            VideoPlayerUseCase.PlayerRequest("Test query")
         )
 
         val expectedPagingData = positiveExpectedResult.data.relatedVideoPagingData.first()

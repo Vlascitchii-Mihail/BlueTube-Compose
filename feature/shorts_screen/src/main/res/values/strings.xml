@@ -4,4 +4,9 @@
     <string name="channel_description">Channel name is </string>
     <string name="shorts_screen_description">The screen with  short vertical videos</string>
 
+    <string name="shorts_pager_description">Listable up-down pager with shorts</string>
+    <string name="shorts_video_description">Shorts video</string>
+    <string name="shorts_channel_icon_description">Shorts channel icon</string>
+    <string name="shorts_title">Shorts title</string>
+
 </resources>
