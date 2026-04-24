@@ -31,7 +31,7 @@ import com.vlascitchii.presentation_common.ui.error.PaginationRetryItem
 import com.vlascitchii.presentation_common.ui.screen.CommonScreen
 import com.vlascitchii.presentation_common.ui.screen.LocalWindowSizeClass
 import com.vlascitchii.presentation_common.ui.screen.PagerContentManager
-import com.vlascitchii.presentation_common.ui.screen.mvi.CommonMVI
+import com.vlascitchii.presentation_common.ui.screen.mvi.MviHandler
 import com.vlascitchii.presentation_common.ui.screen.previewWindowSizeClass
 import com.vlascitchii.presentation_common.ui.theme.BlueTubeComposeTheme
 import com.vlascitchii.presentation_common.ui.video_list.state.UiVideoListAction
@@ -43,7 +43,7 @@ import kotlinx.coroutines.flow.flowOf
 @Composable
 fun YouTubeVideoList(
     videoListUIState: VideoListUIState,
-    videoListMVI: CommonMVI<UiVideoListAction, VideoListNavigationEvent>,
+    videoListMVI: MviHandler<UiVideoListAction, VideoListNavigationEvent>,
     modifier: Modifier = Modifier,
     innerPadding: PaddingValues = PaddingValues(),
 ) {

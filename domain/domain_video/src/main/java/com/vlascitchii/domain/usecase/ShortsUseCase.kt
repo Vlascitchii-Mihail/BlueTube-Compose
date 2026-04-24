@@ -15,14 +15,13 @@ class ShortsUseCase @Inject constructor(
     private val shortsRepository: ShortsRepository
 ) : UseCase<ShortsUseCase.ShortsRequest, ShortsUseCase.ShortsResponse>(configuration) {
 
-    data class ShortsRequest(val coroutineScope: CoroutineScope): UseCase.CommonRequest
+    data object ShortsRequest: UseCase.CommonRequest
     data class ShortsResponse(val shortsPopularVideoPagingData: Flow<PagingData<YoutubeVideoDomain>>) : UseCase.CommonResponse
 
     override fun process(request: ShortsRequest): Flow<ShortsResponse> = flow {
         emit(
             ShortsResponse(
                 shortsRepository.getShorts()
-                    .cachedIn(request.coroutineScope)
             )
         )
     }

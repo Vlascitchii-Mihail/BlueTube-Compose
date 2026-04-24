@@ -67,7 +67,7 @@ class ShortsUseCaseTest {
     fun `fun execute() returns Success SearchVideoResult with pager inside`() = runTest {
         whenever(shortsRepository.getShorts()).thenReturn(repositoryExpectedResultFlow)
 
-        val actualResult = shortsUseCase.execute(ShortsUseCase.ShortsRequest(coroutineScope = this))
+        val actualResult = shortsUseCase.execute(ShortsUseCase.ShortsRequest)
 
         val expectedPagingData = positiveExpectedResult.data.shortsPopularVideoPagingData.first()
         val actualPagingData = (actualResult.first() as VideoResult.Success).data.shortsPopularVideoPagingData.first()
