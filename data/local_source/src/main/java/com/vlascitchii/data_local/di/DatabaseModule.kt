@@ -30,6 +30,10 @@ object DatabaseModule {
 
     @Singleton
     @Provides
+    fun provideCustomCoroutineScope(): CustomCoroutineScope = CustomCoroutineScope()
+
+    @Singleton
+    @Provides
     fun provideDatabaseContentManager(youTubeVideoDao: YouTubeVideoDao) =
         DatabaseContentManager(youTubeVideoDao)
 }

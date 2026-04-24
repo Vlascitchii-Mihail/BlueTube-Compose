@@ -9,7 +9,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemKey
@@ -18,6 +21,10 @@ import com.vlascitchii.presentation_common.model.videos.YoutubeVideoUiModel
 import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityStatus
 import com.vlascitchii.presentation_common.ui.global_snackbar.SnackBarController
 import com.vlascitchii.presentation_common.ui.global_snackbar.SnackBarEvent
+import com.vlascitchii.presentation_common.ui.screen.mvi.MviHandler
+import com.vlascitchii.presentation_shorts.screen_shorts.state.ShortsAction
+import com.vlascitchii.presentation_shorts.screen_shorts.state.ShortsUIEvent
+import com.vlascitchii.shorts_screen.R
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 
@@ -25,17 +32,14 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 fun ShortsList(
     videos: LazyPagingItems<YoutubeVideoUiModel>,
     videoQueue: MutableSharedFlow<YouTubePlayer?>,
-    listenToVideoQueue: () -> Unit,
-    connectivityStatus: Flow<NetworkConnectivityStatus>,
+    shortsMviHandler: MviHandler<ShortsAction, ShortsUIEvent>,
+    connectivityStatus: NetworkConnectivityStatus,
 ) {
     val context = LocalContext.current
     val pagerState = rememberPagerState(pageCount = { videos.itemCount })
-    val networkConnectivityStatus by connectivityStatus.collectAsStateWithLifecycle(
-        initialValue = NetworkConnectivityStatus.Available
-    )
 
-    LaunchedEffect(networkConnectivityStatus) {
-        if (networkConnectivityStatus == NetworkConnectivityStatus.Lost) {
+    LaunchedEffect(connectivityStatus) {
+        if (connectivityStatus == NetworkConnectivityStatus.Lost) {
             SnackBarController.sendEvent(
                 event = SnackBarEvent(
                     message = "Wrong internet connection"
@@ -54,20 +58,21 @@ fun ShortsList(
 
     DisposableEffect(Unit) {
         lockOrientation()
-        listenToVideoQueue.invoke()
+        shortsMviHandler.submitAction(ShortsAction.ListenToVideoQueueAction)
         onDispose { unlockOrientation() }
     }
 
     VerticalPager(
         state = pagerState,
-        key = videos.itemKey { it },
+        key = videos.itemKey { it.id },
         pageSize = PageSize.Fill,
+        modifier = Modifier.semantics { contentDescription = context.getString(R.string.shorts_pager_description) }
     ) { pageIndex: Int ->
         videos[pageIndex]?.let {
             ShortsItem(
                 youTubeVideo = it,
-                videoQueue,
-                networkConnectivityStatus = networkConnectivityStatus
+                videoQueue = videoQueue,
+                networkConnectivityStatus = connectivityStatus
             )
         }
     }

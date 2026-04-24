@@ -3,6 +3,7 @@ package com.vlascitchii.presentation_common.model.util
 import androidx.paging.PagingData
 import androidx.paging.map
 import com.vlascitchii.domain.model.videos.YoutubeVideoDomain
+import com.vlascitchii.domain.usecase.VideoListUseCase
 import com.vlascitchii.domain.util.VideoResult
 import com.vlascitchii.presentation_common.model.videos.ContentDetailsUiModel
 import com.vlascitchii.presentation_common.model.videos.ThumbnailAttributesUiModel
@@ -12,13 +13,26 @@ import com.vlascitchii.presentation_common.model.videos.VideoStatisticsUiModel
 import com.vlascitchii.presentation_common.model.videos.YoutubeVideoUiModel
 import com.vlascitchii.presentation_common.ui.state_common.UiState
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 
 abstract class CommonResultConverter<RECEIVED: Any, CONVERTED: Any> {
 
-    abstract fun convertSuccess(data: RECEIVED): CONVERTED
+    abstract fun convertSuccess(
+        data: RECEIVED,
+    ): CONVERTED
 
-    fun convert(result: VideoResult<RECEIVED>): UiState<CONVERTED> {
+    abstract fun convertSuccessVideo(
+        data: Flow<PagingData<YoutubeVideoDomain>>,
+    ): UiState<CONVERTED>
+
+    abstract fun unpack(
+        result: VideoResult<RECEIVED>,
+    ): Flow<PagingData<YoutubeVideoDomain>>?
+
+    fun convert(
+        result: VideoResult<RECEIVED>,
+    ): UiState<CONVERTED> {
         return when(result) {
             is VideoResult.Error -> {
                 UiState.Error(result.exception.errorDomain?.message.orEmpty())

@@ -2,6 +2,7 @@ package com.vlascitchii.bluetubecompose.fake.converter
 
 import androidx.paging.PagingData
 import com.vlascitchii.bluetubecompose.fake.data.UI_MODEL_VIDEO_LIST_WITH_CHANNEL_IMG_URL
+import com.vlascitchii.domain.model.videos.YoutubeVideoDomain
 import com.vlascitchii.domain.usecase.ShortsUseCase
 import com.vlascitchii.domain.usecase.VideoListUseCase
 import com.vlascitchii.domain.usecase.VideoPlayerUseCase
@@ -16,17 +17,26 @@ private val pagingData: Flow<PagingData<YoutubeVideoUiModel>> = flowOf(PagingDat
 class FakeVideoListConverter @Inject constructor()
     : CommonResultConverter<VideoListUseCase.VideoListResponse, @JvmSuppressWildcards Flow<PagingData<YoutubeVideoUiModel>>>(){
 
-        override fun convertSuccess(data: VideoListUseCase.VideoListResponse): @JvmSuppressWildcards Flow<PagingData<YoutubeVideoUiModel>> = pagingData
+        override fun convertSuccess(
+            data: VideoListUseCase.VideoListResponse,
+            cashLogic: (Flow<PagingData<YoutubeVideoDomain>>) -> Flow<PagingData<YoutubeVideoDomain>>
+        ): @JvmSuppressWildcards Flow<PagingData<YoutubeVideoUiModel>> = pagingData
 }
 
 class FakeShortsConverter @Inject constructor()
     : CommonResultConverter<ShortsUseCase.ShortsResponse, @JvmSuppressWildcards Flow<PagingData<YoutubeVideoUiModel>>>() {
 
-        override fun convertSuccess(data: ShortsUseCase.ShortsResponse): @JvmSuppressWildcards Flow<PagingData<YoutubeVideoUiModel>> = pagingData
+        override fun convertSuccess(
+            data: ShortsUseCase.ShortsResponse,
+            cashLogic: (Flow<PagingData<YoutubeVideoDomain>>) -> Flow<PagingData<YoutubeVideoDomain>>
+        ): @JvmSuppressWildcards Flow<PagingData<YoutubeVideoUiModel>> = pagingData
 }
 
 class FakePlayerConverter @Inject constructor()
     : CommonResultConverter<VideoPlayerUseCase.PlayerResponse, @JvmSuppressWildcards Flow<PagingData<YoutubeVideoUiModel>>>() {
 
-    override fun convertSuccess(data: VideoPlayerUseCase.PlayerResponse): @JvmSuppressWildcards Flow<PagingData<YoutubeVideoUiModel>> = pagingData
+    override fun convertSuccess(
+        data: VideoPlayerUseCase.PlayerResponse,
+        cashLogic: (Flow<PagingData<YoutubeVideoDomain>>) -> Flow<PagingData<YoutubeVideoDomain>>
+    ): @JvmSuppressWildcards Flow<PagingData<YoutubeVideoUiModel>> = pagingData
 }

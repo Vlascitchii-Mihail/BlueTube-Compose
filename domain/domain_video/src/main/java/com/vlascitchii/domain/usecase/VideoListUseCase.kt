@@ -1,7 +1,6 @@
 package com.vlascitchii.domain.usecase
 
 import androidx.paging.PagingData
-import androidx.paging.cachedIn
 import com.vlascitchii.domain.model.videos.YoutubeVideoDomain
 import com.vlascitchii.domain.repository.VideoListRepository
 import com.vlascitchii.domain.usecase.util.DispatcherConfiguration
@@ -16,8 +15,8 @@ class VideoListUseCase @Inject constructor(
 ) : UseCase<VideoListUseCase.VideoListRequest, VideoListUseCase.VideoListResponse>(dispatcherConfiguration) {
 
     sealed class VideoListRequest() : UseCase.CommonRequest {
-        data class VideoRequest(val coroutineScope: CoroutineScope) : VideoListRequest()
-        data class SearchRequest(val query: String, val coroutineScope: CoroutineScope) : VideoListRequest()
+        data object VideoRequest : VideoListRequest()
+        data class SearchRequest(val query: String) : VideoListRequest()
     }
 
     data class VideoListResponse(val youTubeVideoPagingData: Flow<PagingData<YoutubeVideoDomain>>) : UseCase.CommonResponse
@@ -28,14 +27,12 @@ class VideoListUseCase @Inject constructor(
                 is VideoListRequest.VideoRequest -> {
                     VideoListResponse(
                         youTubeVideoPagingData = videoListRepository.getPopularVideos()
-                            .cachedIn(request.coroutineScope)
                     )
                 }
 
                 is VideoListRequest.SearchRequest -> {
                     VideoListResponse(
                         youTubeVideoPagingData = videoListRepository.getSearchVideos(request.query)
-                            .cachedIn(request.coroutineScope)
                     )
                 }
             }

@@ -37,7 +37,6 @@ import com.vlascitchii.presentation_common.ui.screen.LocalWindowSizeClass
 import com.vlascitchii.presentation_common.ui.screen.previewWindowSizeClass
 import com.vlascitchii.presentation_common.ui.theme.BlueTubeComposeTheme
 import com.vlascitchii.presentation_common.ui.theme.statisticsBodySmall
-import com.vlascitchii.presentation_common.utils.VideoListScreenTags.VIDEO_DURATION
 import com.vlascitchii.presentation_common.utils.formatDate
 import com.vlascitchii.presentation_common.utils.formatVideoDuration
 import com.vlascitchii.presentation_common.utils.formatViews
@@ -90,7 +89,6 @@ fun VideoItemLandscape(
             style = MaterialTheme.typography.bodySmall,
             color = Color.White,
             modifier = modifier
-                .semantics { contentDescription = VIDEO_DURATION }
                 .padding(dimensionResource(R.dimen.padding_small_8))
                 .clip(MaterialTheme.shapes.small)
                 .background(MaterialTheme.colorScheme.outline)

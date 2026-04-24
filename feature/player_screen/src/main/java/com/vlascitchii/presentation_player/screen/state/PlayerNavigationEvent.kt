@@ -1,0 +1,10 @@
+package com.vlascitchii.presentation_player.screen.state
+
+import com.vlascitchii.presentation_common.model.videos.YoutubeVideoUiModel
+import com.vlascitchii.presentation_common.ui.state_common.UiSingleEvent
+
+sealed class PlayerNavigationEvent : UiSingleEvent {
+
+    data class NavigationPlayerScreenEvent(val video: YoutubeVideoUiModel) : PlayerNavigationEvent()
+    data object PopBackStackEvent : PlayerNavigationEvent()
+}
