@@ -36,7 +36,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.spy
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
@@ -76,12 +75,11 @@ class ShortsScreenKtTest {
             networkConnectivityObserver,
             Dispatchers.IO
         )
-        mviHandler = spy(
-            ShortsMviHandler(
-                shortsViewModel,
-                navigationHandler = { event: UiSingleEvent -> Unit }
-            )
+        mviHandler = ShortsMviHandler(
+            shortsViewModel,
+            navigationHandler = { event: UiSingleEvent -> Unit }
         )
+
 
         whenever(shortsUseCase.execute(any<ShortsUseCase.ShortsRequest>()))
             .thenReturn(flowOf(expectedRelatedVideosUseCaseResponse))

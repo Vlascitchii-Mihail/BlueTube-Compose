@@ -93,11 +93,15 @@ dependencies {
     implementation(libs.paging)
     implementation(libs.paging.compose)
 
-    implementation(libs.coil)
-
     //navigation
+    implementation(libs.nav3.runtime)
+    implementation(libs.nav3.ui)
+    implementation(libs.androidx.lifecycle.viewmodel.nav3)
+    implementation(libs.androidx.material3.adaptive)
     implementation(libs.kotlinx.serialization.core)
     implementation(libs.kotlinx.serialization.json)
+
+    implementation(libs.coil)
 
     //unit test
     testImplementation(libs.junit)

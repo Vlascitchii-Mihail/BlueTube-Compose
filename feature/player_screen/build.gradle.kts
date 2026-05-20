@@ -85,9 +85,6 @@ dependencies {
     ksp(libs.ksp.hilt.compiler)
     implementation(libs.hilt.navigation)
 
-    //navigation
-    implementation(libs.nav3.runtime)
-
     //Paging
     implementation(libs.paging)
     implementation(libs.paging.compose)

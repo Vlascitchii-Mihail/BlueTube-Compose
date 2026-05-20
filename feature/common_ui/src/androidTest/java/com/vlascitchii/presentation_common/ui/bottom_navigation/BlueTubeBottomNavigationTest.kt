@@ -1,24 +1,19 @@
-package com.vlascitchii.bluetubecompose.navigation.bottom_navigation
+package com.vlascitchii.presentation_common.ui.bottom_navigation
 
-import androidx.activity.compose.setContent
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
-import androidx.compose.ui.test.junit4.AndroidComposeTestRule
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.performClick
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
-import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.vlascitchii.bluetubecompose.MainActivity
-import com.vlascitchii.bluetubecompose.navigation.ScreenType
+import com.vlascitchii.presentation_common.ui.navigation_common.BlueTubeBottomNavigation
+import com.vlascitchii.presentation_common.ui.navigation_common.SETTINGS_BOTTOM_NAV_NAME
+import com.vlascitchii.presentation_common.ui.navigation_common.SHORTS_BOTTOM_NAV_NAME
+import com.vlascitchii.presentation_common.ui.navigation_common.ScreenType
+import com.vlascitchii.presentation_common.ui.navigation_common.VIDEO_LIST_BOTTOM_NAV_NAME
 import com.vlascitchii.presentation_common.ui.theme.BlueTubeComposeTheme
-import com.vlascitchii.presentation_shorts.screen_shorts.screen.SHORTS_BOTTOM_NAV_NAME
-import com.vlascitchii.presentation_video_list.screen.VIDEO_LIST_BOTTOM_NAV_NAME
-import com.vlascitchii.presenttion_settings.screen_settings.SETTINGS_BOTTOM_NAV_NAME
-import dagger.hilt.android.testing.HiltAndroidRule
-import dagger.hilt.android.testing.HiltAndroidTest
 import junit.framework.TestCase.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -29,16 +24,11 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.spy
 import org.mockito.kotlin.verify
 
-@HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
 class BlueTubeBottomNavigationTest {
 
-    @get:Rule(order = 0)
-    val hiltRule = HiltAndroidRule(this)
-
     @get:Rule(order = 1)
-    val composeAndroidTestRule: AndroidComposeTestRule<ActivityScenarioRule<MainActivity>, MainActivity> =
-        createAndroidComposeRule(MainActivity::class.java)
+    val composeAndroidTestRule =  createComposeRule()
 
     private val videoListScreen: String = VIDEO_LIST_BOTTOM_NAV_NAME
     private val shortsScreen: String = SHORTS_BOTTOM_NAV_NAME
@@ -47,7 +37,7 @@ class BlueTubeBottomNavigationTest {
 
     @Before
     fun init_Activity() {
-        with(composeAndroidTestRule.activity) {
+        with(composeAndroidTestRule) {
             backStack = spy(NavBackStack(ScreenType.VideoList()))
 
             setContent {
