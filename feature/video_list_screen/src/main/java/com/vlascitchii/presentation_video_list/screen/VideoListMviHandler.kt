@@ -7,7 +7,7 @@ import com.vlascitchii.presentation_common.ui.video_list.state.VideoListNavigati
 
 class VideoListMviHandler(
     private val videoListViewModel: VideoListViewModel,
-    private val navigationHandler: (UiSingleEvent) -> Unit
+    private val navigationHandler: (VideoListNavigationEvent) -> Unit
 ) : MviHandler<UiVideoListAction, VideoListNavigationEvent> {
 
     override fun submitAction(action: UiVideoListAction) {

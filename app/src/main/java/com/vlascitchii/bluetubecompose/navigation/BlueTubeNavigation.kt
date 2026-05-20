@@ -12,7 +12,8 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
-import com.vlascitchii.bluetubecompose.navigation.bottom_navigation.BlueTubeBottomNavigation
+import com.vlascitchii.presentation_common.ui.navigation_common.BlueTubeBottomNavigation
+import com.vlascitchii.presentation_common.ui.navigation_common.ScreenType
 import com.vlascitchii.presentation_common.ui.state_common.UiSingleEvent
 import com.vlascitchii.presentation_common.ui.video_list.state.VideoListNavigationEvent
 import com.vlascitchii.presentation_player.screen.screen.PlayerMviHandler

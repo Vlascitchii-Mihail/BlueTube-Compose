@@ -10,4 +10,5 @@
     <string name="search_placeholder">Enter search text</string>
     <!--    Video appearance-->
     <string name="video_thumbnail_item">Video thumbnail item</string>
+    <string name="search_app_bar_description">Search app bar</string>
 </resources>

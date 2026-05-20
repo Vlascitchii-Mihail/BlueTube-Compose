@@ -125,8 +125,6 @@ dependencies {
     implementation(libs.nav3.ui)
     implementation(libs.androidx.lifecycle.viewmodel.nav3)
     implementation(libs.androidx.material3.adaptive)
-    implementation(libs.kotlinx.serialization.core)
-    implementation(libs.kotlinx.serialization.json)
 
     //Paging
     implementation(libs.paging)

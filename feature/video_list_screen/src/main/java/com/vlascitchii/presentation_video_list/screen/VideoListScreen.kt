@@ -38,8 +38,6 @@ import kotlinx.coroutines.flow.StateFlow
 import com.vlascitchii.common_ui.R as RCommon
 import com.vlascitchii.video_list_screen.R as RVideoListScreen
 
-const val VIDEO_LIST_BOTTOM_NAV_NAME = "Video list"
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VideoListScreen(

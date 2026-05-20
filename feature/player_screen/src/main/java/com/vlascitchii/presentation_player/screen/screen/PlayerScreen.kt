@@ -49,8 +49,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flowOf
 import com.vlascitchii.common_ui.R as CommonR
 
-const val VIDEO_PLAYER_BOTTOM_NAV_NAME = "Video player"
-
 @Composable
 fun PlayerScreen(
     video: YoutubeVideoUiModel,

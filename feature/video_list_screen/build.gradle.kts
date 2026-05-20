@@ -93,9 +93,9 @@ dependencies {
     //androidTest
     androidTestImplementation(libs.androidx.compose.ui.test)
     androidTestImplementation(libs.navigation.compose.testing)
-    androidTestImplementation(libs.androidx.test.runner)
     androidTestImplementation(libs.androidx.test.ext)
     androidTestImplementation(libs.androidx.test.espresso)
+    androidTestImplementation(libs.mockito)
     androidTestImplementation(libs.dexmaker)
 
     //add the agent to the configuration

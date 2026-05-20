@@ -1,4 +1,4 @@
-package com.vlascitchii.presentation_shorts.screen_shorts
+package com.vlascitchii.presentation_shorts.screen_shorts.di
 
 import androidx.paging.PagingData
 import com.vlascitchii.domain.di_common.SHORTS_CONVERTER

@@ -16,6 +16,8 @@ import androidx.test.espresso.Espresso
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.vlascitchii.bluetubecompose.MainActivity
+import com.vlascitchii.presentation_common.ui.navigation_common.SHORTS_BOTTOM_NAV_NAME
+import com.vlascitchii.presentation_common.ui.navigation_common.ScreenType
 import com.vlascitchii.presentation_common.ui.theme.BlueTubeComposeTheme
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -31,6 +33,7 @@ import org.mockito.kotlin.verify
 import com.vlascitchii.common_ui.R as RCommon
 import com.vlascitchii.player_screen.R as RPlayer
 import com.vlascitchii.video_list_screen.R as RVideoList
+import com.vlascitchii.shorts_screen.R as ShortsR
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
@@ -48,6 +51,8 @@ class BlueTubeNavigationTest {
     private val videoListScreenDescription: String = context.getString(RVideoList.string.video_list_screen_description)
     private val playerScreenDescription: String = context.getString(RPlayer.string.player_screen_description)
     private val videoItemDescription: String = context.getString(RCommon.string.video_compact_preview_description)
+    private val bottomNavigationShortsIconName: String = SHORTS_BOTTOM_NAV_NAME
+    private val shortsListPagerDescription: String = context.getString(ShortsR.string.shorts_pager_description)
     private lateinit var backStack: NavBackStack<NavKey>
 
     @Before
@@ -107,6 +112,16 @@ class BlueTubeNavigationTest {
             Espresso.pressBack()
             onNodeWithContentDescription(videoListScreenDescription).assertIsDisplayed()
             assertTrue(backStack.size == singleElementInBackStack)
+        }
+    }
+
+    @Test
+    fun `Navigate to ShortsScreen`() {
+        val twoElementsInBackStack: Int = 2
+        with(composeAndroidTestRule) {
+            onNodeWithContentDescription(bottomNavigationShortsIconName).performClick()
+            onNodeWithContentDescription(shortsListPagerDescription).assertIsDisplayed()
+            assertTrue(backStack.size == twoElementsInBackStack)
         }
     }
 }

@@ -23,6 +23,9 @@ import com.vlascitchii.presentation_common.di.CommonDiModule
 import com.vlascitchii.presentation_common.model.util.CommonResultConverter
 import com.vlascitchii.presentation_common.model.videos.YoutubeVideoUiModel
 import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityAbstraction
+import com.vlascitchii.presentation_player.screen.di.PlayerDiModule
+import com.vlascitchii.presentation_shorts.screen_shorts.di.ShortsDiModule
+import com.vlascitchii.presentation_video_list.di.VideoListDiModule
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.components.SingletonComponent
@@ -39,16 +42,19 @@ import javax.inject.Singleton
 abstract class DiTestNavigationUseCaseModule {
 
     @Binds
+    @Singleton
     @Named(VIDEO_LIST_USE_CASE)
     abstract fun bindFakeVideoListUseCase(fakeVideoListTestUseCase: FakeVideoListTestUseCase)
     : UseCase<VideoListUseCase.VideoListRequest, VideoListUseCase.VideoListResponse>
 
     @Binds
+    @Singleton
     @Named(SHORTS_USE_CASE)
     abstract fun bindFakeShortsUseCase(fakeShortsUseCase: FakeShortsUseCase)
     : UseCase<ShortsUseCase.ShortsRequest, ShortsUseCase.ShortsResponse>
 
     @Binds
+    @Singleton
     @Named(VIDEO_PLAYER_USE_CASE)
     abstract fun bindFakeVideoPlayerUseCase(fakeVideoPlayerUseCase: FakeVideoPlayerUseCase)
     : UseCase<VideoPlayerUseCase.PlayerRequest, VideoPlayerUseCase.PlayerResponse>
@@ -58,21 +64,39 @@ abstract class DiTestNavigationUseCaseModule {
 @Module
 @TestInstallIn(
     components = [SingletonComponent::class],
-    replaces = [ConverterDiModule::class]
+    replaces = [VideoListDiModule::class]
 )
-abstract class DiTestNavigationConverterModule {
-
+abstract class DiTestVideoListConverter {
     @Binds
+    @Singleton
     @Named(VIDEO_LIST_CONVERTER)
     abstract fun bindFakeVideoListConverter(fakeVideoListConverter: FakeVideoListConverter)
             : CommonResultConverter<VideoListUseCase.VideoListResponse, @JvmSuppressWildcards Flow<PagingData<YoutubeVideoUiModel>>>
+}
 
+
+@Module
+@TestInstallIn(
+    components = [SingletonComponent::class],
+    replaces = [PlayerDiModule::class]
+)
+abstract class DiTestPlayerConverterModule {
     @Binds
+    @Singleton
     @Named(PLAYER_CONVERTER)
     abstract fun bindFakePlayerConverter(fakePlayerConverter: FakePlayerConverter)
             : CommonResultConverter<VideoPlayerUseCase.PlayerResponse, @JvmSuppressWildcards Flow<PagingData<YoutubeVideoUiModel>>>
+}
 
+
+@Module
+@TestInstallIn(
+    components = [SingletonComponent::class],
+    replaces = [ShortsDiModule::class]
+)
+abstract class DiTestShortsConverterModule {
     @Binds
+    @Singleton
     @Named(SHORTS_CONVERTER)
     abstract fun bindFakeShortsConverter(fakeShortsConverter: FakeShortsConverter)
             : CommonResultConverter<ShortsUseCase.ShortsResponse, @JvmSuppressWildcards Flow<PagingData<YoutubeVideoUiModel>>>

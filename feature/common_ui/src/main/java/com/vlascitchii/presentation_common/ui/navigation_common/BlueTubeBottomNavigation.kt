@@ -1,4 +1,4 @@
-package com.vlascitchii.bluetubecompose.navigation.bottom_navigation
+package com.vlascitchii.presentation_common.ui.navigation_common
 
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Icon
@@ -16,16 +16,17 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
-import com.vlascitchii.bluetubecompose.navigation.ScreenType
 import com.vlascitchii.common_ui.R
 import com.vlascitchii.presentation_common.ui.theme.BlueTubeComposeTheme
-import com.vlascitchii.presentation_shorts.screen_shorts.screen.SHORTS_BOTTOM_NAV_NAME
-import com.vlascitchii.presentation_video_list.screen.VIDEO_LIST_BOTTOM_NAV_NAME
-import com.vlascitchii.presenttion_settings.screen_settings.SETTINGS_BOTTOM_NAV_NAME
 
 private const val FIRST_INDEX = 0
 private const val SECOND_INDEX = 1
 private const val THIRD_INDEX = 2
+
+const val SHORTS_BOTTOM_NAV_NAME: String = "Shorts"
+const val VIDEO_LIST_BOTTOM_NAV_NAME = "Video list"
+const val SETTINGS_BOTTOM_NAV_NAME: String = "Settings"
+const val VIDEO_PLAYER_BOTTOM_NAV_NAME = "Video player"
 
 private data class NavigationItem(
     val index: Int,
