@@ -5,7 +5,6 @@ import androidx.room.Room
 import com.vlascitchii.data_local.database.YouTubeDatabase
 import com.vlascitchii.data_local.database.YouTubeVideoDao
 import com.vlascitchii.data_local.source.utils.DatabaseContentManager
-import com.vlascitchii.domain.custom_scope.CustomCoroutineScope
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -27,10 +26,6 @@ object DatabaseModule {
     @Singleton
     @Provides
     fun provideYoutubeVideoDao(database: YouTubeDatabase): YouTubeVideoDao = database.youTubeVideoDao
-
-    @Singleton
-    @Provides
-    fun provideCustomCoroutineScope(): CustomCoroutineScope = CustomCoroutineScope()
 
     @Singleton
     @Provides

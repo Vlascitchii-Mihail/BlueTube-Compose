@@ -1,14 +1,14 @@
 package com.vlascitchii.data_local.database
 
 import androidx.room.TypeConverter
-import com.vlascitchii.data_local.enetity.PageEntity
-import com.vlascitchii.data_local.enetity.video_list.ThumbnailAttributesEntity
-import com.vlascitchii.data_local.enetity.video_list.ThumbnailsEntity
-import com.vlascitchii.data_local.enetity.video_list.videos.ContentDetailsEntity
-import com.vlascitchii.data_local.enetity.video_list.videos.VideoSnippetEntity
-import com.vlascitchii.data_local.enetity.video_list.videos.VideoStatisticsEntity
-import com.vlascitchii.data_local.enetity.video_list.videos.YoutubeVideoEntity
-import com.vlascitchii.data_local.enetity.video_list.videos.YoutubeVideoResponseEntity
+import com.vlascitchii.data_local.entity.PageEntity
+import com.vlascitchii.data_local.entity.video_list.ThumbnailAttributesEntity
+import com.vlascitchii.data_local.entity.video_list.ThumbnailsEntity
+import com.vlascitchii.data_local.entity.video_list.videos.ContentDetailsEntity
+import com.vlascitchii.data_local.entity.video_list.videos.VideoSnippetEntity
+import com.vlascitchii.data_local.entity.video_list.videos.VideoStatisticsEntity
+import com.vlascitchii.data_local.entity.video_list.videos.YoutubeVideoEntity
+import com.vlascitchii.data_local.entity.video_list.videos.YoutubeVideoResponseEntity
 import com.vlascitchii.domain.model.ThumbnailAttributesDomain
 import com.vlascitchii.domain.model.ThumbnailsDomain
 import com.vlascitchii.domain.model.videos.ContentDetailsDomain

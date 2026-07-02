@@ -52,10 +52,11 @@ fun VideoListScreen(
     val scrollBehavior: TopAppBarScrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
 
     videoListUIStateFlow.collectAsStateWithLifecycle().value.let { videoListUIState: VideoListUIState ->
-
-        if (videoListUIState.videoListState == UiState.Loading) videoListMviHandler.submitAction(
-                UiVideoListAction.GetVideo(videoSearchQuery)
-            )
+        LaunchedEffect(videoSearchQuery) {
+            if (videoListUIState.videoListState == UiState.Loading) {
+                videoListMviHandler.submitAction(UiVideoListAction.GetVideo(videoSearchQuery))
+            }
+        }
 
         LaunchedEffect(videoListUIState.networkConnectivityStatus) {
             if (videoListUIState.networkConnectivityStatus == NetworkConnectivityStatus.Lost) {

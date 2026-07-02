@@ -3,13 +3,13 @@ package com.vlascitchii.data_local.database
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.vlascitchii.data_local.enetity.video_list.videos.ContentDetailsEntity
-import com.vlascitchii.data_local.enetity.video_list.videos.VideoSnippetEntity
-import com.vlascitchii.data_local.enetity.video_list.videos.VideoStatisticsEntity
-import com.vlascitchii.data_local.enetity.video_list.videos.YoutubeVideoEntity
-import com.vlascitchii.data_local.enetity.PageEntity
-import com.vlascitchii.data_local.enetity.video_list.ThumbnailAttributesEntity
-import com.vlascitchii.data_local.enetity.video_list.ThumbnailsEntity
+import com.vlascitchii.data_local.entity.video_list.videos.ContentDetailsEntity
+import com.vlascitchii.data_local.entity.video_list.videos.VideoSnippetEntity
+import com.vlascitchii.data_local.entity.video_list.videos.VideoStatisticsEntity
+import com.vlascitchii.data_local.entity.video_list.videos.YoutubeVideoEntity
+import com.vlascitchii.data_local.entity.PageEntity
+import com.vlascitchii.data_local.entity.video_list.ThumbnailAttributesEntity
+import com.vlascitchii.data_local.entity.video_list.ThumbnailsEntity
 
 @Database(
     version = 1,

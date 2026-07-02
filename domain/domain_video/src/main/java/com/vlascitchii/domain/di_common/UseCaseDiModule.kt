@@ -2,7 +2,6 @@ package com.vlascitchii.domain.di_common
 
 import android.content.Context
 import android.net.ConnectivityManager
-import com.vlascitchii.domain.custom_scope.CustomCoroutineScope
 import com.vlascitchii.domain.usecase.ShortsUseCase
 import com.vlascitchii.domain.usecase.UseCase
 import com.vlascitchii.domain.usecase.VideoListUseCase
@@ -17,7 +16,6 @@ import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import javax.inject.Named
-import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)

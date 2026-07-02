@@ -1,11 +1,11 @@
-package com.vlascitchii.data_local.enetity.video_list.videos
+package com.vlascitchii.data_local.entity.video_list.videos
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Ignore
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.vlascitchii.data_local.enetity.video_list.ThumbnailsEntity
+import com.vlascitchii.data_local.entity.video_list.ThumbnailsEntity
 
 @Entity(
     tableName = "video_snippet",

@@ -8,7 +8,6 @@ import com.vlascitchii.data_repository.data_source.local.LocalVideoListDataSourc
 import com.vlascitchii.data_repository.data_source.remote.RemoteSearchDataSource
 import com.vlascitchii.data_repository.data_source.remote.RemoteVideoListDataSource
 import com.vlascitchii.data_repository.mock_model.DOMAIN_RESPONSE_VIDEO_WITH_CHANNEL_IMG
-import com.vlascitchii.domain.custom_scope.CustomCoroutineScope
 import com.vlascitchii.domain.model.videos.YoutubeVideoDomain
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
@@ -33,13 +32,11 @@ class VideoListRepositoryImplTest {
     private val remoteVideoListDataSource: RemoteVideoListDataSource = mock()
     private val remoteSearchDataSource: RemoteSearchDataSource = mock()
     private val localVideoListDataSource: LocalVideoListDataSource = mock()
-    private val customCoroutineScope: CustomCoroutineScope = CustomCoroutineScope(dispatcherTestRule.testDispatcher)
 
     private val videoListRepositoryImpl = VideoListRepositoryImpl(
         remoteVideoListDataSource,
         remoteSearchDataSource,
-        localVideoListDataSource,
-        customCoroutineScope
+        localVideoListDataSource
     )
 
     private val initialPageToken = ""
@@ -63,7 +60,7 @@ class VideoListRepositoryImplTest {
         wheneverBlocking { remoteVideoListDataSource.fetchVideos(initialPageToken) }
             .thenReturn(expectedDataSourceResult)
 
-        wheneverBlocking {remoteSearchDataSource.searchVideos(testQuery, initialPageToken) }
+        wheneverBlocking { remoteSearchDataSource.searchVideos(testQuery, initialPageToken) }
             .thenReturn(expectedDataSourceResult)
     }
 
@@ -112,4 +109,31 @@ class VideoListRepositoryImplTest {
 
         DOMAIN_RESPONSE_VIDEO_WITH_CHANNEL_IMG.items.assertListEqualsTo(testPagingDomainYouTubeVideoDiffer.snapshot())
     }
+
+    @Test
+    fun `fun getVideoListAndCache() positively calls remoteVideoListDataSource fetchVideos() and databaseVideoSourceImpl insertVideosWithTimeStamp()`() =
+        runTest {
+            val pagingData = videoListRepositoryImpl.getPopularVideos().first()
+            val testJob = launch { testPagingDomainYouTubeVideoDiffer.submitData(pagingData) }
+
+            advanceUntilIdle()
+            testJob.cancel()
+
+            verify(remoteVideoListDataSource).fetchVideos(initialPageToken)
+            verify(localVideoListDataSource).insertVideosWithTimeStamp(any(), any())
+        }
+
+    @Test
+    fun `fun getVideoListAndCache() positively calls remoteVideoListDataSource searchVideos() and databaseVideoSourceImpl insertVideosWithTimeStamp()`() =
+        runTest {
+            val pagingData = videoListRepositoryImpl.getSearchVideos(testQuery).first()
+            val testJob = launch { testPagingDomainYouTubeVideoDiffer.submitData(pagingData) }
+
+            advanceUntilIdle()
+            testJob.cancel()
+
+            verify(remoteSearchDataSource).searchVideos(testQuery, initialPageToken)
+            verify(localVideoListDataSource).insertVideosWithTimeStamp(any(), any())
+
+        }
 }

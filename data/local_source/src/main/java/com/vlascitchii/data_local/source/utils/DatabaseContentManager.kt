@@ -1,9 +1,9 @@
 package com.vlascitchii.data_local.source.utils
 
 import com.vlascitchii.data_local.database.YouTubeVideoDao
-import com.vlascitchii.data_local.enetity.INITIAL_PAGE_TOKEN
-import com.vlascitchii.data_local.enetity.video_list.videos.YoutubeVideoEntity
-import com.vlascitchii.data_local.enetity.video_list.videos.YoutubeVideoResponseEntity
+import com.vlascitchii.data_local.entity.INITIAL_PAGE_TOKEN
+import com.vlascitchii.data_local.entity.video_list.videos.YoutubeVideoEntity
+import com.vlascitchii.data_local.entity.video_list.videos.YoutubeVideoResponseEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
@@ -84,8 +84,8 @@ class DatabaseContentManager(private val youTubeVideoDao: YouTubeVideoDao) {
         }
     }
 
-    fun updateCurrentPageToken(videoResponseEntity:  YoutubeVideoResponseEntity?) {
-        videoResponseEntity?.pageEntity?.nextPageToken?.let { sourceCurrentPageToken = it }
+    fun updateCurrentPageTokenForNextPage(videoResponseEntity: YoutubeVideoResponseEntity) {
+        sourceCurrentPageToken = videoResponseEntity.pageEntity.nextPageToken
     }
 
     fun getFirstPageFromDatabase(): Flow<YoutubeVideoResponseEntity> {

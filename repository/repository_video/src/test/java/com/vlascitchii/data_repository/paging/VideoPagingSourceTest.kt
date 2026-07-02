@@ -3,9 +3,7 @@ package com.vlascitchii.data_repository.paging
 import android.net.http.HttpException
 import androidx.paging.PagingSource
 import com.vlascitchii.common_test.rule.DispatcherTestRule
-import com.vlascitchii.data_repository.data_source.local.LocalVideoListDataSource
 import com.vlascitchii.data_repository.mock_model.DOMAIN_RESPONSE_VIDEO_WITH_CHANNEL_IMG
-import com.vlascitchii.domain.custom_scope.CustomCoroutineScope
 import com.vlascitchii.domain.model.ErrorDomain
 import com.vlascitchii.domain.model.videos.YoutubeVideoDomain
 import com.vlascitchii.domain.model.videos.YoutubeVideoResponseDomain
@@ -15,10 +13,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
-import java.time.OffsetDateTime
 
 class VideoPagingSourceTest {
 
@@ -27,10 +21,8 @@ class VideoPagingSourceTest {
 
     private val initialPageToken = ""
 
-    private val localVideoListDataSource: LocalVideoListDataSource = mock()
     private lateinit var mockApiFetchLambda: suspend (page: String) -> YoutubeVideoResponseDomain
     private lateinit var videoPagingSource: VideoPagingSource
-    private val customCoroutineScope = CustomCoroutineScope(dispatcherTestRule.testDispatcher)
 
     private val refreshLoadParamsRequest = PagingSource.LoadParams.Refresh(
         key = initialPageToken,
@@ -48,6 +40,12 @@ class VideoPagingSourceTest {
         prevKey = DOMAIN_RESPONSE_VIDEO_WITH_CHANNEL_IMG.prevPageToken
     )
 
+    private val expectedPageLoadResultWithNullPrevKey =  PagingSource.LoadResult.Page(
+        data = DOMAIN_RESPONSE_VIDEO_WITH_CHANNEL_IMG.items,
+        nextKey = DOMAIN_RESPONSE_VIDEO_WITH_CHANNEL_IMG.nextPageToken,
+        prevKey = null
+    )
+
     private val testUseCaseException: UseCaseException.VideoListLoadException =
         UseCaseException.VideoListLoadException(
             HttpException("400", RuntimeException()),
@@ -57,8 +55,6 @@ class VideoPagingSourceTest {
     private fun testPositiveCase() {
         mockApiFetchLambda = { DOMAIN_RESPONSE_VIDEO_WITH_CHANNEL_IMG }
         videoPagingSource = VideoPagingSource(
-            localDataSource = localVideoListDataSource,
-            customCoroutineScope = customCoroutineScope,
             fetch = mockApiFetchLambda
         )
     }
@@ -66,8 +62,13 @@ class VideoPagingSourceTest {
     private fun testNegativeCase() {
         mockApiFetchLambda = { throw testUseCaseException }
         videoPagingSource = VideoPagingSource(
-            localDataSource = localVideoListDataSource,
-            customCoroutineScope = customCoroutineScope,
+            fetch = mockApiFetchLambda
+        )
+    }
+
+    private fun testPositiveCaseWithEmptyPrevKey() {
+        mockApiFetchLambda = { DOMAIN_RESPONSE_VIDEO_WITH_CHANNEL_IMG.copy(prevPageToken = "") }
+        videoPagingSource = VideoPagingSource(
             fetch = mockApiFetchLambda
         )
     }
@@ -108,14 +109,12 @@ class VideoPagingSourceTest {
     }
 
     @Test
-    fun `on each fun mockApiFetchLambda invoke() data is inserted to DB`() = runTest {
-        testPositiveCase()
+    fun `paging does not write empty string as a page`() = runTest {
+        testPositiveCaseWithEmptyPrevKey()
 
-        videoPagingSource.load(refreshLoadParamsRequest)
+        val actualPageLoadResult = videoPagingSource.load(refreshLoadParamsRequest)
 
-        verify(localVideoListDataSource).insertVideosWithTimeStamp(
-            any<YoutubeVideoResponseDomain>(),
-            any<OffsetDateTime>()
-        )
+        expectedPageLoadResultWithNullPrevKey.assertExpectedPagingLoadResultWith(actualPageLoadResult)
+
     }
 }

@@ -1,8 +1,8 @@
 package com.vlascitchii.domain.model.videos
 
 data class YoutubeVideoResponseDomain(
-    val nextPageToken: String? = null,
+    val nextPageToken: String = "",
     var currentPageToken: String = "",
-    val prevPageToken: String? = null,
+    val prevPageToken: String = "",
     val items: List<YoutubeVideoDomain> = emptyList()
 )
