@@ -3,6 +3,7 @@ package com.vlascitchii.presentation_shorts.screen_shorts.screen
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.PagingData
@@ -29,9 +30,11 @@ fun ShortsScreen(
 ) {
     Surface {
         shortsStateFlow.collectAsStateWithLifecycle().value.let { shortsUiState: ShortsUiState ->
-            if (shortsUiState.shortsState == UiState.Loading) shortsMviHandler.submitAction(
-                ShortsAction.FetchShortsAction
-            )
+            LaunchedEffect(Unit) {
+                if (shortsUiState.shortsState == UiState.Loading) {
+                    shortsMviHandler.submitAction(ShortsAction.FetchShortsAction)
+                }
+            }
 
             CommonScreen(shortsUiState.shortsState) { pagingData: Flow<PagingData<YoutubeVideoUiModel>> ->
                 val shorts = pagingData.collectAsLazyPagingItems()

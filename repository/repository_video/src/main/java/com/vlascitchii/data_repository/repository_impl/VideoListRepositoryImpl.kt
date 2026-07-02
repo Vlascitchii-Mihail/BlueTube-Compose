@@ -7,13 +7,16 @@ import com.vlascitchii.data_repository.data_source.local.LocalVideoListDataSourc
 import com.vlascitchii.data_repository.data_source.remote.RemoteSearchDataSource
 import com.vlascitchii.data_repository.data_source.remote.RemoteVideoListDataSource
 import com.vlascitchii.data_repository.paging.VideoPagingSource
-import com.vlascitchii.domain.custom_scope.CustomCoroutineScope
 import com.vlascitchii.domain.di_common.DATABASE_SOURCE
 import com.vlascitchii.domain.di_common.REMOTE_SEARCH_VIDEO_OR_SHORTS_LIST_SOURCE
 import com.vlascitchii.domain.di_common.REMOTE_VIDEO_LIST_SOURCE
 import com.vlascitchii.domain.model.videos.YoutubeVideoDomain
+import com.vlascitchii.domain.model.videos.YoutubeVideoResponseDomain
 import com.vlascitchii.domain.repository.VideoListRepository
+import com.vlascitchii.domain.util.UseCaseException
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import java.time.OffsetDateTime
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -27,7 +30,6 @@ class VideoListRepositoryImpl @Inject constructor(
     private val remoteSearchDataSource: RemoteSearchDataSource,
     @param:Named(DATABASE_SOURCE)
     private val databaseVideoSourceImpl: LocalVideoListDataSource,
-    private val customCoroutineScope: CustomCoroutineScope
 ) : VideoListRepository {
 
     private val pagerConfig = PagingConfig(
@@ -40,11 +42,10 @@ class VideoListRepositoryImpl @Inject constructor(
             config = pagerConfig,
             pagingSourceFactory = {
                 VideoPagingSource(
-                    localDataSource = databaseVideoSourceImpl,
-                    customCoroutineScope = customCoroutineScope
-                ) { page: String ->
-                    remoteVideoListDataSource.fetchVideos(page)
-                }
+                    { page: String ->
+                        getVideoListAndCache(page)
+                    }
+                )
             }
         ).flow
 
@@ -52,12 +53,35 @@ class VideoListRepositoryImpl @Inject constructor(
         Pager(
             config = pagerConfig,
             pagingSourceFactory = {
-                VideoPagingSource(
-                    localDataSource = databaseVideoSourceImpl,
-                    customCoroutineScope = customCoroutineScope
-                ) { page: String ->
-                    remoteSearchDataSource.searchVideos(query = query, nextPageToken = page)
+                VideoPagingSource() { page: String ->
+                    getVideoListAndCache(page, query)
                 }
             }
         ).flow
+
+    private suspend fun getVideoListAndCache(page: String, query: String = ""): YoutubeVideoResponseDomain {
+
+        var youTubeVideoResponseDomain: YoutubeVideoResponseDomain = YoutubeVideoResponseDomain()
+
+        try {
+            youTubeVideoResponseDomain = if (query == "") {
+                remoteVideoListDataSource.fetchVideos(page)
+            } else {
+                remoteSearchDataSource.searchVideos(query = query, nextPageToken = page)
+            }
+
+            databaseVideoSourceImpl.insertVideosWithTimeStamp(
+                youTubeVideoResponseDomain,
+                OffsetDateTime.now()
+            )
+        } catch(remoteEx: UseCaseException) {
+            youTubeVideoResponseDomain = databaseVideoSourceImpl.getVideosFromStore(page).first()
+        } catch (databaseEx: UseCaseException.LocalStorageException) {
+            throw databaseEx
+        } catch (ex: Throwable) {
+            throw UseCaseException.UnknownException(ex)
+        }
+
+        return youTubeVideoResponseDomain
+    }
 }

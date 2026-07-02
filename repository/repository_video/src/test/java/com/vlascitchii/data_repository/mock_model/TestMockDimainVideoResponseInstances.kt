@@ -147,7 +147,7 @@ private val DOMAIN_VIDEO_LIST_WITH_CHANNEL_IMG_URL = listOf(
 
 val DOMAIN_RESPONSE_VIDEO_WITH_CHANNEL_IMG = YoutubeVideoResponseDomain(
     nextPageToken = "CAoQAA",
-    "",
+    currentPageToken = "",
     prevPageToken = "CAUQAQ",
     DOMAIN_VIDEO_LIST_WITH_CHANNEL_IMG_URL
 )

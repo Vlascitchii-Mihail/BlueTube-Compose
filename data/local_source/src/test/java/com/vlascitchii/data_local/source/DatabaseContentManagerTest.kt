@@ -3,18 +3,15 @@ package com.vlascitchii.data_local.source
 import com.vlascitchii.common_test.rule.DispatcherTestRule
 import com.vlascitchii.common_test.util.assertListEqualsTo
 import com.vlascitchii.data_local.database.YouTubeVideoDao
-import com.vlascitchii.data_local.database.convertToLocalYoutubeVideoResponseEntity
-import com.vlascitchii.data_local.enetity.INITIAL_PAGE_TOKEN
-import com.vlascitchii.data_local.enetity.video_list.videos.YoutubeVideoEntity
-import com.vlascitchii.data_local.enetity.video_list.videos.YoutubeVideoResponseEntity
-import com.vlascitchii.data_local.enetity.video_list.videos.YoutubeVideoResponseEntity.Companion.TEST_DATABASE_VIDEO_RESPONSE
+import com.vlascitchii.data_local.entity.INITIAL_PAGE_TOKEN
+import com.vlascitchii.data_local.entity.video_list.videos.YoutubeVideoEntity
+import com.vlascitchii.data_local.entity.video_list.videos.YoutubeVideoResponseEntity
+import com.vlascitchii.data_local.mock_model.TEST_DATABASE_VIDEO_RESPONSE
+import com.vlascitchii.data_local.mock_model.testDateTime
 import com.vlascitchii.data_local.source.utils.DatabaseContentManager
-import com.vlascitchii.domain.model.videos.YoutubeVideoResponseDomain.Companion.DOMAIN_RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG
-import com.vlascitchii.domain.model.videos.YoutubeVideoResponseDomain.Companion.testDateTime
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotEquals
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -25,6 +22,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import kotlin.collections.forEach
 
 @RunWith(MockitoJUnitRunner::class)
 class DatabaseContentManagerTest {
@@ -35,11 +33,10 @@ class DatabaseContentManagerTest {
     private val youTubeDao: YouTubeVideoDao = mock()
     private lateinit var databaseContentManager: DatabaseContentManager
     private lateinit var testVideoResponseEntity: YoutubeVideoResponseEntity
-
-    @Before
+        @Before
     fun init() {
         databaseContentManager = DatabaseContentManager(youTubeDao)
-        testVideoResponseEntity = DOMAIN_RESPONSE_VIDEO_LIST_WITH_CHANNEL_IMG.convertToLocalYoutubeVideoResponseEntity()
+        testVideoResponseEntity = TEST_DATABASE_VIDEO_RESPONSE
     }
 
     @Test
@@ -48,7 +45,7 @@ class DatabaseContentManagerTest {
             testVideoResponseEntity.setCurrentPageTokenToVideos(INITIAL_PAGE_TOKEN)
         }
 
-        assertEquals(
+        Assert.assertEquals(
             TEST_DATABASE_VIDEO_RESPONSE.pageEntity.currentPageToken,
             videoResponseWithCurrentPageToken.pageEntity.currentPageToken
         )
@@ -65,23 +62,27 @@ class DatabaseContentManagerTest {
     }
 
     @Test
-    fun `bindVideosFromResponseWithData() binds videos in response and inserts to the DB`() = runTest {
-        with(databaseContentManager) {
-            testVideoResponseEntity.bindAndInsertVideoWith(testDateTime)
-        }
+    fun `bindVideosFromResponseWithData() binds videos in response and inserts to the DB`() =
+        runTest {
+            with(databaseContentManager) {
+                testVideoResponseEntity.bindAndInsertVideoWith(testDateTime)
+            }
 
-        testVideoResponseEntity.items.forEach { video: YoutubeVideoEntity ->
-            verify(youTubeDao).insertVideo(video)
+            testVideoResponseEntity.items.forEach { video: YoutubeVideoEntity ->
+                verify(youTubeDao).insertVideo(video)
+            }
+            Assert.assertEquals(TEST_DATABASE_VIDEO_RESPONSE, testVideoResponseEntity)
         }
-        assertEquals(TEST_DATABASE_VIDEO_RESPONSE, testVideoResponseEntity)
-    }
 
     @Test
     fun `bindVideosFromResponseWithData() sets the video key values for relation database`() {
         with(databaseContentManager) {
             testVideoResponseEntity.items.first().bindVideosFromResponseWithData(testDateTime)
 
-            assertEquals(TEST_DATABASE_VIDEO_RESPONSE.items.first(), testVideoResponseEntity.items.first())
+            Assert.assertEquals(
+                TEST_DATABASE_VIDEO_RESPONSE.items.first(),
+                testVideoResponseEntity.items.first()
+            )
         }
     }
 
@@ -158,32 +159,23 @@ class DatabaseContentManagerTest {
     }
 
     @Test
-    fun `deleteExtraVideos() calls youTubeDao deleteExtraFiveVideos if overall size is greater than 100`() = runTest {
-        whenever(youTubeDao.getVideosCount()).thenReturn(flowOf(110))
+    fun `deleteExtraVideos() calls youTubeDao deleteExtraFiveVideos if overall size is greater than 100`() =
+        runTest {
+            whenever(youTubeDao.getVideosCount()).thenReturn(flowOf(110))
 
-        databaseContentManager.deleteExtraVideos()
+            databaseContentManager.deleteExtraVideos()
 
-        verify(youTubeDao, times(1)).deleteExtraFiveVideos()
-    }
+            verify(youTubeDao, times(1)).deleteExtraFiveVideos()
+        }
 
     @Test
-    fun `updateCurrentPageToken() updates the sourceCurrentPageToken`() {
+    fun `updateCurrentPageTokenForNextPage() updates the sourceCurrentPageToken`() {
         val testToken = "Test token"
         val testPage = TEST_DATABASE_VIDEO_RESPONSE.pageEntity.copy(nextPageToken = testToken)
         val testDatabaseResponse = TEST_DATABASE_VIDEO_RESPONSE.copy(pageEntity = testPage)
-        databaseContentManager.updateCurrentPageToken(testDatabaseResponse)
+        databaseContentManager.updateCurrentPageTokenForNextPage(testDatabaseResponse)
 
-        assertEquals(databaseContentManager.sourceCurrentPageToken, testToken)
-    }
-
-    @Test
-    fun `updateCurrentPageToken() doesn't updates the sourceCurrentPageToken if we pass null`() {
-        val testToken = null
-        val testPage = TEST_DATABASE_VIDEO_RESPONSE.pageEntity.copy(nextPageToken = testToken)
-        val testDatabaseResponse = TEST_DATABASE_VIDEO_RESPONSE.copy(pageEntity = testPage)
-        databaseContentManager.updateCurrentPageToken(testDatabaseResponse)
-
-        assertNotEquals(databaseContentManager.sourceCurrentPageToken, testToken)
+        Assert.assertEquals(databaseContentManager.sourceCurrentPageToken, testToken)
     }
 
     @Test

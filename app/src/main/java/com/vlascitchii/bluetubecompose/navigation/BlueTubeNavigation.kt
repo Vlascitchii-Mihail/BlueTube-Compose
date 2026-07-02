@@ -105,7 +105,10 @@ fun BlueTubeNavigation(
     )
 }
 
-private fun handleVideoListNavigationEvent(singleVideoListNavigationEvent: VideoListNavigationEvent, backStack: NavBackStack<NavKey>) {
+private fun handleVideoListNavigationEvent(
+    singleVideoListNavigationEvent: VideoListNavigationEvent,
+    backStack: NavBackStack<NavKey>
+) {
     when (singleVideoListNavigationEvent) {
         is VideoListNavigationEvent.NavigationPlayerScreenEvent -> {
             backStack.add(ScreenType.PlayerScreen(singleVideoListNavigationEvent.video))
