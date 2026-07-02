@@ -12,7 +12,7 @@ android {
     defaultConfig {
         minSdk = 31
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.vlascitchii.data_local.BlueTubeTestRunner"
         consumerProguardFiles("consumer-rules.pro")
     }
 

@@ -7,7 +7,6 @@ import com.vlascitchii.common_test.util.assertListEqualsTo
 import com.vlascitchii.data_repository.data_source.local.LocalVideoListDataSource
 import com.vlascitchii.data_repository.data_source.remote.RemoteVideoListDataSource
 import com.vlascitchii.data_repository.mock_model.DOMAIN_RESPONSE_VIDEO_WITH_CHANNEL_IMG
-import com.vlascitchii.domain.custom_scope.CustomCoroutineScope
 import com.vlascitchii.domain.model.videos.YoutubeVideoDomain
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
@@ -31,9 +30,9 @@ class ShortsRepositoryImplTest {
 
     private val remoteShortsDataSource: RemoteVideoListDataSource = mock()
     private val localVideoListDataSource: LocalVideoListDataSource = mock()
-    private val customCoroutineScope: CustomCoroutineScope = CustomCoroutineScope(dispatcherTestRule.testDispatcher)
+
     private val shortsListRepositoryImpl =
-        ShortsListRepositoryImpl(remoteShortsDataSource, localVideoListDataSource, customCoroutineScope)
+        ShortsListRepositoryImpl(remoteShortsDataSource, localVideoListDataSource)
 
     private val initialPageToken = ""
     private val expectedResult = DOMAIN_RESPONSE_VIDEO_WITH_CHANNEL_IMG
@@ -78,4 +77,18 @@ class ShortsRepositoryImplTest {
         assertTrue(testPagingDomainYouTubeVideoDiffer.snapshot().isNotEmpty())
         verify(localVideoListDataSource).insertVideosWithTimeStamp(any(), any())
     }
+
+    @Test
+    fun `fun getShortsListAndCache() positively calls remoteShortsDataSource fetchVideos() and databaseVideoSourceImpl insertVideosWithTimeStamp()`() =
+        runTest {
+            val pagingData = shortsListRepositoryImpl.getShorts().first()
+            val testJob = launch { testPagingDomainYouTubeVideoDiffer.submitData(pagingData) }
+
+            advanceUntilIdle()
+            testJob.cancel()
+
+            verify(remoteShortsDataSource).fetchVideos( initialPageToken)
+            verify(localVideoListDataSource).insertVideosWithTimeStamp(any(), any())
+
+        }
 }

@@ -5,6 +5,6 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 data class SearchVideoResponseApiModel (
     val nextPageToken: String = "",
-    val prevPageToken: String? = null,
+    val prevPageToken: String = "",
     val items: List<SearchVideoItemApiModel> = emptyList()
 )

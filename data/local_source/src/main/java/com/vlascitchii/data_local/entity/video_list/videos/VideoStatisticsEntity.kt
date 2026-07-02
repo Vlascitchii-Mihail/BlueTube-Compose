@@ -1,4 +1,4 @@
-package com.vlascitchii.data_local.enetity.video_list.videos
+package com.vlascitchii.data_local.entity.video_list.videos
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
