@@ -1,6 +1,7 @@
 package com.vlascitchii.presentation_player.screen.screen
 
 import android.content.Context
+import android.content.pm.ActivityInfo
 import android.net.ConnectivityManager
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
@@ -25,15 +26,14 @@ import com.vlascitchii.presentation_common.network_observer.NetworkConnectivityO
 import com.vlascitchii.presentation_common.ui.state_common.UiSingleEvent
 import com.vlascitchii.presentation_common.ui.state_common.UiState
 import com.vlascitchii.presentation_common.ui.theme.BlueTubeComposeTheme
+import com.vlascitchii.presentation_player.model.TestVideoUIModel
 import com.vlascitchii.presentation_player.screen.OrientationState
 import com.vlascitchii.presentation_player.screen.TestActivity
-import com.vlascitchii.presentation_player.model.TestVideoUIModel
 import com.vlascitchii.presentation_player.screen.state.PlayerActionState
 import com.vlascitchii.ui_test.autorotation_system_setting.AUTOROTATION_OFF
-import com.vlascitchii.ui_test.autorotation_system_setting.landscapeOrientation
-import com.vlascitchii.ui_test.autorotation_system_setting.portraitOrientation
 import com.vlascitchii.ui_test.autorotation_system_setting.setAutorotationEnabledValue
 import com.vlascitchii.ui_test.autorotation_system_setting.unspecifiedOrientation
+import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -44,6 +44,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import com.vlascitchii.common_ui.R as CommonR
 import com.vlascitchii.player_screen.R as PlayerR
@@ -64,6 +66,10 @@ class PlayerScreenActivityTest {
 
     private lateinit var videoPlayerViewModel: VideoPlayerViewModel
     private lateinit var mviHandler: PlayerMviHandler
+
+    private val portraitOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT // 1
+    private val landscapeOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE // 6
+
 
     private val pagingUiData: Flow<PagingData<YoutubeVideoUiModel>> =
         flowOf(PagingData.Companion.from(TestVideoUIModel.TestUIData.TEST_UI_VIDEO_LIST))
@@ -127,9 +133,7 @@ class PlayerScreenActivityTest {
 
         whenever(videoPlayerUseCase.execute(any<VideoPlayerUseCase.PlayerRequest>()))
             .thenReturn(flowOf(expectedRelatedVideosUseCaseResponse))
-        whenever(videoPlayerConverter.convertSuccessVideo(any<Flow<PagingData<YoutubeVideoDomain>>>()))
-            .thenReturn(successConverterUiState)
-        whenever(videoPlayerConverter.convert(any<VideoResult<VideoPlayerUseCase.PlayerResponse>>()))
+        whenever(videoPlayerConverter.convertResult(any<VideoResult<VideoPlayerUseCase.PlayerResponse>>()))
             .thenReturn(successConverterUiState)
 
         initPlayer()
@@ -185,6 +189,38 @@ class PlayerScreenActivityTest {
             waitForIdle()
 
             assertTrue(activity.requestedOrientation == unspecifiedOrientation)
+        }
+    }
+
+    @Test
+    fun `videoListUseCase execute method is called once during configuration change`() {
+        with(composeActivityTestRule) {
+            verify(videoPlayerUseCase, times(1)).execute(any())
+
+            activity.requestedOrientation = landscapeOrientation
+            waitForIdle()
+            verify(videoPlayerUseCase, times(1)).execute(any())
+
+            activity.requestedOrientation = portraitOrientation
+            waitForIdle()
+            verify(videoPlayerUseCase, times(1)).execute(any())
+        }
+    }
+
+
+    @Test
+    fun `Pager calls remoteDataSource once on configuration change`() {
+        with(composeActivityTestRule) {
+            val initialPagingFlow: UiState<Flow<PagingData<YoutubeVideoUiModel>>> =
+                videoPlayerViewModel.playerStateFlow.value.relatedVideoState
+
+            activity.requestedOrientation = landscapeOrientation
+            waitForIdle()
+            assertEquals(initialPagingFlow,   videoPlayerViewModel.playerStateFlow.value.relatedVideoState)
+
+            activity.requestedOrientation = portraitOrientation
+            waitForIdle()
+            assertEquals(initialPagingFlow,   videoPlayerViewModel.playerStateFlow.value.relatedVideoState)
         }
     }
 }

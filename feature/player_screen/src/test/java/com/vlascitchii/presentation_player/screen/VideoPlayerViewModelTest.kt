@@ -78,7 +78,7 @@ class VideoPlayerViewModelTest {
 
         whenever(
             videoPlayerConverter
-                .convert(any<VideoResult<VideoPlayerUseCase.PlayerResponse>>())
+                .convertResult(any<VideoResult<VideoPlayerUseCase.PlayerResponse>>())
         )
             .thenReturn(positiveConvertResult)
     }
@@ -96,7 +96,7 @@ class VideoPlayerViewModelTest {
 
         whenever(
             videoPlayerConverter
-                .convert(any<VideoResult<VideoPlayerUseCase.PlayerResponse>>())
+                .convertResult(any<VideoResult<VideoPlayerUseCase.PlayerResponse>>())
         )
             .thenReturn(negativeConvertResult)
     }
@@ -112,7 +112,7 @@ class VideoPlayerViewModelTest {
     }
 
     @Test
-    fun `fun getSearchedRelatedVideos() gets UiState Success and assigns it to the ViewModel state`() =
+    fun `fun getSearchedRelatedVideos() handles VideoResult, gets UiState Success, caches it in the ViewModel and returns new UiState`() =
         runTest {
             positiveCase()
 
@@ -124,8 +124,8 @@ class VideoPlayerViewModelTest {
 
             verify(videoPlayerUseCase).execute(any<VideoPlayerUseCase.PlayerRequest>())
             verify(videoPlayerConverter)
-                .convert(any<VideoResult<VideoPlayerUseCase.PlayerResponse>>())
-            Assert.assertEquals(positiveConvertResult, actualResult)
+                .convertResult(any<VideoResult<VideoPlayerUseCase.PlayerResponse>>())
+            Assert.assertNotEquals(positiveConvertResult, actualResult)
         }
 
     @Test
@@ -141,7 +141,7 @@ class VideoPlayerViewModelTest {
 
             verify(videoPlayerUseCase).execute(any<VideoPlayerUseCase.PlayerRequest>())
             verify(videoPlayerConverter)
-                .convert(any<VideoResult<VideoPlayerUseCase.PlayerResponse>>())
+                .convertResult(any<VideoResult<VideoPlayerUseCase.PlayerResponse>>())
             Assert.assertEquals(negativeConvertResult, actualResult)
         }
 
