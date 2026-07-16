@@ -60,7 +60,7 @@ class VideoListViewModelTest {
         whenever(videoListUseCase.execute(any<VideoListUseCase.VideoListRequest>()))
             .thenReturn(flowOf(expectedVideoListUseCaseResponse))
 
-        whenever(videoListConverter.convert(expectedVideoListUseCaseResponse))
+        whenever(videoListConverter.convertResult(expectedVideoListUseCaseResponse))
             .thenReturn(positiveConvertResult)
     }
 
@@ -75,7 +75,7 @@ class VideoListViewModelTest {
         whenever(videoListUseCase.execute(any<VideoListUseCase.VideoListRequest>()))
              .thenReturn(flowOf(expectedNegativeVideoListUseCaseResponse))
 
-        whenever(videoListConverter.convert(expectedNegativeVideoListUseCaseResponse))
+        whenever(videoListConverter.convertResult(expectedNegativeVideoListUseCaseResponse))
             .thenReturn(negativeConvertResult)
     }
 
@@ -122,7 +122,7 @@ class VideoListViewModelTest {
             advanceUntilIdle()
             val actualErrorResult = videoListViewModel.videoListUIStateFlow.first().videoListState
 
-            verify(videoListConverter).convert(expectedNegativeVideoListUseCaseResponse)
+            verify(videoListConverter).convertResult(expectedNegativeVideoListUseCaseResponse)
             Assert.assertEquals(negativeConvertResult, actualErrorResult)
         }
 
@@ -138,12 +138,12 @@ class VideoListViewModelTest {
                 videoListViewModel.videoListUIStateFlow.first().videoListState
 
             verify(videoListUseCase).execute(any<VideoListUseCase.VideoListRequest>())
-            verify(videoListConverter).convert(expectedNegativeVideoListUseCaseResponse)
+            verify(videoListConverter).convertResult(expectedNegativeVideoListUseCaseResponse)
             Assert.assertEquals(negativeConvertResult, actualErrorResult)
         }
 
     @Test
-    fun `getVideos() VideoRequest gets UiState Success and assigns it to the ViewModel state`() =
+    fun `getVideos() handles VideoResult, gets UiState Success, caches it in the ViewModel and returns new UiState`() =
         runTest {
             positiveCase()
 
@@ -153,12 +153,12 @@ class VideoListViewModelTest {
             val actualResult = videoListViewModel.videoListUIStateFlow.first().videoListState
 
             verify(videoListUseCase).execute(any<VideoListUseCase.VideoListRequest>())
-            verify(videoListConverter).convert(expectedVideoListUseCaseResponse)
-            Assert.assertEquals(positiveConvertResult, actualResult)
+            verify(videoListConverter).convertResult(expectedVideoListUseCaseResponse)
+            Assert.assertNotEquals(positiveConvertResult, actualResult)
         }
 
     @Test
-    fun `getVideos() SearchRequest gets UiState Success and assigns it to the ViewModel state`() =
+    fun `getVideos() handles Search VideoResult, gets UiState Success, caches it in the ViewModel and returns new UiState`() =
         runTest {
             positiveCase()
 
@@ -168,8 +168,8 @@ class VideoListViewModelTest {
             val actualResult = videoListViewModel.videoListUIStateFlow.first().videoListState
 
             verify(videoListUseCase).execute(any<VideoListUseCase.VideoListRequest>())
-            verify(videoListConverter).convert(expectedVideoListUseCaseResponse)
-            Assert.assertEquals(positiveConvertResult, actualResult)
+            verify(videoListConverter).convertResult(expectedVideoListUseCaseResponse)
+            Assert.assertNotEquals(positiveConvertResult, actualResult)
         }
 
     @Test

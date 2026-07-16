@@ -7,7 +7,6 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.vlascitchii.domain.di_common.VIDEO_LIST_CONVERTER
 import com.vlascitchii.domain.di_common.VIDEO_LIST_USE_CASE
-import com.vlascitchii.domain.model.videos.YoutubeVideoDomain
 import com.vlascitchii.domain.usecase.UseCase
 import com.vlascitchii.domain.usecase.VideoListUseCase
 import com.vlascitchii.domain.util.VideoResult
@@ -19,7 +18,6 @@ import com.vlascitchii.presentation_common.ui.state_common.UiState
 import com.vlascitchii.presentation_common.ui.video_list.state.INITIAL_CURSOR_POSITION
 import com.vlascitchii.presentation_common.ui.video_list.state.SearchState
 import com.vlascitchii.presentation_common.ui.video_list.state.UiVideoListAction
-import com.vlascitchii.presentation_common.ui.video_list.state.VideoListNavigationEvent
 import com.vlascitchii.presentation_common.ui.video_list.state.VideoListUIState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -27,7 +25,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
@@ -89,7 +86,10 @@ class VideoListViewModel @Inject constructor(
             if (query.isEmpty()) {
                 videoListUseCase.execute(VideoListUseCase.VideoListRequest.VideoRequest)
                     .map { videoResult: VideoResult<VideoListUseCase.VideoListResponse> ->
-                        cacheVideos(videoResult)
+                        val uiResult: UiState<@JvmSuppressWildcards Flow<PagingData<YoutubeVideoUiModel>>> =
+                            videoListConverter.convertResult(videoResult)
+
+                        cacheVideos(uiResult)
                     }
                     .flowOn(dispatcher)
                     .collect { uiState: UiState<Flow<PagingData<YoutubeVideoUiModel>>> ->
@@ -100,7 +100,10 @@ class VideoListViewModel @Inject constructor(
                     VideoListUseCase.VideoListRequest.SearchRequest(query)
                 )
                     .map { videoResult: VideoResult<VideoListUseCase.VideoListResponse> ->
-                        cacheVideos(videoResult)
+                        val uiResult: UiState<@JvmSuppressWildcards Flow<PagingData<YoutubeVideoUiModel>>> =
+                            videoListConverter.convertResult(videoResult)
+
+                        cacheVideos(uiResult)
                     }
                     .flowOn(dispatcher)
                     .collect { uiState: UiState<Flow<PagingData<YoutubeVideoUiModel>>> ->
@@ -110,13 +113,12 @@ class VideoListViewModel @Inject constructor(
         }
     }
 
-    private fun cacheVideos(videoResult: VideoResult<VideoListUseCase.VideoListResponse>)
-    : UiState<@JvmSuppressWildcards Flow<PagingData<YoutubeVideoUiModel>>> {
-        val videoFlow: Flow<PagingData<YoutubeVideoDomain>>? =
-            videoListConverter.unpack(videoResult)?.cachedIn(viewModelScope)
-        return if (videoFlow != null) {
-            videoListConverter.convertSuccessVideo(videoFlow)
-        } else videoListConverter.convert(videoResult)
+    private fun cacheVideos(videoResult: UiState<@JvmSuppressWildcards Flow<PagingData<YoutubeVideoUiModel>>>)
+    : UiState<Flow<PagingData<YoutubeVideoUiModel>>> {
+
+        return if (videoResult is UiState.Success)
+            UiState.Success(videoResult.data.cachedIn(viewModelScope))
+        else videoResult
     }
 
     fun updateSearchState(newSearchState: SearchState) {

@@ -6,7 +6,6 @@ import androidx.paging.cachedIn
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.vlascitchii.domain.di_common.SHORTS_CONVERTER
 import com.vlascitchii.domain.di_common.SHORTS_USE_CASE
-import com.vlascitchii.domain.model.videos.YoutubeVideoDomain
 import com.vlascitchii.domain.usecase.ShortsUseCase
 import com.vlascitchii.domain.usecase.UseCase
 import com.vlascitchii.domain.util.VideoResult
@@ -77,7 +76,10 @@ class ShortsViewModel @Inject constructor(
         viewModelScope.launch {
             shortsUseCase.execute(ShortsUseCase.ShortsRequest)
                 .map { shortsVideoResult: VideoResult<ShortsUseCase.ShortsResponse> ->
-                    cacheShorts(shortsVideoResult)
+                    val uiResult: UiState<@JvmSuppressWildcards Flow<PagingData<YoutubeVideoUiModel>>> =
+                        shortsConverter.convertResult(shortsVideoResult)
+
+                    cacheVideos(uiResult)
                 }
                 .flowOn(dispatcher)
                 .collect { uiState: UiState<Flow<PagingData<YoutubeVideoUiModel>>> ->
@@ -86,12 +88,12 @@ class ShortsViewModel @Inject constructor(
         }
     }
 
-    private fun cacheShorts(shortsResult: VideoResult<ShortsUseCase.ShortsResponse>)
-    : UiState<@JvmSuppressWildcards Flow<PagingData<YoutubeVideoUiModel>>> {
-        val shortsFlow: Flow<PagingData<YoutubeVideoDomain>>? =
-            shortsConverter.unpack(shortsResult)?.cachedIn(viewModelScope)
-        return if (shortsFlow != null) shortsConverter.convertSuccessVideo(shortsFlow)
-        else shortsConverter.convert(shortsResult)
+    private fun cacheVideos(videoResult: UiState<@JvmSuppressWildcards Flow<PagingData<YoutubeVideoUiModel>>>)
+            : UiState<Flow<PagingData<YoutubeVideoUiModel>>> {
+
+        return if (videoResult is UiState.Success)
+            UiState.Success(videoResult.data.cachedIn(viewModelScope))
+        else videoResult
     }
 
     fun listenToVideoQueue() {

@@ -1,6 +1,7 @@
 package com.vlascitchii.presentation_shorts.shorts_screen
 
 import android.content.Context
+import android.content.pm.ActivityInfo
 import android.net.ConnectivityManager
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
@@ -27,6 +28,7 @@ import com.vlascitchii.presentation_shorts.screen_shorts.screen.ShortsMviHandler
 import com.vlascitchii.presentation_shorts.screen_shorts.screen.ShortsScreen
 import com.vlascitchii.presentation_shorts.screen_shorts.screen.ShortsViewModel
 import com.vlascitchii.shorts_screen.R
+import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
@@ -36,6 +38,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
@@ -52,6 +56,10 @@ class ShortsScreenKtTest {
         )
     private lateinit var shortsViewModel: ShortsViewModel
     private lateinit var mviHandler: ShortsMviHandler
+
+    private val portraitOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT // 1
+    private val landscapeOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE // 6
+
 
     private val pagingUiData: Flow<PagingData<YoutubeVideoUiModel>> =
         flowOf(PagingData.Companion.from(TestVideoUIModel.TestUIData.TEST_UI_VIDEO_LIST))
@@ -83,9 +91,7 @@ class ShortsScreenKtTest {
 
         whenever(shortsUseCase.execute(any<ShortsUseCase.ShortsRequest>()))
             .thenReturn(flowOf(expectedRelatedVideosUseCaseResponse))
-        whenever(shortsConverter.convertSuccessVideo(any<Flow<PagingData<YoutubeVideoDomain>>>()))
-            .thenReturn(successConverterUiState)
-        whenever(shortsConverter.convert(any<VideoResult<ShortsUseCase.ShortsResponse>>()))
+        whenever(shortsConverter.convertResult(any<VideoResult<ShortsUseCase.ShortsResponse>>()))
             .thenReturn(successConverterUiState)
 
         composeActivityTestRule.setContent {
@@ -103,6 +109,38 @@ class ShortsScreenKtTest {
             onAllNodesWithContentDescription(sortsVideoPlayerDescription).onFirst().assertIsDisplayed()
             onAllNodesWithContentDescription(shortsTitle).onFirst().assertIsDisplayed()
             onAllNodesWithContentDescription(shortsChannelIconDescription).onFirst().assertIsDisplayed()
+        }
+    }
+
+    @Test
+    fun `videoListUseCase execute method is called once during configuration change`() {
+        with(composeActivityTestRule) {
+            verify(shortsUseCase, times(1)).execute(any())
+
+            activity.requestedOrientation = landscapeOrientation
+            waitForIdle()
+            verify(shortsUseCase, times(1)).execute(any())
+
+            activity.requestedOrientation = portraitOrientation
+            waitForIdle()
+            verify(shortsUseCase, times(1)).execute(any())
+        }
+    }
+
+
+    @Test
+    fun `Pager calls remoteDataSource once on configuration change`() {
+        with(composeActivityTestRule) {
+            val initialPagingFlow: UiState<Flow<PagingData<YoutubeVideoUiModel>>> =
+                shortsViewModel.shortsUiStateFlow.value.shortsState
+
+            activity.requestedOrientation = landscapeOrientation
+            waitForIdle()
+            assertEquals(initialPagingFlow,  shortsViewModel.shortsUiStateFlow.value.shortsState)
+
+            activity.requestedOrientation = portraitOrientation
+            waitForIdle()
+            assertEquals(initialPagingFlow,  shortsViewModel.shortsUiStateFlow.value.shortsState)
         }
     }
 }
