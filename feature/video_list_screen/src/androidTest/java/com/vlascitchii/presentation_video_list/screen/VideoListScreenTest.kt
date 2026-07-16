@@ -1,6 +1,7 @@
 package com.vlascitchii.presentation_video_list.screen
 
 import android.content.Context
+import android.content.pm.ActivityInfo
 import android.net.ConnectivityManager
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
@@ -26,6 +27,7 @@ import com.vlascitchii.presentation_common.ui.state_common.UiState
 import com.vlascitchii.presentation_common.ui.video_list.state.VideoListNavigationEvent
 import com.vlascitchii.presentation_video_list.TestVideoListActivity
 import com.vlascitchii.presentation_video_list.model.TestVideoUIModel
+import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
@@ -35,15 +37,15 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import com.vlascitchii.common_ui.R as CommonR
 import com.vlascitchii.video_list_screen.R as VideoListR
 
-
 @RunWith(AndroidJUnit4::class)
 class VideoListScreenTest {
     @get:Rule
-    // try to exclude activity and use createComposeRule()
     val composeAndroidTestRule: AndroidComposeTestRule<ActivityScenarioRule<TestVideoListActivity>, TestVideoListActivity> =
         createAndroidComposeRule(TestVideoListActivity::class.java)
 
@@ -56,6 +58,9 @@ class VideoListScreenTest {
         )
     private lateinit var videoListViewModel: VideoListViewModel
     private lateinit var mviHandler: VideoListMviHandler
+
+    private val portraitOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT // 1
+    private val landscapeOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE // 6
 
     private val pagingUiData: Flow<PagingData<YoutubeVideoUiModel>> =
         flowOf(PagingData.Companion.from(TestVideoUIModel.TestUIData.TEST_UI_VIDEO_LIST))
@@ -91,9 +96,7 @@ class VideoListScreenTest {
 
         whenever(videoListUseCase.execute(any<VideoListUseCase.VideoListRequest>()))
             .thenReturn(flowOf(expectedVideoListResponse))
-        whenever(videoListConverter.convertSuccessVideo(any<Flow<PagingData<YoutubeVideoDomain>>>()))
-            .thenReturn(successConvertedUiState)
-        whenever(videoListConverter.convert(any<VideoResult<VideoListUseCase.VideoListResponse>>()))
+        whenever(videoListConverter.convertResult(any<VideoResult<VideoListUseCase.VideoListResponse>>()))
             .thenReturn(successConvertedUiState)
 
         composeAndroidTestRule.setContent {
@@ -132,6 +135,38 @@ class VideoListScreenTest {
             onNodeWithContentDescription(closeSearchIconDescription).performClick()
             onNodeWithContentDescription(searchAppBarDescription).assertIsNotDisplayed()
             onNodeWithContentDescription(blueTubeTopAppBarDescription).assertIsDisplayed()
+        }
+    }
+
+    @Test
+    fun `videoListUseCase execute method is called once during configuration change`() {
+        with(composeAndroidTestRule) {
+            verify(videoListUseCase, times(1)).execute(any())
+
+            activity.requestedOrientation = landscapeOrientation
+            waitForIdle()
+            verify(videoListUseCase, times(1)).execute(any())
+
+            activity.requestedOrientation = portraitOrientation
+            waitForIdle()
+            verify(videoListUseCase, times(1)).execute(any())
+        }
+    }
+
+
+    @Test
+    fun `Pager calls remoteDataSource once on configuration change`() {
+        with(composeAndroidTestRule) {
+            val initialPagingFlow: UiState<Flow<PagingData<YoutubeVideoUiModel>>> =
+                videoListViewModel.videoListUIStateFlow.value.videoListState
+
+            activity.requestedOrientation = landscapeOrientation
+            waitForIdle()
+            assertEquals(initialPagingFlow,  videoListViewModel.videoListUIStateFlow.value.videoListState)
+
+            activity.requestedOrientation = portraitOrientation
+            waitForIdle()
+            assertEquals(initialPagingFlow,  videoListViewModel.videoListUIStateFlow.value.videoListState)
         }
     }
 }

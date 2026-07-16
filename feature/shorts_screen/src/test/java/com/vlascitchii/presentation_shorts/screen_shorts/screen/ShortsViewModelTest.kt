@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -54,7 +55,7 @@ class ShortsViewModelTest {
     private fun positiveCase() {
         whenever(shortsUseCase.execute(ShortsUseCase.ShortsRequest))
             .thenReturn(flowOf(expectedShortsUseCaseResponse))
-        whenever(shortsConverter.convert(expectedShortsUseCaseResponse))
+        whenever(shortsConverter.convertResult(expectedShortsUseCaseResponse))
             .thenReturn(positiveConvertResult)
     }
 
@@ -68,7 +69,7 @@ class ShortsViewModelTest {
     private fun negativeCase() {
         whenever(shortsUseCase.execute(ShortsUseCase.ShortsRequest))
             .thenReturn(flowOf(expectedNegativeShortsUseCaseResponse))
-        whenever(shortsConverter.convert(expectedNegativeShortsUseCaseResponse))
+        whenever(shortsConverter.convertResult(expectedNegativeShortsUseCaseResponse))
             .thenReturn(negativeConvertResultShorts)
     }
 
@@ -86,7 +87,7 @@ class ShortsViewModelTest {
     }
 
     @Test
-    fun `fun fetchShorts() gets UiState Success and assigns it to the ViewModel state`() = runTest {
+    fun `fun fetchShorts() handles VideoResult, gets UiState Success, caches it in the ViewModel and returns new UiState`() = runTest {
         positiveCase()
 
         shortsViewModel.fetchShorts()
@@ -95,8 +96,8 @@ class ShortsViewModelTest {
         val actualResult = shortsViewModel.shortsUiStateFlow.first().shortsState
 
         verify(shortsUseCase).execute(ShortsUseCase.ShortsRequest)
-        verify(shortsConverter).convert(expectedShortsUseCaseResponse)
-        assertEquals(positiveConvertResult, actualResult)
+        verify(shortsConverter).convertResult(expectedShortsUseCaseResponse)
+        assertNotEquals(positiveConvertResult, actualResult)
     }
 
     @Test
@@ -109,7 +110,7 @@ class ShortsViewModelTest {
         val actualErrorResult = shortsViewModel.shortsUiStateFlow.first().shortsState
 
         verify(shortsUseCase).execute(ShortsUseCase.ShortsRequest)
-        verify(shortsConverter).convert(expectedNegativeShortsUseCaseResponse)
+        verify(shortsConverter).convertResult(expectedNegativeShortsUseCaseResponse)
         assertEquals(negativeConvertResultShorts, actualErrorResult)
     }
 

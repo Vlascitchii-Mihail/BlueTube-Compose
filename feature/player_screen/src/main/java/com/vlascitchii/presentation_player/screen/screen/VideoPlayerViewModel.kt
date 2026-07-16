@@ -5,7 +5,6 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.vlascitchii.domain.di_common.PLAYER_CONVERTER
 import com.vlascitchii.domain.di_common.VIDEO_PLAYER_USE_CASE
-import com.vlascitchii.domain.model.videos.YoutubeVideoDomain
 import com.vlascitchii.domain.usecase.UseCase
 import com.vlascitchii.domain.usecase.VideoPlayerUseCase
 import com.vlascitchii.domain.util.VideoResult
@@ -94,7 +93,10 @@ class VideoPlayerViewModel @Inject constructor(
         viewModelScope.launch {
             videoPlayerUseCase.execute(VideoPlayerUseCase.PlayerRequest(query))
                 .map { playerSearchVideoResult: VideoResult<VideoPlayerUseCase.PlayerResponse> ->
-                    cacheRelatedVideos(playerSearchVideoResult)
+                    val uiResult: UiState<@JvmSuppressWildcards Flow<PagingData<YoutubeVideoUiModel>>> =
+                        videoPlayerConverter.convertResult(playerSearchVideoResult)
+
+                    cacheVideos(uiResult)
                 }
                 .flowOn(dispatcher)
                 .collect { uiState: UiState<Flow<PagingData<YoutubeVideoUiModel>>> ->
@@ -103,13 +105,12 @@ class VideoPlayerViewModel @Inject constructor(
         }
     }
 
-    private fun cacheRelatedVideos(relatedVideosResult: VideoResult<VideoPlayerUseCase.PlayerResponse>)
-        : UiState<@JvmSuppressWildcards Flow<PagingData<YoutubeVideoUiModel>>> {
-        val relatedVideoFlow: Flow<PagingData<YoutubeVideoDomain>>? =
-            videoPlayerConverter.unpack(relatedVideosResult)?.cachedIn(viewModelScope)
-        return if (relatedVideoFlow != null) videoPlayerConverter.convertSuccessVideo(relatedVideoFlow)
-        else videoPlayerConverter.convert(relatedVideosResult)
+    private fun cacheVideos(videoResult: UiState<@JvmSuppressWildcards Flow<PagingData<YoutubeVideoUiModel>>>)
+            : UiState<Flow<PagingData<YoutubeVideoUiModel>>> {
 
+        return if (videoResult is UiState.Success)
+            UiState.Success(videoResult.data.cachedIn(viewModelScope))
+        else videoResult
     }
 
     fun updateVideoPlayState(isPlaying: Boolean) {
